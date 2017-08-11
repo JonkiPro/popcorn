@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="../static/css/newQuickMessage.css" th:href="@{/css/newQuickMessage.css}"/>
+    <link rel="stylesheet" th:href="#{bootstrap.css}"/>
+    <title th:text="#{newQuickMessage.title}">New a quick message</title>
+</head>
+<body>
+<div class="container">
+    <!-- NAVBAR -->
+    <nav data-th-replace="/include/navbar::navbar"></nav>
+
+    <div class="row">
+        <div class="tab-content">
+            <div class="content-container clearfix">
+                <h1 class="content-title"><span th:text="#{newQuickMessage.title}">New a quick message</span></h1>
+                <div class="col-md-12">
+                    <form role="form" id="sendMessageForm">
+                        <div class="form-group">
+                            <input name="username" id="username" th:value="${username}" type="text" class="form-control" readonly="readonly"/>
+                        </div>
+                        <div class="form-group">
+                            <input name="subject" id="subject" type="text" class="form-control" maxlength="255" th:placeholder="#{newQuickMessage.inputSubject}"/>
+                        </div>
+                        <textarea name="text" id="text" class="form-control" maxlength="4000" th:placeholder="#{newQuickMessage.inputText}"></textarea>
+                        <div class="btn-send">
+                            <button class="btn btn-success btn-lg"><span class="glyphicon glyphicon-send"></span>
+                                <span th:text="#{newQuickMessage.btnSend}">SEND</span></button>
+                        </div>
+                    </form>
+                    <a th:href="'/profile/' + ${username}"><button class="btn btn-danger btn-lg"><span class="glyphicon glyphicon-arrow-left"></span>
+                        <span th:text="#{newQuickMessage.btnCancel}">CANCEL</span></button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- FOOTER -->
+    <footer data-th-replace="/include/footer::footer"></footer>
+
+
+    <script type="text/javascript" th:src="#{jquery.js}"></script>
+    <script type="text/javascript" th:src="#{bootstrap.js}"></script>
+    <script type="text/javascript" th:src="#{jquery_validation.js}"></script>
+    <script type="text/javascript" src="../static/js/newQuickMessage.js" th:src="@{/js/newQuickMessage.js}"></script>
+</body>
+</html>

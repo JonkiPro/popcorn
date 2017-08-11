@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="../static/css/messages.css" th:href="@{/css/messages.css}"/>
+    <link rel="stylesheet" th:href="#{bootstrap.css}"/>
+    <title th:text="#{showReceivedMessage.title}">Received message</title>
+</head>
+<body data-ng-app="app" data-ng-controller="ShowReceivedMessageController">
+<div class="container">
+    <!-- NAVBAR -->
+    <nav data-th-replace="/include/navbar::navbar"></nav>
+
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="btn-compose pull-left">
+                <a type="button" class="btn btn-success navbar-btn" th:href="@{/message/new}">
+                    <span class="glyphicon glyphicon-pencil"></span> <span th:text="#{showReceivedMessage.btnNewMessage}">New message</span></a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a th:href="@{/messages}"><span th:text="#{showReceivedMessage.btnMessages}">Messages</span></a></li>
+            </ul>
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <div class="tab-content">
+        <input type="hidden" id="messageId" th:value="${messageId}"/>
+        <div class="content-container clearfix">
+            <h1 class="content-title"><span th:text="#{showReceivedMessage.title}">Received message</span></h1>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <a data-ng-href="/profile/{{message.sender}}"><input data-ng-model="message.sender" id="sender" type="text" class="form-control" style="font-weight:bold;" readonly="readonly"/></a>
+                </div>
+                <div class="form-group">
+                    <input data-ng-model="message.subject" type="text" class="form-control" readonly="readonly"/>
+                </div>
+                <textarea data-ng-model="message.text" class="form-control" readonly="readonly"></textarea>
+                <div class="btn-send">
+                    <button data-ng-click="removeMessage()" class="btn btn-danger btn-lg"><span
+                            class="glyphicon glyphicon-remove"></span> <span th:text="#{showReceivedMessage.btnRemove}">REMOVE</span>
+                    </button>
+                    <button data-ng-click="replyMessage={'display':''}" class="btn btn-success btn-lg"><span
+                            class="glyphicon glyphicon-send"></span> <span th:text="#{showReceivedMessage.btnReply}">REPLY</span>
+                    </button>
+                    <p class="pull-right" style="margin-top: 5px;">Date of read: {{message.date_of_read | date:'dd/MM/yyyy HH:mm:ss'}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div data-ng-style="replyMessage" class="tab-content" style="display:none;">
+        <div class="content-container clearfix">
+            <div class="col-md-12">
+                <form role="form" id="replyMessageForm">
+                    <div class="form-group">
+                        <input name="subject" id="subject" type="text" class="form-control" th:placeholder="#{showReceivedMessage.inputSubject}"/>
+                    </div>
+                    <textarea name="text" id="text" class="form-control" th:placeholder="#{showReceivedMessage.inputText}"></textarea>
+                    <div class="btn-send">
+                        <button class="btn btn-success btn-lg"><span
+                                class="glyphicon glyphicon-send"></span> <span th:text="#{showReceivedMessage.btnSend}">SEND</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- FOOTER -->
+    <footer data-th-replace="/include/footer::footer"></footer>
+
+
+    <script type="text/javascript" th:src="#{jquery.js}"></script>
+    <script type="text/javascript" th:src="#{bootstrap.js}"></script>
+    <script type="text/javascript" th:src="#{jquery_validation.js}"></script>
+    <script type="text/javascript" src="../static/js/showReceivedMessage.js" th:src="@{/js/showReceivedMessage.js}"></script>
+    <script type="text/javascript" th:src="#{angular.js}"></script>
+    <script type="text/javascript" src="../static/app/showReceivedMessage.js" th:src="@{/app/showReceivedMessage.js}"></script>
+</body>
+</html>

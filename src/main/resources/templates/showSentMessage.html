@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="../static/css/messages.css" th:href="@{/css/messages.css}"/>
+    <link rel="stylesheet" th:href="#{bootstrap.css}"/>
+    <title th:text="#{showSentMessage.title}">Sent message</title>
+</head>
+<body data-ng-app="app" data-ng-controller="ShowSentMessageController">
+<div class="container">
+    <!-- NAVBAR -->
+    <nav data-th-replace="/include/navbar::navbar"></nav>
+
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="btn-compose pull-left">
+                <a type="button" class="btn btn-success navbar-btn" th:href="@{/message/new}">
+                    <span class="glyphicon glyphicon-pencil"></span> <span th:text="#{showSentMessage.btnNewMessage}">New message</span></a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a th:href="@{/messages}"><span th:text="#{showSentMessage.btnMessages}">Messages</span></a></li>
+            </ul>
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <div class="tab-content">
+        <input type="hidden" id="messageId" th:value="${messageId}"/>
+        <div class="content-container clearfix">
+            <h1 class="content-title"><span th:text="#{showSentMessage.title}">Sent message</span></h1>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <a data-ng-href="/profile/{{message.recipient}}"><input data-ng-model="message.recipient" type="text" class="form-control" style="font-weight:bold;" readonly="readonly"/></a>
+                </div>
+                <div class="form-group">
+                    <input data-ng-model="message.subject" type="text" class="form-control" readonly="readonly"/>
+                </div>
+                <textarea data-ng-model="message.text" class="form-control" readonly="readonly"></textarea>
+                <div class="btn-send">
+                    <button data-ng-click="removeMessage()" class="btn btn-danger btn-lg"><span
+                            class="glyphicon glyphicon-remove"></span> <span th:text="#{showSentMessage.btnRemove}">REMOVE</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- FOOTER -->
+    <footer data-th-replace="/include/footer::footer"></footer>
+
+
+    <script type="text/javascript" th:src="#{jquery.js}"></script>
+    <script type="text/javascript" th:src="#{bootstrap.js}"></script>
+    <script type="text/javascript" th:src="#{angular.js}"></script>
+    <script type="text/javascript" src="../static/app/showSentMessage.js" th:src="@{/app/showSentMessage.js}"></script>
+</body>
+</html>

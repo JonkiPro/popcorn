@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="../static/css/settings.css" th:href="@{/css/settings.css}"/>
+    <link rel="stylesheet" th:href="#{bootstrap.css}"/>
+    <title th:text="#{settings.title}">Settings</title>
+</head>
+<body>
+<div class="container">
+    <!-- NAVBAR -->
+    <nav data-th-replace="/include/navbar::navbar"></nav>
+
+    <div class="row">
+        <div class="col-md-6 panel1">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <div th:if="${success}" class="alert alert-dismissable alert-success">
+                        <span th:text="#{settings.successChangeEmail}">An e-mail has been successfully sent on your new e-mail. Please allow a few minutes for it to get to your inbox!</span>
+                    </div>
+                    <form role="form" id="changeEmailForm">
+                        <div class="form-group">
+                            <h2><span th:text="#{settings.changeEmail}">Change e-mail</span></h2>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="password" th:text="#{settings.password}">Password</label>
+                            <input name="password" id="password" type="password" maxlength="36" class="form-control"
+                                   th:placeholder="#{settings.password}"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="email" th:text="#{settings.newEmail}">New e-mail</label>
+                            <input name="email" id="email" type="email" class="form-control"
+                                   th:placeholder="#{settings.newEmail}"/>
+                        </div>
+                        <div class="form-group">
+                            <button id="changeEmailSubmit" type="submit" class="btn btn-info btn-block"><span
+                                    th:text="#{settings.btnChangeEmail}">Change e-mail</span></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 panel2">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <div th:if="${success}" class="alert alert-dismissable alert-success">
+                        <span th:text="#{settings.successChangePassword}">Your password has been changed.</span>
+                    </div>
+                    <form role="form" id="changePasswordForm">
+                        <div class="form-group">
+                            <h2><span th:text="#{settings.changePassword}">Change password</span></h2>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="oldPassword" th:text="#{settings.password}">Password</label>
+                            <input name="oldPassword" id="oldPassword" type="password" maxlength="36" class="form-control"
+                                   th:placeholder="#{settings.password}"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="newPassword" th:text="#{settings.newPassword}">New password</label>
+                            <input name="newPassword" id="newPassword" type="password" maxlength="36" class="form-control"
+                                   th:placeholder="#{settings.newPassword}"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="newPasswordAgain" th:text="#{settings.newPasswordAgain}">New password again</label>
+                            <input name="newPasswordAgain" id="newPasswordAgain" type="password" maxlength="36" class="form-control"
+                                   th:placeholder="#{settings.newPasswordAgain}"/>
+                        </div>
+                        <div class="form-group">
+                            <button id="changePasswordSubmit" type="submit" class="btn btn-info btn-block"><span
+                                    th:text="#{settings.btnChangePassword}">Change password</span></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- FOOTER -->
+    <footer data-th-replace="/include/footer::footer"></footer>
+
+
+    <script type="text/javascript" th:src="#{jquery.js}"></script>
+    <script type="text/javascript" th:src="#{bootstrap.js}"></script>
+    <script type="text/javascript" th:src="#{jquery_validation.js}"></script>
+    <script type="text/javascript" src="../static/js/settings.js" th:src="@{/js/settings.js}"></script>
+</body>
+</html>

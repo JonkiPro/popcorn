@@ -1,0 +1,44 @@
+body {
+    background-color:#F7F7F7;
+    font-family: 'Open Sans', sans-serif;
+}
+/*Forms setup*/
+.form-control {
+    border-radius:0;
+    box-shadow:none;
+    height:auto;
+}
+.float-label{
+    font-size:10px;
+}
+input[type="text"].form-control,
+input[type="search"].form-control{
+    border:none;
+    border-bottom:1px dotted #CFCFCF;
+}
+textarea {
+    border:1px dotted #CFCFCF!important;
+    height:130px!important;
+}
+/*Content Container*/
+.content-container {
+    background-color:#fff;
+    padding:35px 20px;
+    margin-bottom:20px;
+}
+h1.content-title{
+    font-size:32px;
+    font-weight:300;
+    text-align:center;
+    margin-top:0;
+    margin-bottom:20px;
+    font-family: 'Open Sans', sans-serif!important;
+}
+/*Compose*/
+.btn-send{
+    text-align:center;
+    margin-top:20px;
+}
+.error {
+    color: red;
+}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" th:href="#{bootstrap.css}"/>
+    <title>index</title>
+</head>
+<body>
+<div class="container">
+    <div data-th-replace="/include/navbar::navbar"></div>
+
+
+    <div data-th-replace="/include/footer::footer"></div>
+</div>
+
+
+
+    <script type="text/javascript" th:src="#{jquery.js}"></script>
+    <script type="text/javascript" th:src="#{bootstrap.js}"></script>
+</body>
+</html>

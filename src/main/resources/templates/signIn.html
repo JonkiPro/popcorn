@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="../static/css/bootstrap/bootstrap.css" th:href="@{/css/bootstrap/bootstrap.css}" />
+    <link rel="stylesheet" href="../static/css/signIn.css" th:href="@{/css/signIn.css}" />
+    <title th:text="#{signIn.title}">Sign in</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <div th:if="${param.error}" class="alert alert-dismissable alert-danger">
+                        <span th:text="#{signIn.error}">The username or password is incorrect!</span>
+                    </div>
+                    <form th:action="@{/signIn}" method="POST" role="form" id="signInForm">
+                        <div class="form-group">
+                            <h2><span th:text="#{signIn.title}">Sign in</span></h2>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="username"><span th:text="#{signIn.username}">Username</span></label>
+                            <input th:name="username" id="username" type="text" maxlength="36" class="form-control" th:placeholder="#{signIn.username}"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="password"><span th:text="#{signIn.password}">Password</span></label>
+                            <input th:name="password" id="password" type="password" maxlength="36" class="form-control" th:placeholder="#{signIn.password}"/>
+                        </div>
+                        <div class="form-group">
+                            <button id="signInSubmit" type="submit" class="btn btn-info btn-block"><span th:text="#{signIn.textOnButton}">Sign in</span></button>
+                        </div>
+                        <p>
+                            <span th:text="#{signIn.haveYouForgottenYourPasswordOrUsername}">Have you forgotten your password or username? </span>
+                            <a th:href="@{/forgotPassword}"><span th:text="#{signIn.recoverPassword}">Recover password </span></a>
+                            <span th:text="#{signIn.or}">or </span>
+                            <a th:href="@{/forgotUsername}"><span th:text="#{signIn.recoverUsername}">Recover username </span></a>
+                        </p>
+                        <hr />
+                        <p>
+                            <span th:text="#{signIn.newToTheSite}">New to the site? </span>
+                            <a th:href="@{/register}"><span th:text="#{signIn.createAccount}">Create account</span></a>
+                        </p>
+                        <hr />
+                        <p>
+                            <span th:text="#{signIn.goBackToTheHomepage}">Go back to the homepage</span>
+                            <a th:href="@{/}"><span th:text="#{signIn.go}">GO</span></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript" th:src="#{jquery.js}"></script>
+    <script type="text/javascript" th:src="#{jquery_validation.js}"></script>
+    <script type="text/javascript" src="../static/js/signIn.js" th:src="@{/js/signIn.js}"></script>
+</body>
+</html>

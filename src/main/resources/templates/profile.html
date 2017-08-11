@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="../static/css/profile.css" th:href="@{/css/profile.css}"/>
+    <link rel="stylesheet" th:href="#{bootstrap.css}"/>
+    <title th:text="#{profile.title} + ' - ' + ${username}">Profile</title>
+</head>
+<body data-ng-app="app" data-ng-controller="ProfileController">
+<div class="container">
+    <!-- NAVBAR -->
+    <nav data-th-replace="/include/navbar::navbar"></nav>
+
+    <input type="hidden" th:value="${username}" id="username" />
+
+        <div class="row">
+            <div class="col-sm-10">
+                <h1 class="username"><label>{{profile.username}}</label></h1>
+                <div sec:authorize="isAuthenticated()" class="btn-group">
+                    <button data-ng-click="sendAction()" data-ng-model="btnAction" class="btn btn-info">
+                        <span class="glyphicon glyphicon-user"></span> {{btnText}}
+                    </button>
+                    <a data-ng-href="/message/new?username={{profile.username}}">
+                        <button type="button" class="btn btn-success">
+                            <span class="glyphicon glyphicon-envelope"></span> <span th:text="#{profile.btnSendMessage}">Send a message!</span>
+                        </button>
+                    </a>
+                </div>
+                <br />
+            </div>
+            <div class="col-sm-2"><a href="#" class="pull-right"><img title="profile image" class="img-circle img-responsive" src="#"/></a>
+
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-3">
+                <!--left col-->
+                <ul class="list-group">
+                    <li class="list-group-item text-muted" contenteditable="false"><span th:text="#{profile.title}">Profile</span></li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong class=""><span th:text="#{profile.username}">Username</span></strong></span>{{profile.username}}</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong class="">Xxxxxx</strong></span>xxx</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong class="">Xxxxxx</strong></span>xxx</li>
+                </ul>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Here will be something.
+
+                    </div>
+                    <div class="panel-body"><i style="color:green" class="fa fa-check-square"></i> Here will be something.
+
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Here will be something. <i class="fa fa-link fa-1x"></i>
+
+                    </div>
+                    <div class="panel-body"><a href="#" class="">Friends 0 </a>
+
+                    </div>
+                </div>
+
+                <ul class="list-group">
+                    <li class="list-group-item text-muted">Statistics<i class="fa fa-dashboard fa-1x"></i>
+
+                    </li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong class="">Something</strong></span> #</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong class="">Something</strong></span> #</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong class="">Something</strong></span> #</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong class="">Something</strong></span> #</li>
+                </ul>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Here will be something.</div>
+                    <div class="panel-body">	<i class="fa fa-facebook fa-2x"></i>  <i class="fa fa-github fa-2x"></i>
+                        <i class="fa fa-twitter fa-2x"></i> <i class="fa fa-pinterest fa-2x"></i>  <i class="fa fa-google-plus fa-2x"></i>
+
+                    </div>
+                </div>
+            </div>
+            <!--/col-3-->
+            <div class="col-sm-9" contenteditable="false">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Here will be something.</div>
+                    <div class="panel-body"> Here will be something.
+
+                    </div>
+                </div>
+                <div class="panel panel-default target">
+                    <div class="panel-heading" contenteditable="false">Here will be something.</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="thumbnail">
+                                    <img alt="300x200" src="#"/>
+                                    <div class="caption">
+                                        <h3>
+                                            Jonki
+                                        </h3>
+                                        <p>
+                                            Here will be something.
+                                        </p>
+                                        <p>
+
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="thumbnail">
+                                    <img alt="300x200" src="#"/>
+                                    <div class="caption">
+                                        <h3>
+                                            Jonki
+                                        </h3>
+                                        <p>
+                                            Here will be something.
+                                        </p>
+                                        <p>
+
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="thumbnail">
+                                    <img alt="300x200" src="#"/>
+                                    <div class="caption">
+                                        <h3>
+                                            Jonki
+                                        </h3>
+                                        <p>
+                                            Here will be something.
+                                        </p>
+                                        <p>
+
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Here will be something.</div>
+                    <div class="panel-body"> Here will be something.
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="push"></div>
+        </div>
+</div>
+
+    <!-- FOOTER -->
+    <footer data-th-replace="/include/footer::footer"></footer>
+
+
+    <script type="text/javascript" th:src="#{jquery.js}"></script>
+    <script type="text/javascript" th:src="#{bootstrap.js}"></script>
+    <script type="text/javascript" th:src="#{angular.js}"></script>
+    <script type="text/javascript" src="../static/app/profile.js" th:src="@{/app/profile.js}"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head></head>
+<body>
+
+<nav class="navbar navbar-default" role="navigation" data-th-fragment="navbar">
+
+    <link rel="stylesheet" href="../static/css/include/navbar.css" th:href="@{/css/include/navbar.css}"/>
+
+    <div class="container-fluid navbar-border">
+
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/}">JONKI</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="#"><span th:text="#{navbar.about}">About</span></a></li>
+                <li><a href="#"><span th:text="#{navbar.contact}">Contact</span></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span th:text="#{navbar.community}">Community</span><span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a th:href="@{/users}"><span th:text="#{navbar.users}">Users</span></a></li>
+                        <li class="divider"></li>
+                        <li><a th:href="@{/messages}"><span th:text="#{navbar.messages}">Messages</span></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="input-group my-group">
+                        <form th:action="@{/search}" method="get" class="navbar-form navbar-search" role="search">
+                            <select th:name="type" class="form-control">
+                                <option th:name="user" value="user"><span th:text="#{navbar.user}">User</span></option>
+                                <option th:name="movie" value="movie" disabled="disabled"><span th:text="#{navbar.movie}">Movie</span></option>
+                            </select>
+
+                            <div class="input-group">
+
+                                <input th:name="q" type="text" class="form-control input-search"/>
+
+                                <div class="input-group-btn">
+                                    <button type="submit" class="btn btn-search btn-default dropdown-toggle"
+                                            id="btnSearch">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+
+            <ul sec:authorize="isAnonymous()" class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a th:href="@{/signIn}"><b><span th:text="#{navbar.signIn}">Sign in</span></b></a>
+                </li>
+                <li class="dropdown">
+                    <a th:href="@{/register}"><b><span th:text="#{navbar.register}">Register</span></b></a>
+                </li>
+            </ul>
+
+            <ul sec:authorize="isAuthenticated()" class="nav navbar-nav navbar-right">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-user"></span> 
+                            <strong sec:authentication="name">Username</strong>
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <div class="navbar-login">
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <p class="text-center">
+                                                <span class="glyphicon glyphicon-user icon-size"></span>
+                                            </p>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <p class="text-left"><strong sec:authentication="name">Username</strong></p>
+                                            <p class="text-left small">XXXXXXXXX</p>
+                                            <p class="text-left">
+                                                <a th:href="@{/settings}" class="btn btn-primary btn-block btn-sm">
+                                                    <span class="glyphicon glyphicon-cog"></span> <span th:text="#{navbar.settings}">Settings</span>
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <div class="navbar-login navbar-login-session">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <p>
+                                                <a th:href="@{/logout}" class="btn btn-danger btn-block">
+                                                    <span class="glyphicon glyphicon-log-out"></span> <span th:text="#{navbar.logout}">Logout</span>
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+
+    <script type="text/javascript" src="../static/js/include/navbar.js" th:src="@{/js/include/navbar.js}"></script>
+
+</nav>
+
+</body>
+</html>

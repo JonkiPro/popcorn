@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="../static/css/messages.css" th:href="@{/css/messages.css}"/>
+    <link rel="stylesheet" th:href="#{bootstrap.css}"/>
+    <title th:text="#{newMessage.title}">New message</title>
+</head>
+<body>
+<div class="container">
+    <!-- NAVBAR -->
+    <nav data-th-replace="/include/navbar::navbar"></nav>
+
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="btn-compose pull-left">
+                <a type="button" class="btn btn-success navbar-btn" th:href="@{/message/new}">
+                    <span class="glyphicon glyphicon-pencil"></span> <span th:text="#{newMessage.btnNewMessage}">New message</span></a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a th:href="@{/messages}"><span th:text="#{newMessage.btnMessages}">Messages</span></a></li>
+            </ul>
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <div class="tab-content">
+        <div class="content-container clearfix">
+            <h1 class="content-title"><span th:text="#{newMessage.title}">New message</span></h1>
+            <div class="col-md-12">
+                <form role="form" id="sendMessageForm">
+                    <div class="form-group">
+                        <input name="username" id="username" type="text" class="form-control" th:placeholder="#{newMessage.inputTo}"/>
+                    </div>
+                    <div class="form-group">
+                        <input name="subject" id="subject" type="text" class="form-control" maxlength="255" th:placeholder="#{newMessage.inputSubject}"/>
+                    </div>
+                    <textarea name="text" id="text" class="form-control" maxlength="4000" th:placeholder="#{newMessage.inputText}"></textarea>
+                    <div class="btn-send">
+                        <button class="btn btn-success btn-lg">
+                            <span class="glyphicon glyphicon-send"></span> <span th:text="#{newMessage.btnSend}">SEND</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- FOOTER -->
+    <footer data-th-replace="/include/footer::footer"></footer>
+
+
+    <script type="text/javascript" th:src="#{jquery.js}"></script>
+    <script type="text/javascript" th:src="#{bootstrap.js}"></script>
+    <script type="text/javascript" th:src="#{jquery_validation.js}"></script>
+    <script type="text/javascript" src="../static/js/newMessage.js" th:src="@{/js/newMessage.js}"></script>
+</body>
+</html>

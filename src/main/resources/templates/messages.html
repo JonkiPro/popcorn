@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="../static/css/messages.css" th:href="@{css/messages.css}"/>
+    <link rel="stylesheet" th:href="#{bootstrap.css}"/>
+    <title th:text="#{messages.title}">Messages</title>
+</head>
+<body data-ng-app="app" data-ng-controller="MessagesController">
+<div class="container">
+    <!-- NAVBAR -->
+    <nav data-th-replace="/include/navbar::navbar"></nav>
+
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="btn-compose pull-left">
+                <a type="button" class="btn btn-success navbar-btn" th:href="@{/message/new}">
+                    <span class="glyphicon glyphicon-pencil"></span> <span th:text="#{messages.btnNewMessage}">New message</span>
+                </a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a data-ng-click="getReceivedMessages()" href="" role="tab" data-toggle="tab"><span th:text="#{messages.btnReceivedMessages}">Received messages</span></a></li>
+                <li><a data-ng-click="getSentMessages()" href="" role="tab" data-toggle="tab"><span th:text="#{messages.btnSentMessages}">Sent messages</span></a></li>
+            </ul>
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="Messages">
+            <div class="content-container clearfix">
+                <div class="col-md-12">
+                    <h1 class="content-title">{{typeOfMessages}} ({{numberOfMessages}})</h1>
+                    <form action="" th:method="POST">
+                        <input th:name="search" data-ng-keyup="getMessagesByText()" id="search-value" type="search" th:placeholder="#{messages.searchMessages}" class="form-control mail-search"/>
+                    </form>
+                    <label>{{noResults}}</label>
+                    <ul class="mail-list" data-ng-repeat="message in messages">
+                        <li>
+                            <a data-ng-href="/message/{{message.id}}">
+                                <span class="mail-sender">{{message.sender}}</span>
+                                <span class="mail-sender">{{message.recipient}}</span>
+                                <span class="mail-subject">{{message.subject}}</span>
+                                <span class="mail-message-preview">{{message.text}}</span>
+                                <span class="mail-message-preview pull-right">{{message.date | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- FOOTER -->
+    <footer data-th-replace="/include/footer::footer"></footer>
+
+
+    <script type="text/javascript" th:src="#{jquery.js}"></script>
+    <script type="text/javascript" th:src="#{bootstrap.js}"></script>
+    <script type="text/javascript" th:src="#{angular.js}"></script>
+    <script type="text/javascript" src="../static/app/messages.js" th:src="@{/app/messages.js}"></script>
+</body>
+</html>
