@@ -6,8 +6,8 @@
 *  Spring Boot
 *  Spring Data
 *  Spring Security
-*  Hibernate / ORM / JPA
-*  MySQL
+*  Hibernate / JPA / ORM
+*  MySQL / SQL
 *  Lombok
 *  JSONDoc
 *  Mail
