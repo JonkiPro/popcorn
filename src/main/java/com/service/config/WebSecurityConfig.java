@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -43,6 +45,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${invalid.session.url}") String invalidSessionUrl;
     @Value("${maximum.sessions}") int maximumSessions;
     @Value("${expired.url}") String expiredUrl;
+
+    // Remember Me
+    @Value("${remember.me.parameter}") String rememberMeParameter;
+    @Value("${remember.me.cookie.name}") String rememberMeCookieName;
+    @Value("${token.validity.seconds}") int tokenValiditySeconds;
 
     // Authentication Manager
     @Value("${users.by.username.query}") String usersByUsernameQuery;
@@ -82,6 +89,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .maximumSessions(maximumSessions)
                         .expiredUrl(expiredUrl).and()
                 .and()
+                    .rememberMe()
+                        .rememberMeParameter(rememberMeParameter)
+                        .rememberMeCookieName(rememberMeCookieName)
+                        .tokenValiditySeconds(tokenValiditySeconds)
+                        .tokenRepository(persistentTokenRepository())
+                .and()
                     .csrf().disable();
     }
 
@@ -92,6 +105,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .dataSource(dataSource)
                 .usersByUsernameQuery(usersByUsernameQuery)
                 .authoritiesByUsernameQuery(authoritiesByUsernameQuery);
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl impl = new JdbcTokenRepositoryImpl();
+        impl.setDataSource(dataSource);
+        return impl;
     }
 
     @Bean

@@ -3,6 +3,7 @@
 
 # Intellij Idea project files
 .idea/
+out/
 *.iml
 
 # project binaries

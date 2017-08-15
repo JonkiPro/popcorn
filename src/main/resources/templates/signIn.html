@@ -26,6 +26,11 @@
                             <label class="control-label" for="password"><span th:text="#{signIn.password}">Password</span></label>
                             <input th:name="password" id="password" type="password" maxlength="36" class="form-control" th:placeholder="#{signIn.password}"/>
                         </div>
+                        <label for="remember" class="btn btn-primary">
+                            <span th:text="#{signIn.rememberMe}">Remember Me</span>
+                            <input id="remember" type="checkbox" name="remember-me" class="badgebox">
+                            <span class="badge">&check;</span>
+                        </label>
                         <div class="form-group">
                             <button id="signInSubmit" type="submit" class="btn btn-info btn-block"><span th:text="#{signIn.textOnButton}">Sign in</span></button>
                         </div>

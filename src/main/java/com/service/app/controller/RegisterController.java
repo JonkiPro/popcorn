@@ -2,6 +2,7 @@ package com.service.app.controller;
 
 import com.service.app.dto.in.RegisterDTO;
 import com.service.app.exception.ActivationTokenNotFoundException;
+import com.service.app.security.SecurityRole;
 import com.service.app.utils.EncryptUtils;
 import com.service.app.entity.User;
 import com.service.app.converter.UnidirectionalConverter;
@@ -60,7 +61,7 @@ public class RegisterController {
 
         User user = converterRegisterDTOToUser.convert(registerDTO);
         user.setActivationToken(EncryptUtils.encrypt(user.getUsername()));
-        user.setAuthorities("ROLE_USER");
+        user.setAuthorities(SecurityRole.ROLE_USER.toString());
 
         mailService.sendMailWithActivationToken(user.getEmail(), user.getActivationToken());
 
