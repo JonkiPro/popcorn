@@ -30,25 +30,15 @@ public class ForgotController {
     @Autowired
     private MailService mailService;
 
-    /**
-     * @param modelMap {@link ModelMap}
-     * @return Returns the ModelAndView for the page that is responsible for sending the email with the username.
-     */
     @GetMapping("/forgotUsername")
     public ModelAndView showFormForgotUsername(
             ModelMap modelMap
     ) {
         modelMap.addAttribute("forgotUsernameDTO", new ForgotUsernameDTO());
 
-        return new ModelAndView("forgotUsername", modelMap);
+        return new ModelAndView("forgotUsername");
     }
 
-    /**
-     * @param forgotUsernameDTO A form to remind the user's name.
-     * @param result {@link BindingResult}
-     * @param modelMap {@link ModelMap}
-     * @return Returns the ModelAndView for the page that is responsible for sending the email with the username.
-     */
     @PostMapping("/forgotUsername")
     public ModelAndView recoverUsername(
             @ModelAttribute("forgotUsernameDTO") @Valid ForgotUsernameDTO forgotUsernameDTO,
@@ -58,7 +48,7 @@ public class ForgotController {
         if(result.hasErrors()) {
             modelMap.addAttribute("error", true);
 
-            return new ModelAndView("forgotUsername", modelMap);
+            return new ModelAndView("forgotUsername");
         }
 
         Optional<User> userOptional = userService.findByEmail(forgotUsernameDTO.getEmail());
@@ -74,10 +64,6 @@ public class ForgotController {
         return new ModelAndView("forgotUsername", modelMap);
     }
 
-    /**
-     * @param modelMap {@link ModelMap}
-     * @return Returns the ModelAndView for the page that is responsible for sending the email with the password.
-     */
     @GetMapping("/forgotPassword")
     public ModelAndView showFormForgotPassword(
             ModelMap modelMap
@@ -87,12 +73,6 @@ public class ForgotController {
         return new ModelAndView("forgotPassword", modelMap);
     }
 
-    /**
-     * @param forgotPasswordDTO A form to send a new password.
-     * @param result {@link BindingResult}
-     * @param modelMap {@link ModelMap}
-     * @return Returns the ModelAndView for the page that is responsible for sending the email with the password.
-     */
     @PutMapping("/forgotPassword")
     public ModelAndView recoverPassword(
             @ModelAttribute("forgotPasswordDTO") @Valid ForgotPasswordDTO forgotPasswordDTO,

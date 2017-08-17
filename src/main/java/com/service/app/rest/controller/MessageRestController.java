@@ -157,7 +157,6 @@ public class MessageRestController {
     }
 
     @ApiMethod(description = "Set the date to read the message by ID", verb = ApiVerb.PUT)
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No messages found") })
     @PutMapping(value = "/setDateOfRead")
     @SuppressWarnings("ConstantConditions")
     public @ApiResponseObject
@@ -183,10 +182,6 @@ public class MessageRestController {
         return ResponseEntity.ok(message.getDateOfRead());
     }
 
-    /**
-     * This method checks to see if the message belongs to the user.
-     * @param messageId The message ID.
-     */
     private void validAccessToMessage(Long messageId) {
         List<Message> messageList = messageService.findBySender(authorizationService.getUserId());
         messageList.addAll(messageService.findByRecipient(authorizationService.getUserId()));
