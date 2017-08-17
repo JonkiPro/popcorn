@@ -17,11 +17,19 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /**
+     * @return Returns the ModelAndView for the list of users.
+     */
     @GetMapping("/users")
     public ModelAndView users() {
         return new ModelAndView("users");
     }
 
+    /**
+     * @param username The user's name.
+     * @param modelMap {@link ModelMap}
+     * @return Returns the ModelAndView for the user profile.
+     */
     @GetMapping("/profile/{username}")
     public ModelAndView getProfile(
             @PathVariable String username,
@@ -34,6 +42,10 @@ public class UserController {
         return new ModelAndView("profile", modelMap);
     }
 
+    /**
+     * This method checks to see if the user exists.
+     * @param username The user's name.
+     */
     private void validUserExistence(String username) {
         userService.findAll().stream()
                 .filter(v -> username.equals(v.getUsername()))

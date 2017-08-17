@@ -2,6 +2,10 @@ package com.service.app.utils;
 
 public class RandomUtils {
 
+    /**
+     * This method generates a password.
+     * @return Returns the generated password.
+     */
     public static String randomPassword() {
         char[] alphabet = ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789").toCharArray();
 
