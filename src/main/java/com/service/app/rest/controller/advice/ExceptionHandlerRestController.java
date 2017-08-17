@@ -21,6 +21,10 @@ public class ExceptionHandlerRestController {
     @Autowired
     private MessageSource messageSource;
 
+    /**
+     * @param ex {@link MethodArgumentNotValidException}
+     * @return Returns the process of creating an object with a list of error fields.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorDTO processValidationError(MethodArgumentNotValidException ex) {
@@ -30,6 +34,10 @@ public class ExceptionHandlerRestController {
         return processFieldErrors(fieldErrors);
     }
 
+    /**
+     * @param fieldErrors List with fields containing errors. {@link FieldError}
+     * @return Returns an object containing a list of error fields.
+     */
     private ValidationErrorDTO processFieldErrors(List<FieldError> fieldErrors) {
         ValidationErrorDTO dto = new ValidationErrorDTO();
 
@@ -41,6 +49,10 @@ public class ExceptionHandlerRestController {
         return dto;
     }
 
+    /**
+     * @param fieldError Encapsulates a field error, that is, a reason for rejecting a specific field value. {@link FieldError}
+     * @return Returns an error message for the current location.
+     */
     private String resolveLocalizedErrorMessage(FieldError fieldError) {
         Locale currentLocale =  LocaleContextHolder.getLocale();
 

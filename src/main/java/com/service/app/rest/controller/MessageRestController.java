@@ -157,6 +157,7 @@ public class MessageRestController {
     }
 
     @ApiMethod(description = "Set the date to read the message by ID", verb = ApiVerb.PUT)
+    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No messages found") })
     @PutMapping(value = "/setDateOfRead")
     @SuppressWarnings("ConstantConditions")
     public @ApiResponseObject

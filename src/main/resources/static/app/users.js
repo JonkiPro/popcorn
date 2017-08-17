@@ -11,10 +11,7 @@ app.controller('UsersController', function ($scope, $http) {
         angular.element('#search-value').val('');
         $scope.pageSize = 1;
         $scope.page=1;
-
-        console.log('he');
     }
-    console.log('he');
 
     init();
 
