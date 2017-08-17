@@ -19,18 +19,11 @@ public class SettingsController {
     @Autowired
     private UserService userService;
 
-    /**
-     * @return Returns the ModelAndView for the account settings page.
-     */
     @GetMapping
     public ModelAndView settings() {
         return new ModelAndView("settings");
     }
 
-    /**
-     * @param token E-mail change token.
-     * @return Returns the ModelAndView, which redirects to the login page.
-     */
     @GetMapping("/changeEmail/thanks")
     public ModelAndView emailChangeToken(
             @RequestParam("token") String token

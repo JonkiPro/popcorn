@@ -11,14 +11,6 @@ import org.springframework.web.servlet.ModelAndView;
 @PreAuthorize("permitAll()")
 public class SearchController {
 
-    /**
-     * @param type Type of data sought.
-     * @param q Search for a phrase.
-     * @param page Page number.
-     * @param pageSize Number of items per page.
-     * @param modelMap {@link ModelMap}
-     * @return Returns the ModelAndView for a list of users (or a list of movies( in the future )).
-     */
     @GetMapping("/search")
     public ModelAndView search(
             @RequestParam String type,
@@ -32,6 +24,6 @@ public class SearchController {
         modelMap.addAttribute("page", page);
         modelMap.addAttribute("pageSize", pageSize);
 
-        return new ModelAndView("users", modelMap);
+        return new ModelAndView("users");
     }
 }

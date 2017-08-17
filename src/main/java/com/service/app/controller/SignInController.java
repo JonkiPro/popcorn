@@ -11,9 +11,6 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/signIn")
 public class SignInController {
 
-    /**
-     * @return Returns the ModelAndView for the login page.
-     */
     @GetMapping
     public ModelAndView signIn() {
         return new ModelAndView("signIn");
