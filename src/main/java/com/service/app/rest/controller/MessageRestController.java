@@ -182,6 +182,10 @@ public class MessageRestController {
         return ResponseEntity.ok(message.getDateOfRead());
     }
 
+    /**
+     * This method checks to see if the message belongs to the user.
+     * @param messageId The message ID.
+     */
     private void validAccessToMessage(Long messageId) {
         List<Message> messageList = messageService.findBySender(authorizationService.getUserId());
         messageList.addAll(messageService.findByRecipient(authorizationService.getUserId()));

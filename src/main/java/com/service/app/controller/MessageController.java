@@ -25,11 +25,19 @@ public class MessageController {
     @Autowired
     private AuthorizationService authorizationService;
 
+    /**
+     * @return Returns the ModelAndView for the list of messages.
+     */
     @GetMapping("/messages")
     public ModelAndView messages() {
         return new ModelAndView("messages");
     }
 
+    /**
+     * @param username The user's name.
+     * @param modelMap {@link ModelMap}
+     * @return Returns the ModelAndView to create new messages.
+     */
     @GetMapping("/message/new")
     public ModelAndView newMessage(
             @RequestParam(required = false) String username,
@@ -45,6 +53,11 @@ public class MessageController {
         }
     }
 
+    /**
+     * @param id The message ID;
+     * @param modelMap {@link ModelMap}
+     * @return Returns the ModelAndView for the selected message.
+     */
     @GetMapping("/message/{id}")
     public ModelAndView showMessage(
             @PathVariable Long id,
@@ -61,6 +74,10 @@ public class MessageController {
         }
     }
 
+    /**
+     * This method checks to see if the message belongs to the user.
+     * @param messageId The message ID;
+     */
     private void validAccessToMessage(Long messageId) {
         List<Message> messageList = messageService.findBySender(authorizationService.getUserId());
         messageList.addAll(messageService.findByRecipient(authorizationService.getUserId()));

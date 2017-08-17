@@ -35,11 +35,19 @@ public class RegisterController {
     @Autowired
     private UnidirectionalConverter<RegisterDTO, User> converterRegisterDTOToUser;
 
+    /**
+     * This method initializes the validator.
+     * @param binder {@link WebDataBinder}
+     */
     @InitBinder
     private void initBinder(WebDataBinder binder) {
         binder.addValidators(registerPasswordsValidator);
     }
 
+    /**
+     * @param modelMap {@link ModelMap}
+     * @return Returns the ModelAndView for the registration page.
+     */
     @GetMapping
     public ModelAndView showRegister(
             ModelMap modelMap
@@ -49,11 +57,15 @@ public class RegisterController {
         return new ModelAndView("register", modelMap);
     }
 
+    /**
+     * @param registerDTO Registration form.
+     * @param result {@link BindingResult}
+     * @return Returns the ModelAndView, which redirects to the login page.
+     */
     @PostMapping
     public ModelAndView register(
             @ModelAttribute("registerDTO") @Valid RegisterDTO registerDTO,
-            BindingResult result,
-            ModelMap modelMap
+            BindingResult result
     ) {
         if(result.hasErrors()) {
             return new ModelAndView("register");
@@ -67,9 +79,13 @@ public class RegisterController {
 
         userService.saveUser(user);
 
-        return new ModelAndView("redirect:/signIn", modelMap);
+        return new ModelAndView("redirect:/signIn");
     }
 
+    /**
+     * @param token Activation token.
+     * @return Returns the ModelAndView, which redirects to the login page.
+     */
     @GetMapping("/thanks")
     public ModelAndView confirmAccount(
             @RequestParam("token") String token
