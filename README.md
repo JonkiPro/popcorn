@@ -25,8 +25,10 @@ create table persistent_logins (
 *  Hibernate / JPA / ORM
 *  MySQL / SQL
 *  Lombok
-*  JSONDoc
 *  Mail
+*  JUnit
+*  Mockito
+*  JSONDoc
 *  WebJars
 *  Thymeleaf
 *  HTML

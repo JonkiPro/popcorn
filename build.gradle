@@ -45,15 +45,6 @@ dependencies {
 	compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity4', version: '3.0.2.RELEASE'
 	//
 
-	// WebJars
-	compile 'org.webjars:bootstrap:3.3.7-1'
-	compile 'org.webjars:jquery:3.2.1'
-	compile 'org.webjars:angularjs:1.6.4'
-	compile 'org.webjars:jquery-validation:1.16.0'
-	compile 'org.webjars:handlebars:4.0.5'
-	compile 'org.webjars:prettify:4-Mar-2013-1'
-	//
-
 	// JSONDoc
 	compile group: 'org.jsondoc', name: 'spring-boot-starter-jsondoc', version: '1.2.17'
 	compile group: 'org.jsondoc', name: 'jsondoc-ui-webjar', version: '1.2.17'
@@ -61,5 +52,22 @@ dependencies {
 
 	// Lombok
 	compileOnly('org.projectlombok:lombok')
+	//
+
+	// Mockito
+	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.8.47'
+	//
+
+	// Spring Security Test
+	testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '4.2.3.RELEASE'
+	//
+
+	// WebJars
+	compile 'org.webjars:bootstrap:3.3.7-1'
+	compile 'org.webjars:jquery:3.2.1'
+	compile 'org.webjars:angularjs:1.6.4'
+	compile 'org.webjars:jquery-validation:1.16.0'
+	compile 'org.webjars:handlebars:4.0.5'
+	compile 'org.webjars:prettify:4-Mar-2013-1'
 	//
 }
