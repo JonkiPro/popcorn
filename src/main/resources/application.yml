@@ -1,0 +1,45 @@
+#settings datasource
+spring.datasource:
+  driver-class-name: org.postgresql.Driver
+  url: jdbc:postgresql:database
+  username: root
+  password: root
+  data: classpath:/db/init/data.sql
+
+#settings hibernate
+spring.jpa:
+  hibernate.ddl-auto: update
+  properties.hibernate:
+    dialect: org.hibernate.dialect.PostgreSQLDialect
+    show_sql: true
+
+#settings mail
+spring.mail:
+  host: smtp.gmail.com
+  port: 587
+  username: TkM2Gs9Hrd@gmail.com
+  password: 8pKZu9SStJ
+  properties.mail.smtp:
+    auth: true
+    starttls.enable: true
+
+#server
+server.session:
+  timeout: 25200
+
+#messages
+spring.messages:
+  basename: internationalization/viewMessages,\
+            internationalization/validationMessages,\
+            static/linkToCssAndJs
+  encoding: UTF-8
+  cache-seconds: -1
+  fallback-to-system-locale: true
+
+#logging
+logging.level.org.springframework.web: DEBUG
+
+#Spring Profiles
+spring:
+  profiles:
+    include: security

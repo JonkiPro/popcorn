@@ -1,29 +1,29 @@
 package com.service.app.dto.out;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
 
 import java.util.Date;
 
 @Data
-@ApiObject(group = "Message")
+@ApiModel
 public class ReceivedMessageDTO {
 
-    @ApiObjectField(description = "The message ID")
+    @ApiModelProperty(notes = "The message ID", required = true)
     private Long id;
 
-    @ApiObjectField(description = "The sender's username")
+    @ApiModelProperty(notes = "The sender's username", required = true)
     private String sender;
 
-    @ApiObjectField(description = "The message subject")
+    @ApiModelProperty(notes = "The message subject", required = true)
     private String subject;
 
-    @ApiObjectField(description = "The message text")
+    @ApiModelProperty(notes = "The message text", required = true)
     private String text;
 
     @JsonProperty("date_of_read")
-    @ApiObjectField(name = "date_of_read", description = "The message date of read")
+    @ApiModelProperty(notes = "The message date of read")
     private Date dateOfRead;
 }

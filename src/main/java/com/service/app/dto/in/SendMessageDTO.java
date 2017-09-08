@@ -1,29 +1,29 @@
 package com.service.app.dto.in;
 
 import com.service.app.validator.annotation.ExistsUsername;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
 
 import javax.validation.constraints.Size;
 
 @Data
-@ApiObject(group = "Message")
+@ApiModel
 public class SendMessageDTO {
 
     @NotEmpty
     @ExistsUsername
-    @ApiObjectField(description = "The recipient's username")
+    @ApiModelProperty(notes = "The recipient's username", required = true)
     private String to;
 
     @NotEmpty
     @Size(min = 1, max = 255)
-    @ApiObjectField(description = "The message subject")
+    @ApiModelProperty(notes = "The message subject", required = true)
     private String subject;
 
     @NotEmpty
     @Size(min = 1, max = 4000)
-    @ApiObjectField(description = "The message text")
+    @ApiModelProperty(notes = "The message text", required = true)
     private String text;
 }

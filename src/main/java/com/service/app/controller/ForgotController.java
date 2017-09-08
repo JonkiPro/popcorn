@@ -15,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -93,7 +92,7 @@ public class ForgotController {
      * @param modelMap {@link ModelMap}
      * @return Returns the ModelAndView for the page that is responsible for sending the email with the password.
      */
-    @PutMapping("/forgotPassword")
+    @PostMapping("/forgotPassword")
     public ModelAndView recoverPassword(
             @ModelAttribute("forgotPasswordDTO") @Valid ForgotPasswordDTO forgotPasswordDTO,
             BindingResult result,

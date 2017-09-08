@@ -1,16 +1,16 @@
 package com.service.app.dto.out;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
 
 @Data
-@ApiObject(group = "User")
+@ApiModel
 public class UserProfileDTO {
 
-    @ApiObjectField(description = "The user's ID")
+    @ApiModelProperty(notes = "The user's ID", required = true)
     private Long id;
 
-    @ApiObjectField(description = "The user's name")
+    @ApiModelProperty(notes = "The user's name", required = true)
     private String username;
 }

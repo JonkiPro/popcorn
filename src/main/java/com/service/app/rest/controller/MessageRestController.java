@@ -10,9 +10,7 @@ import com.service.app.entity.Message;
 import com.service.app.exception.AccessToMessageForbiddenException;
 import com.service.app.service.AuthorizationService;
 import com.service.app.service.MessageService;
-import org.jsondoc.core.annotation.*;
-import org.jsondoc.core.pojo.ApiStage;
-import org.jsondoc.core.pojo.ApiVerb;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,7 +25,7 @@ import java.util.Optional;
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping(value = "/messages", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(name = "Message API", description = "Provides a list of methods that manage messages", group = "Message", stage = ApiStage.BETA)
+@Api(value = "Message API", description = "Provides a list of methods that manage messages")
 public class MessageRestController {
 
     @Autowired
@@ -45,23 +43,23 @@ public class MessageRestController {
     @Autowired
     private UnidirectionalConverter<Message, ReceivedMessageDTO> converterMessageToReceivedMessageDTO;
 
-    @ApiMethod(description = "Save message", responsestatuscode = "201")
-    @ApiErrors(apierrors = { @ApiError(code = "400", description = "Incorrect data in the form") })
+    @ApiOperation(value = "Save message", code = 201)
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Incorrect data in the form") })
     @PostMapping(value = "/sendMessage")
     @ResponseStatus(HttpStatus.CREATED)
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> sendMessage(
-            @ApiBodyObject @RequestBody @Valid SendMessageDTO sendMessageDTO
+            @ApiParam(value = "Message", required = true) @RequestBody @Valid SendMessageDTO sendMessageDTO
     ) {
         messageService.saveMessage(converterSendMessageDTOToMessage.convert(sendMessageDTO));
 
         return new ResponseEntity<>(true, HttpStatus.CREATED);
     }
 
-    @ApiMethod(description = "Get all sent messages by user ID")
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No messages found") })
+    @ApiOperation(value = "Get all sent messages by user ID")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
     @GetMapping(value = "/getSentMessages")
-    public @ApiResponseObject
+    public
     HttpEntity<List<SentMessageInfoDTO>> getSentMessageInfoDTO() {
         List<Message> messageList = messageService.findBySender(authorizationService.getUserId());
 
@@ -69,10 +67,10 @@ public class MessageRestController {
                 ResponseEntity.ok().body(converterMessageToSentMessageInfoDTO.convertAll(messageList)) : ResponseEntity.notFound().build();
     }
 
-    @ApiMethod(description = "Get all received messages by user ID")
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No messages found") })
+    @ApiOperation(value = "Get all received messages by user ID")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
     @GetMapping(value = "/getReceivedMessages")
-    public @ApiResponseObject
+    public
     HttpEntity<List<ReceivedMessageInfoDTO>> getReceivedMessageInfoDTO() {
         List<Message> messageList = messageService.findByRecipient(authorizationService.getUserId());
 
@@ -80,34 +78,34 @@ public class MessageRestController {
                 ResponseEntity.ok().body(converterMessageToReceivedMessageInfoDTO.convertAll(messageList)) : ResponseEntity.notFound().build();
     }
 
-    @ApiMethod(description = "Remove sent message by ID", verb = ApiVerb.DELETE)
-    @ApiErrors(apierrors = { @ApiError(code = "403", description = "No messages found or you have not accessed") })
+    @ApiOperation(value = "Remove sent message by ID")
+    @ApiResponses(value = { @ApiResponse(code = 403, message = "No messages found or you have not accessed") })
     @DeleteMapping(value = "/removeSentMessage")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> removeSentMessage(
-            @ApiQueryParam(description = "The message ID") @RequestParam Long id
+            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
     ) {
         return messageService.findBySender(authorizationService.getUserId()).stream().anyMatch(message -> message.getId().equals(id)) ?
                 ResponseEntity.ok().body(messageService.removeSentMessage(id)) : new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
     }
 
-    @ApiMethod(description = "Remove received message by ID", verb = ApiVerb.DELETE)
-    @ApiErrors(apierrors = { @ApiError(code = "403", description = "No messages found or you have not accessed") })
+    @ApiOperation(value = "Remove received message by ID")
+    @ApiResponses(value = { @ApiResponse(code = 403, message = "No messages found or you have not accessed") })
     @DeleteMapping(value = "/removeReceivedMessage")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> removeReceivedMessage(
-            @ApiQueryParam(description = "The message ID") @RequestParam Long id
+            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
     ) {
         return messageService.findByRecipient(authorizationService.getUserId()).stream().anyMatch(message -> message.getId().equals(id)) ?
                 ResponseEntity.ok().body(messageService.removeReceivedMessage(id)) : new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
     }
 
-    @ApiMethod(description = "Search sent messages by phrase")
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No messages found") })
+    @ApiOperation(value = "Search sent messages by phrase")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
     @GetMapping(value = "/searchSentMessages")
-    public @ApiResponseObject
+    public
     HttpEntity<List<SentMessageInfoDTO>> searchSentMessage(
-            @ApiQueryParam(description = "Search for a phrase") @RequestParam String q
+            @ApiParam(value = "Search for a phrase", required = true) @RequestParam String q
     ) {
         List<Message> messageList = messageService.findSentMessagesByContaining(authorizationService.getUserId(), q);
 
@@ -115,12 +113,12 @@ public class MessageRestController {
                 ResponseEntity.ok().body(converterMessageToSentMessageInfoDTO.convertAll(messageList)) : ResponseEntity.notFound().build();
     }
 
-    @ApiMethod(description = "Search received messages by phrase")
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No messages found") })
+    @ApiOperation(value = "Search received messages by phrase")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
     @GetMapping(value = "/searchReceivedMessages")
-    public @ApiResponseObject
+    public
     HttpEntity<List<ReceivedMessageInfoDTO>> searchReceivedMessage(
-            @ApiQueryParam(description = "Search for a phrase") @RequestParam String q
+            @ApiParam(value = "Search for a phrase", required = true) @RequestParam String q
     ) {
         List<Message> messageList = messageService.findReceivedMessagesByContaining(authorizationService.getUserId(), q);
 
@@ -128,12 +126,12 @@ public class MessageRestController {
                 ResponseEntity.ok().body(converterMessageToReceivedMessageInfoDTO.convertAll(messageList)) : ResponseEntity.notFound().build();
     }
 
-    @ApiMethod(description = "Get sent message by ID")
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No messages found") })
+    @ApiOperation(value = "Get sent message by ID")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
     @GetMapping(value = "/getSentMessage")
-    public @ApiResponseObject
+    public
     HttpEntity<SentMessageDTO> getSentMessageDTO(
-            @ApiQueryParam(description = "The message ID") @RequestParam Long id
+            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
     ) {
         Optional<Message> messageOptional = messageService.findByIdAndSender(id, authorizationService.getUserId());
 
@@ -142,12 +140,12 @@ public class MessageRestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @ApiMethod(description = "Get received message by ID")
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No messages found") })
+    @ApiOperation(value = "Get received message by ID")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
     @GetMapping(value = "/getReceivedMessage")
-    public @ApiResponseObject
+    public
     HttpEntity<ReceivedMessageDTO> getReceivedMessageDTO(
-            @ApiQueryParam(description = "The message ID") @RequestParam Long id
+            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
     ) {
         Optional<Message> messageOptional = messageService.findByIdAndRecipient(id, authorizationService.getUserId());
 
@@ -156,13 +154,13 @@ public class MessageRestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @ApiMethod(description = "Set the date to read the message by ID", verb = ApiVerb.PUT)
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No messages found") })
+    @ApiOperation(value = "Set the date to read the message by ID")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
     @PutMapping(value = "/setDateOfRead")
     @SuppressWarnings("ConstantConditions")
-    public @ApiResponseObject
+    public
     HttpEntity<Date> setDateOfRead(
-            @ApiQueryParam(description = "The message ID") @RequestParam Long id
+            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
     ) {
         this.validAccessToMessage(id);
 

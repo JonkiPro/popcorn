@@ -1,8 +1,9 @@
 package com.service.config;
 
 import com.service.app.security.CustomAuthenticationSuccessHandler;
+import com.service.config.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -23,40 +24,11 @@ import javax.sql.DataSource;
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Import({WebDatasourceConfig.class})
 @ComponentScan(basePackages = "com.service.app.security")
-@PropertySource("classpath:security.properties")
+@EnableConfigurationProperties(SecurityProperties.class)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${pattern}") String pattern;
-
-    // Form Login
-    @Value("${login.page}") String loginPage;
-    @Value("${failure.url}") String failureUrl;
-    @Value("${username.parameter}") String usernameParameter;
-    @Value("${password.parameter}") String passwordParameter;
-
-    // Logout
-    @Value("${delete.cookies}") String deleteCookies;
-    @Value("${invalidate.http.session}") boolean invalidateHttpSession;
-    @Value("${clear.authentication}") boolean clearAuthentication;
-    @Value("${logout.request.matcher}") String logoutRequestMatcher;
-    @Value("${logout.success.url}") String logoutSuccessUrl;
-
-    // Session Management
-    @Value("${invalid.session.url}") String invalidSessionUrl;
-    @Value("${maximum.sessions}") int maximumSessions;
-    @Value("${expired.url}") String expiredUrl;
-
-    // Remember Me
-    @Value("${remember.me.parameter}") String rememberMeParameter;
-    @Value("${remember.me.cookie.name}") String rememberMeCookieName;
-    @Value("${token.validity.seconds}") int tokenValiditySeconds;
-
-    // Authentication Manager
-    @Value("${users.by.username.query}") String usersByUsernameQuery;
-    @Value("${authorities.by.username.query}") String authoritiesByUsernameQuery;
-
-    // Password Encoder
-    @Value("${strength.password.encoder}") int strengthPasswordEncoder;
+    @Autowired
+    private SecurityProperties securityProperties;
 
     @Autowired
     private DataSource dataSource;
@@ -67,32 +39,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(pattern).permitAll()
+                .antMatchers(securityProperties.getPattern()).permitAll()
                 .and()
                     .formLogin()
-                        .loginPage(loginPage)
+                        .loginPage(securityProperties.getLoginPage())
                         .successHandler(customAuthenticationSuccessHandler)
-                        .failureUrl(failureUrl)
-                        .usernameParameter(usernameParameter)
-                        .passwordParameter(passwordParameter)
+                        .failureUrl(securityProperties.getFailureUrl())
+                        .usernameParameter(securityProperties.getUsernameParameter())
+                        .passwordParameter(securityProperties.getPasswordParameter())
                 .and()
                     .logout()
-                        .deleteCookies(deleteCookies)
-                        .invalidateHttpSession(invalidateHttpSession)
-                        .clearAuthentication(clearAuthentication)
-                        .logoutRequestMatcher(new AntPathRequestMatcher(logoutRequestMatcher))
-                        .logoutSuccessUrl(logoutSuccessUrl)
+                        .invalidateHttpSession(securityProperties.isInvalidateHttpSession())
+                        .clearAuthentication(securityProperties.isClearAuthentication())
+                        .logoutRequestMatcher(new AntPathRequestMatcher(securityProperties.getLogoutRequestMatcher()))
+                        .logoutSuccessUrl(securityProperties.getLogoutSuccessUrl())
                 .and()
                     .sessionManagement()
-                        .invalidSessionUrl(invalidSessionUrl)
+                        .invalidSessionUrl(securityProperties.getInvalidSessionUrl())
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .maximumSessions(maximumSessions)
-                        .expiredUrl(expiredUrl).and()
+                        .maximumSessions(securityProperties.getMaximumSessions())
+                        .expiredUrl(securityProperties.getExpiredUrl()).and()
                 .and()
                     .rememberMe()
-                        .rememberMeParameter(rememberMeParameter)
-                        .rememberMeCookieName(rememberMeCookieName)
-                        .tokenValiditySeconds(tokenValiditySeconds)
+                        .rememberMeParameter(securityProperties.getRememberMeParameter())
+                        .rememberMeCookieName(securityProperties.getRememberMeCookieName())
+                        .tokenValiditySeconds(securityProperties.getTokenValiditySeconds())
                         .tokenRepository(persistentTokenRepository())
                 .and()
                     .csrf().disable();
@@ -103,8 +74,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.jdbcAuthentication()
                 .passwordEncoder(passwordEncoder())
                 .dataSource(dataSource)
-                .usersByUsernameQuery(usersByUsernameQuery)
-                .authoritiesByUsernameQuery(authoritiesByUsernameQuery);
+                .usersByUsernameQuery(securityProperties.getUsersByUsernameQuery())
+                .authoritiesByUsernameQuery(securityProperties.getAuthoritiesByUsernameQuery());
     }
 
     @Bean
@@ -116,7 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(strengthPasswordEncoder);
+        return new BCryptPasswordEncoder(securityProperties.getStrengthPasswordEncoder());
     }
 
     @Bean

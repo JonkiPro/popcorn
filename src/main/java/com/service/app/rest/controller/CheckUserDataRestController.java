@@ -2,11 +2,7 @@ package com.service.app.rest.controller;
 
 import com.service.app.service.UserService;
 import com.service.app.utils.EncryptUtils;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
-import org.jsondoc.core.pojo.ApiStage;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -21,65 +17,65 @@ import java.security.Principal;
 @RestController
 @PreAuthorize("permitAll()")
 @RequestMapping(value = "/checkUserData")
-@Api(name = "Check User Data API", description = "Provides a list of methods for checking user data", group = "User", stage = ApiStage.BETA)
+@Api(value = "Check User Data API", description = "Provides a list of methods for checking user data")
 public class CheckUserDataRestController {
 
     @Autowired
     private UserService userService;
 
-    @ApiMethod(description = "Return false if the user by username exists")
+    @ApiOperation(value = "Return false if the user by username exists")
     @GetMapping("/checkUsernameAtRegistering")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> checkUsernameAtRegistering(
-            @ApiQueryParam(description = "The user's name") @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @RequestParam String username
     ) {
         return ResponseEntity.ok().body(!userService.existsByUsername(username));
     }
 
-    @ApiMethod(description = "Return false if the user by e-mail exists")
+    @ApiOperation(value = "Return false if the user by e-mail exists")
     @GetMapping("/checkEmailAtRegistering")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> checkEmailAtRegistering(
-            @ApiQueryParam(description = "The user's e-mail") @RequestParam String email
+            @ApiParam(value = "The user's e-mail", required = true) @RequestParam String email
     ) {
         return ResponseEntity.ok().body(!userService.existsByEmail(email));
     }
 
-    @ApiMethod(description = "Return true if the user by username exists")
+    @ApiOperation(value = "Return true if the user by username exists")
     @GetMapping("/checkUsername")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> checkUsername(
-            @ApiQueryParam(description = "The user's name") @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @RequestParam String username
     ) {
         return ResponseEntity.ok().body(userService.existsByUsername(username));
     }
 
-    @ApiMethod(description = "Return true if the user by e-mail exists")
+    @ApiOperation(value = "Return true if the user by e-mail exists")
     @GetMapping("/checkEmail")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> checkEmail(
-            @ApiQueryParam(description = "The user's e-mail") @RequestParam String email
+            @ApiParam(value = "The user's e-mail", required = true) @RequestParam String email
     ) {
         return ResponseEntity.ok().body(userService.existsByEmail(email));
     }
 
-    @ApiMethod(description = "Return true if the given password is the same as the database")
+    @ApiOperation(value = "Return true if the given password is the same as the database")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/checkPassword")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> checkPassword(
-            @ApiQueryParam(description = "The user's password") @RequestParam String password,
+            @ApiParam(value = "The user's password", required = true) @RequestParam String password,
             Principal principal
     ) {
         return ResponseEntity.ok().body(EncryptUtils.matches(password, userService.findOneByUsername(principal.getName()).getPassword()));
     }
 
-    @ApiMethod(description = "Return false if the given password is the same as the database")
+    @ApiOperation(value = "Return false if the given password is the same as the database")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/checkPasswordIsTheSame")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> checkPasswordIsTheSame(
-            @ApiQueryParam(description = "The user's password") @RequestParam String password,
+            @ApiParam(value = "The user's password", required = true) @RequestParam String password,
             Principal principal
     ) {
         return ResponseEntity.ok().body(!(EncryptUtils.matches(password, userService.findOneByUsername(principal.getName()).getPassword())));

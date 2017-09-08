@@ -1,21 +1,21 @@
 package com.service.app.dto.out;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
-@ApiObject
+@ApiModel
 public class ValidationErrorDTO {
 
     @JsonProperty("field_errors")
-    @ApiObjectField(description = "The list of errors")
+    @ApiModelProperty(notes = "The list of errors")
     private List<ErrorMessageDTO> fieldErrors = new ArrayList<>();
 
     public void addFieldError(String path, String message) {

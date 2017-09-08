@@ -6,9 +6,7 @@ import com.service.app.entity.User;
 import com.service.app.service.MailService;
 import com.service.app.service.UserService;
 import com.service.app.utils.EncryptUtils;
-import org.jsondoc.core.annotation.*;
-import org.jsondoc.core.pojo.ApiStage;
-import org.jsondoc.core.pojo.ApiVerb;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
@@ -26,7 +24,7 @@ import java.util.Optional;
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping(value = "/settings", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(name = "Settings API", description = "Provides a list of methods that manage settings", group = "Settings", stage = ApiStage.BETA)
+@Api(value = "Settings API", description = "Provides a list of methods that manage settings")
 public class SettingsRestController {
 
     @Autowired
@@ -34,12 +32,12 @@ public class SettingsRestController {
     @Autowired
     private MailService mailService;
 
-    @ApiMethod(description = "It changes the user's email and sends a token to the mail", verb = ApiVerb.PUT)
-    @ApiErrors(apierrors = { @ApiError(code = "400", description = "Incorrect data in the form") })
+    @ApiOperation(value = "It changes the user's email and sends a token to the mail")
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Incorrect data in the form") })
     @PutMapping(value = "/changeEmail")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> changeEmail(
-            @ApiBodyObject @RequestBody @Valid ChangeEmailDTO changeEmailDTO,
+            @ApiParam(value = "Form of e-mail change", required = true) @RequestBody @Valid ChangeEmailDTO changeEmailDTO,
             Principal principal
     ) {
         Optional<User> userOptional = userService.findByUsername(principal.getName());
@@ -58,12 +56,12 @@ public class SettingsRestController {
         return ResponseEntity.ok(true);
     }
 
-    @ApiMethod(description = "It changes the user's password", verb = ApiVerb.PUT)
-    @ApiErrors(apierrors = { @ApiError(code = "400", description = "Incorrect data in the form") })
+    @ApiOperation(value = "It changes the user's password")
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Incorrect data in the form") })
     @PutMapping(value = "/changePassword")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> changePassword(
-            @ApiBodyObject @RequestBody @Valid ChangePasswordDTO changePasswordDTO,
+            @ApiParam(value = "Form of password change", required = true) @RequestBody @Valid ChangePasswordDTO changePasswordDTO,
             Principal principal
     ) {
         Optional<User> userOptional = userService.findByUsername(principal.getName());

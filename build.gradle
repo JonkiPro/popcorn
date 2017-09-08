@@ -31,8 +31,12 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	//
 
-	// MySQL Connector
-	runtime('mysql:mysql-connector-java')
+	// Spring Boot
+	compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '1.5.6.RELEASE'
+	//
+
+	// PostgreSQL
+	compile group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
 	//
 
 	// Commons Validator
@@ -45,9 +49,9 @@ dependencies {
 	compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity4', version: '3.0.2.RELEASE'
 	//
 
-	// JSONDoc
-	compile group: 'org.jsondoc', name: 'spring-boot-starter-jsondoc', version: '1.2.17'
-	compile group: 'org.jsondoc', name: 'jsondoc-ui-webjar', version: '1.2.17'
+	// Swagger
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
 	//
 
 	// Lombok
@@ -67,7 +71,5 @@ dependencies {
 	compile 'org.webjars:jquery:3.2.1'
 	compile 'org.webjars:angularjs:1.6.4'
 	compile 'org.webjars:jquery-validation:1.16.0'
-	compile 'org.webjars:handlebars:4.0.5'
-	compile 'org.webjars:prettify:4-Mar-2013-1'
 	//
 }

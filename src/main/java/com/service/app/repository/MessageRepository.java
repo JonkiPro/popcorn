@@ -17,9 +17,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     Optional<Message> findByIdAndRecipientAndIsVisibleForRecipientTrue(Long id, Long recipient);
     Optional<Message> findByIdAndSenderAndIsVisibleForSenderTrue(Long id, Long sender);
 
-    @Query("SELECT e FROM Message e WHERE e.recipient = :recipient AND (e.subject LIKE :subject OR e.text LIKE :text) AND e.isVisibleForRecipient = true ORDER BY id DESC")
+    @Query("SELECT e FROM Message e WHERE e.recipient = :recipient AND (UPPER(e.subject) LIKE UPPER(:subject) OR UPPER(e.text) LIKE UPPER(:text)) AND e.isVisibleForRecipient = true ORDER BY id DESC")
     List<Message> findReceivedMessagesByContaining(@Param("recipient") Long recipient, @Param("subject") String subject, @Param("text") String text);
 
-    @Query("SELECT e FROM Message e WHERE e.sender = :sender AND (e.subject LIKE :subject OR e.text LIKE :text) AND e.isVisibleForSender = true ORDER BY id DESC")
+    @Query("SELECT e FROM Message e WHERE e.sender = :sender AND (UPPER(e.subject) LIKE UPPER(:subject) OR UPPER(e.text) LIKE UPPER(:text)) AND e.isVisibleForSender = true ORDER BY id DESC")
     List<Message> findSentMessagesByContaining(@Param("sender") Long sender, @Param("subject") String subject, @Param("text") String text);
 }

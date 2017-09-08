@@ -28,12 +28,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
+        return userRepository.existsByUsernameIgnoreCase(username);
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+        return userRepository.existsByEmailIgnoreCase(email);
     }
 
     @Override
@@ -48,12 +48,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsernameIgnoreCase(username);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmailIgnoreCase(email);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByUsernameAndEmail(String username, String email) {
-        return userRepository.findByUsernameAndEmail(username, email);
+        return userRepository.findByUsernameIgnoreCaseAndEmailIgnoreCase(username, email);
     }
 
     @Override
@@ -78,16 +78,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findByUsernameContaining(String username, int page, int pageSize, Sort sort) {
-        return userRepository.findByUsernameContainingAndEnabledTrue(username, new PageRequest(page, pageSize, sort)).getContent();
+        return userRepository.findByUsernameContainingIgnoreCaseAndEnabledTrue(username, new PageRequest(page, pageSize, sort)).getContent();
     }
 
     @Override
     public Long countByUsernameContaining(String username) {
-        return userRepository.countByUsernameContainingAndEnabledTrue(username);
+        return userRepository.countByUsernameContainingIgnoreCaseAndEnabledTrue(username);
     }
 
     @Override
     public User findOneByUsername(String username) {
-        return userRepository.findOneByUsername(username);
+        return userRepository.findOneByUsernameIgnoreCase(username);
     }
 }

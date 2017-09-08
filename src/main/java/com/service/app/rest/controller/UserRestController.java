@@ -5,8 +5,7 @@ import com.service.app.dto.out.UserProfileDTO;
 import com.service.app.entity.User;
 import com.service.app.converter.UnidirectionalConverter;
 import com.service.app.service.UserService;
-import org.jsondoc.core.annotation.*;
-import org.jsondoc.core.pojo.ApiStage;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
@@ -19,7 +18,7 @@ import java.util.Optional;
 @RestController
 @PreAuthorize("permitAll()")
 @RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(name = "User API", description = "Provides a list of methods that retrieve users and their data", group = "User", stage = ApiStage.BETA)
+@Api(value = "User API", description = "Provides a list of methods that retrieve users and their data")
 public class UserRestController {
 
     @Autowired
@@ -29,25 +28,25 @@ public class UserRestController {
     @Autowired
     private UnidirectionalConverter<User, UserProfileDTO> converterUserToUserProfileDTO;
 
-    @ApiMethod(description = "Get the number of users by fragment of username")
+    @ApiOperation(value = "Get the number of users by fragment of username")
     @GetMapping(value = "/getNumberOfUsersByUsername")
     @ResponseStatus(HttpStatus.OK)
-    public @ApiResponseObject
+    public
     HttpEntity<Long> getNumberOfUsersByUsername(
-            @ApiQueryParam(description = "Fragment of username") @RequestParam String username
+            @ApiParam(value = "Fragment of username", required = true) @RequestParam String username
     ) {
         return ResponseEntity.ok().body(userService.countByUsernameContaining(username));
     }
 
-    @ApiMethod(description = "Get list of users by phrase")
+    @ApiOperation(value = "Get list of users by phrase")
     @GetMapping(value = "/getUsers")
     @ResponseStatus(HttpStatus.OK)
-    public @ApiResponseObject
+    public
     HttpEntity<List<UserInfoDTO>> getUsers(
-            @ApiQueryParam(description = "Search for a phrase") @RequestParam(required = false) String q,
-            @ApiQueryParam(description = "Page number") @RequestParam(required = false, defaultValue = "1") int page,
-            @ApiQueryParam(description = "Number of items per page") @RequestParam(required = false, defaultValue = "1") int pageSize,
-            @ApiQueryParam(description = "Sort field") @RequestParam(required = false, defaultValue = "id") String sort
+            @ApiParam(value = "Search for a phrase") @RequestParam(required = false) String q,
+            @ApiParam(value = "Page number") @RequestParam(required = false, defaultValue = "1") int page,
+            @ApiParam(value = "Number of items per page") @RequestParam(required = false, defaultValue = "1") int pageSize,
+            @ApiParam(value = "Sort field") @RequestParam(required = false, defaultValue = "id") String sort
     ) {
         return Optional
                 .ofNullable(q)
@@ -57,12 +56,12 @@ public class UserRestController {
                 );
     }
 
-    @ApiMethod(description = "Get user profile by username")
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No user found") })
+    @ApiOperation(value = "Get user profile by username")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
     @GetMapping(value = "/getProfile")
-    public @ApiResponseObject
+    public
     HttpEntity<UserProfileDTO> getProfile(
-            @ApiQueryParam(description = "The user's name") @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @RequestParam String username
     ) {
         return Optional
                 .ofNullable(userService.findOneByUsername(username))

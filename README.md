@@ -1,20 +1,25 @@
 # REST-Web-Services
-#### 1. Database: MySQL
-
-#### 2. To use the "Remember Me" feature when logging in, you must perform a sql query in the database
-```sql
-create table persistent_logins (
-    username varchar(64) not null,
-    series varchar(64) primary key,
-    token varchar(64) not null,
-    last_used timestamp not null
-);
-```
-
-#### 3. To properly launch an application with added Lombok annotations you must
-- add Lombok Plugin
-- enable annotation processing
-
+## Preconditions
+*  Java 8
+*  IntelliJ IDEA
+*  Lombok (plugin + config)
+*  PostgreSQL
+*  ./gradlew build (Linux), gradlew.bat build (Windows)
+### Lombok
+*  File -> Settings -> Plugins
+*  Browse repositories -> Lombok Plugin -> Install
+*  Restart
+*  File -> Settings
+*  Build, execution, deployment -> Compiler -> Annotation Processors
+*  Enable annotation processing
+### PostgreSQL
+*  Create a user with all permissions. <b>username:</b> <i>root</i>, <b>password:</b> <i>root</i>
+*  Create a database. <b>name:</b> <i>database</i>, <b>owner:</b> <i>root</i>
+## Running
+*  Right click on class name and "Run".
+*  Visit [http://localhost:8080/].
+### REST
+*  Visit [http://localhost:8080/swagger-ui.html].
 ## Tech Stack
 *  Java
 *  Spring
@@ -23,12 +28,12 @@ create table persistent_logins (
 *  Spring Data
 *  Spring Security
 *  Hibernate / JPA / ORM
-*  MySQL / SQL
+*  PostgreSQL / SQL
 *  Lombok
 *  Mail
 *  JUnit
 *  Mockito
-*  JSONDoc
+*  Swagger
 *  WebJars
 *  Thymeleaf
 *  HTML
@@ -39,3 +44,9 @@ create table persistent_logins (
 *  AngularJS
 *  IntelliJ
 *  Gradle
+
+
+
+
+[http://localhost:8080/]: <http://localhost:8080/>
+[http://localhost:8080/swagger-ui.html]: <http://localhost:8080/swagger-ui.html>

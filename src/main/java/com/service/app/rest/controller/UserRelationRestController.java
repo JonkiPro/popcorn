@@ -7,9 +7,7 @@ import com.service.app.service.AuthorizationService;
 import com.service.app.service.FriendshipService;
 import com.service.app.service.InvitationService;
 import com.service.app.service.UserService;
-import org.jsondoc.core.annotation.*;
-import org.jsondoc.core.pojo.ApiStage;
-import org.jsondoc.core.pojo.ApiVerb;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpEntity;
@@ -23,7 +21,7 @@ import java.util.NoSuchElementException;
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping(value = "/relations")
-@Api(name = "User Relation API", description = "Provides a list of methods that manage user relationships", group = "User", stage = ApiStage.BETA)
+@Api(value = "User Relation API", description = "Provides a list of methods that manage user relationships")
 public class UserRelationRestController {
 
     @Autowired
@@ -35,13 +33,13 @@ public class UserRelationRestController {
     @Autowired
     private FriendshipService friendshipService;
 
-    @ApiMethod(description = "Save invitation", verb = ApiVerb.POST)
-    @ApiErrors(apierrors = { @ApiError(code = "400", description = "Incorrect username") })
+    @ApiOperation(value = "Save invitation", code = 201)
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Incorrect username") })
     @PostMapping("/sendInvitation")
     @SuppressWarnings("ConstantConditions")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> sendInvitation(
-            @ApiQueryParam(description = "The user's name") @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @RequestParam String username
     ) {
         try {
             invitationService.saveInvitation(new Invitation(authorizationService.getUserId(), userService.findByUsername(username).get().getId()));
@@ -52,13 +50,16 @@ public class UserRelationRestController {
         return new ResponseEntity<>(true, HttpStatus.CREATED);
     }
 
-    @ApiMethod(description = "Remove invitation", verb = ApiVerb.DELETE)
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No invitation found"), @ApiError(code = "400", description = "Incorrect username") })
+    @ApiOperation(value = "Remove invitation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No invitation found"),
+            @ApiResponse(code = 400, message = "Incorrect username")
+    })
     @DeleteMapping("/removeInvitation")
     @SuppressWarnings("ConstantConditions")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> removeInvitation(
-            @ApiQueryParam(description = "The user's name") @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @RequestParam String username
     ) {
         try {
             invitationService.removeInvitation(invitationService.findInvitation(authorizationService.getUserId(), userService.findByUsername(username).get().getId()));
@@ -71,13 +72,16 @@ public class UserRelationRestController {
         return ResponseEntity.ok(true);
     }
 
-    @ApiMethod(description = "Reject invitation", verb = ApiVerb.DELETE)
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No invitation found"), @ApiError(code = "400", description = "Incorrect username") })
+    @ApiOperation(value = "Reject invitation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No invitation found"),
+            @ApiResponse(code = 400, message = "Incorrect username")
+    })
     @DeleteMapping("/rejectInvitation")
     @SuppressWarnings("ConstantConditions")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> rejectInvitation(
-            @ApiQueryParam(description = "The user's name") @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @RequestParam String username
     ) {
         try {
             invitationService.removeInvitation(invitationService.findInvitation(userService.findByUsername(username).get().getId(), authorizationService.getUserId()));
@@ -90,13 +94,16 @@ public class UserRelationRestController {
         return ResponseEntity.ok(true);
     }
 
-    @ApiMethod(description = "Save friendship", verb = ApiVerb.POST)
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No invitation found"), @ApiError(code = "400", description = "Incorrect username") })
+    @ApiOperation(value = "Save friendship")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No invitation found"),
+            @ApiResponse(code = 400, message = "Incorrect username")
+    })
     @PostMapping("/addFriend")
     @SuppressWarnings("ConstantConditions")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> saveFriendship(
-            @ApiQueryParam(description = "The user's name") @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @RequestParam String username
     ) {
         Long fromId = authorizationService.getUserId();
         try {
@@ -115,13 +122,16 @@ public class UserRelationRestController {
         return new ResponseEntity<>(true, HttpStatus.CREATED);
     }
 
-    @ApiMethod(description = "Remove friendship", verb = ApiVerb.DELETE)
-    @ApiErrors(apierrors = { @ApiError(code = "404", description = "No invitation found"), @ApiError(code = "400", description = "Incorrect username") })
+    @ApiOperation(value = "Remove friendship")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No invitation found"),
+            @ApiResponse(code = 400, message = "Incorrect username")
+    })
     @DeleteMapping("/removeFriend")
     @SuppressWarnings("ConstantConditions")
-    public @ApiResponseObject
+    public
     HttpEntity<Boolean> removeFriend(
-            @ApiQueryParam(description = "The user's name") @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @RequestParam String username
     ) {
         Long fromId = authorizationService.getUserId();
         try {
@@ -138,13 +148,13 @@ public class UserRelationRestController {
         return ResponseEntity.ok(true);
     }
 
-    @ApiMethod(description = "Get the relationship status between users")
-    @ApiErrors(apierrors = { @ApiError(code = "400", description = "Incorrect username") })
+    @ApiOperation(value = "Get the relationship status between users")
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Incorrect username") })
     @GetMapping("/getStatus")
     @SuppressWarnings("ConstantConditions")
-    public @ApiResponseObject
+    public
     ResponseEntity<RelationshipStatusDTO> getStatus(
-            @ApiQueryParam(description = "The user's name") @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @RequestParam String username
     ) {
         String status;
         Long fromId = authorizationService.getUserId();

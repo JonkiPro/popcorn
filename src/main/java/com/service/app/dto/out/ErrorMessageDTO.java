@@ -1,18 +1,18 @@
 package com.service.app.dto.out;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
 
 @Data
 @AllArgsConstructor
-@ApiObject
+@ApiModel
 public class ErrorMessageDTO {
 
-    @ApiObjectField(description = "The field's name")
+    @ApiModelProperty(notes = "The field's name", required = true)
     private String field;
 
-    @ApiObjectField(description = "The error message")
+    @ApiModelProperty(notes = "The error message", required = true)
     private String message;
 }
