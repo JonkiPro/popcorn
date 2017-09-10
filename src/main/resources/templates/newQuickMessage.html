@@ -18,7 +18,7 @@
                 <div class="col-md-12">
                     <form role="form" id="sendMessageForm">
                         <div class="form-group">
-                            <input name="username" id="username" th:value="${username}" type="text" class="form-control" readonly="readonly"/>
+                            <input name="to" id="to" th:value="${username}" type="text" class="form-control" readonly="readonly"/>
                         </div>
                         <div class="form-group">
                             <input name="subject" id="subject" type="text" class="form-control" maxlength="255" th:placeholder="#{newQuickMessage.inputSubject}"/>

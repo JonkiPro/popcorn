@@ -1,4 +1,4 @@
-package com.service.app.dto.in;
+package com.service.app.rest.request;
 
 import com.service.app.validator.annotation.PasswordIsDifferent;
 import com.service.app.validator.annotation.PasswordIsTheSame;

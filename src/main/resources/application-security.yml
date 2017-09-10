@@ -24,3 +24,9 @@ security:
   authorities-by-username-query: SELECT username, authorities FROM users WHERE username=?
 #password encoder
   strength-password-encoder: 12
+
+
+#reCaptcha
+app.reCaptcha:
+  apiUrl: https://www.google.com/recaptcha/api/siteverify
+  secretKey: 6LeTEjAUAAAAAB23AV1aokKfDYhfP-HLIV90DRWq

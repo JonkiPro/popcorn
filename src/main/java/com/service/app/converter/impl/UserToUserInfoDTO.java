@@ -1,7 +1,7 @@
 package com.service.app.converter.impl;
 
 import com.service.app.converter.UnidirectionalConverter;
-import com.service.app.dto.out.UserInfoDTO;
+import com.service.app.rest.response.UserInfoDTO;
 import com.service.app.entity.User;
 import org.springframework.stereotype.Component;
 

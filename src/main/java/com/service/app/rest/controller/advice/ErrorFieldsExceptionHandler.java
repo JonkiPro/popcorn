@@ -1,6 +1,6 @@
 package com.service.app.rest.controller.advice;
 
-import com.service.app.dto.out.ValidationErrorDTO;
+import com.service.app.rest.response.ValidationErrorDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 @RestControllerAdvice
-public class ExceptionHandlerRestController {
+public class ErrorFieldsExceptionHandler {
 
     @Autowired
     private MessageSource messageSource;

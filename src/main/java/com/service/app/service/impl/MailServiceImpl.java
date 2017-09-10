@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
 import javax.mail.MessagingException;
@@ -24,6 +25,7 @@ public class MailServiceImpl implements MailService{
         javaMailSender.send(mailMessage);
     }
 
+    @Async
     @Override
     public void sendMailWithActivationToken(String email, String token) {
         try {
@@ -46,6 +48,7 @@ public class MailServiceImpl implements MailService{
         }
     }
 
+    @Async
     @Override
     public void sendMailWithEmailChangeToken(String email, String token) {
         try {
@@ -68,6 +71,7 @@ public class MailServiceImpl implements MailService{
         }
     }
 
+    @Async
     @Override
     public void sendMailWithNewPassword(String email, String newPassword) {
         try {
@@ -87,6 +91,7 @@ public class MailServiceImpl implements MailService{
         }
     }
 
+    @Async
     @Override
     public void sendMailWithUsername(String email, String username) {
         try {

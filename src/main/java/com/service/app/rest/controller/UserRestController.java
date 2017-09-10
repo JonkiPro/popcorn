@@ -1,7 +1,8 @@
 package com.service.app.rest.controller;
 
-import com.service.app.dto.out.UserInfoDTO;
-import com.service.app.dto.out.UserProfileDTO;
+import com.service.app.exception.ProfileNotFoundException;
+import com.service.app.rest.response.UserInfoDTO;
+import com.service.app.rest.response.UserProfileDTO;
 import com.service.app.entity.User;
 import com.service.app.converter.UnidirectionalConverter;
 import com.service.app.service.UserService;
@@ -66,6 +67,6 @@ public class UserRestController {
         return Optional
                 .ofNullable(userService.findOneByUsername(username))
                 .map(user -> ResponseEntity.ok().body(converterUserToUserProfileDTO.convert(user)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(ProfileNotFoundException::new);
     }
 }

@@ -1,9 +1,9 @@
-package com.service.controller;
+package com.service.restcontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.service.app.dto.in.RegisterDTO;
+import com.service.app.rest.request.RegisterDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -49,6 +49,6 @@ public class RegisterControllerTest {
                 .perform(post("/register")
                              .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                              .content(requestJson))
-                .andExpect(view().name("register"));
+                .andExpect(status().isBadRequest());
     }
 }

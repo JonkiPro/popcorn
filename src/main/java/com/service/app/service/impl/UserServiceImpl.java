@@ -28,12 +28,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean existsByUsername(String username) {
-        return userRepository.existsByUsernameIgnoreCase(username);
+        return userRepository.existsByUsernameIgnoreCase(username.trim());
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return userRepository.existsByEmailIgnoreCase(email);
+        return userRepository.existsByEmailIgnoreCase(email.trim());
     }
 
     @Override
@@ -48,12 +48,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsernameIgnoreCase(username);
+        return userRepository.findByUsernameIgnoreCase(username.trim());
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmailIgnoreCase(email);
+        return userRepository.findByEmailIgnoreCase(email.trim());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByUsernameAndEmail(String username, String email) {
-        return userRepository.findByUsernameIgnoreCaseAndEmailIgnoreCase(username, email);
+        return userRepository.findByUsernameIgnoreCaseAndEmailIgnoreCase(username.trim(), email.trim());
     }
 
     @Override
@@ -78,16 +78,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findByUsernameContaining(String username, int page, int pageSize, Sort sort) {
-        return userRepository.findByUsernameContainingIgnoreCaseAndEnabledTrue(username, new PageRequest(page, pageSize, sort)).getContent();
+        return userRepository.findByUsernameContainingIgnoreCaseAndEnabledTrue(username.trim(), new PageRequest(page, pageSize, sort)).getContent();
     }
 
     @Override
     public Long countByUsernameContaining(String username) {
-        return userRepository.countByUsernameContainingIgnoreCaseAndEnabledTrue(username);
+        return userRepository.countByUsernameContainingIgnoreCaseAndEnabledTrue(username.trim());
     }
 
     @Override
     public User findOneByUsername(String username) {
-        return userRepository.findOneByUsernameIgnoreCase(username);
+        return userRepository.findOneByUsernameIgnoreCase(username.trim());
     }
 }

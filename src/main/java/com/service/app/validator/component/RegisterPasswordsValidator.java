@@ -1,6 +1,6 @@
 package com.service.app.validator.component;
 
-import com.service.app.dto.in.RegisterDTO;
+import com.service.app.rest.request.RegisterDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

@@ -17,12 +17,4 @@ public class HomeController {
     public ModelAndView index() {
         return new ModelAndView("index");
     }
-
-    /**
-     * @return Returns the ModelAndView for the jsondoc-ui.
-     */
-    @GetMapping("jsondoc-ui")
-    public ModelAndView json() {
-        return new ModelAndView("jsondoc/jsondoc-ui");
-    }
 }

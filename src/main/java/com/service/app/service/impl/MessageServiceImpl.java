@@ -83,11 +83,11 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> findReceivedMessagesByContaining(Long recipient, String containing) {
-        return messageRepository.findReceivedMessagesByContaining(recipient, "%"+containing+"%", "%"+containing+"%");
+        return messageRepository.findReceivedMessagesByContaining(recipient, "%"+containing.trim()+"%", "%"+containing.trim()+"%");
     }
 
     @Override
     public List<Message> findSentMessagesByContaining(Long sender, String containing) {
-        return messageRepository.findSentMessagesByContaining(sender, "%"+containing+"%", "%"+containing+"%");
+        return messageRepository.findSentMessagesByContaining(sender, "%"+containing.trim()+"%", "%"+containing.trim()+"%");
     }
 }

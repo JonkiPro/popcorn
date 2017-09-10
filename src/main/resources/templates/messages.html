@@ -13,7 +13,6 @@
 
     <nav class="navbar navbar-default" role="navigation">
         <div class="container">
-            <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="btn-compose pull-left">
                 <a type="button" class="btn btn-success navbar-btn" th:href="@{/message/new}">
                     <span class="glyphicon glyphicon-pencil"></span> <span th:text="#{messages.btnNewMessage}">New message</span>
@@ -24,18 +23,17 @@
                 <li><a data-ng-click="getSentMessages()" href="" role="tab" data-toggle="tab"><span th:text="#{messages.btnSentMessages}">Sent messages</span></a></li>
             </ul>
         </div>
-        <!-- /.container-fluid -->
     </nav>
 
     <div class="tab-content">
         <div class="tab-pane active" id="Messages">
             <div class="content-container clearfix">
                 <div class="col-md-12">
-                    <h1 class="content-title">{{typeOfMessages}} ({{numberOfMessages}})</h1>
+                    <h1 class="content-title"> <span ng-bind="typeOfMessages"></span> <span ng-bind="numberOfMessages"></span></h1>
                     <form action="" th:method="POST">
                         <input th:name="search" data-ng-keyup="getMessagesByText()" id="search-value" type="search" th:placeholder="#{messages.searchMessages}" class="form-control mail-search"/>
                     </form>
-                    <label>{{noResults}}</label>
+                    <label><span ng-bind="noResults"></span></label>
                     <ul class="mail-list" data-ng-repeat="message in messages">
                         <li>
                             <a data-ng-href="/message/{{message.id}}">

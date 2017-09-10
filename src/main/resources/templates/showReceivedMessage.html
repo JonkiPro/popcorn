@@ -13,7 +13,6 @@
 
     <nav class="navbar navbar-default" role="navigation">
         <div class="container">
-            <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="btn-compose pull-left">
                 <a type="button" class="btn btn-success navbar-btn" th:href="@{/message/new}">
                     <span class="glyphicon glyphicon-pencil"></span> <span th:text="#{showReceivedMessage.btnNewMessage}">New message</span></a>
@@ -22,7 +21,6 @@
                 <li><a th:href="@{/messages}"><span th:text="#{showReceivedMessage.btnMessages}">Messages</span></a></li>
             </ul>
         </div>
-        <!-- /.container-fluid -->
     </nav>
 
     <div class="tab-content">
@@ -44,7 +42,7 @@
                     <button data-ng-click="replyMessage={'display':''}" class="btn btn-success btn-lg"><span
                             class="glyphicon glyphicon-send"></span> <span th:text="#{showReceivedMessage.btnReply}">REPLY</span>
                     </button>
-                    <p class="pull-right" style="margin-top: 5px;">Date of read: {{message.date_of_read | date:'dd/MM/yyyy HH:mm:ss'}}</p>
+                    <p class="pull-right" style="margin-top: 5px;">Date of read: <span ng-bind="message.date_of_read | date:'dd/MM/yyyy HH:mm:ss'"></span></p>
                 </div>
             </div>
         </div>

@@ -1,11 +1,11 @@
 package com.service.app.rest.controller;
 
 import com.service.app.converter.UnidirectionalConverter;
-import com.service.app.dto.in.SendMessageDTO;
-import com.service.app.dto.out.ReceivedMessageDTO;
-import com.service.app.dto.out.ReceivedMessageInfoDTO;
-import com.service.app.dto.out.SentMessageDTO;
-import com.service.app.dto.out.SentMessageInfoDTO;
+import com.service.app.rest.request.SendMessageDTO;
+import com.service.app.rest.response.ReceivedMessageDTO;
+import com.service.app.rest.response.ReceivedMessageInfoDTO;
+import com.service.app.rest.response.SentMessageDTO;
+import com.service.app.rest.response.SentMessageInfoDTO;
 import com.service.app.entity.Message;
 import com.service.app.exception.AccessToMessageForbiddenException;
 import com.service.app.service.AuthorizationService;

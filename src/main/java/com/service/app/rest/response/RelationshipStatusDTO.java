@@ -1,4 +1,4 @@
-package com.service.app.dto.out;
+package com.service.app.rest.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

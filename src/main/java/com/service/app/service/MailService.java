@@ -1,5 +1,7 @@
 package com.service.app.service;
 
+import org.springframework.scheduling.annotation.Async;
+
 /**
  * E-mail sending service.
  */
@@ -10,6 +12,7 @@ public interface MailService {
      * @param email E-mail address of the recipient.
      * @param token Activation token.
      */
+    @Async
     void sendMailWithActivationToken(String email, String token);
 
     /**
@@ -17,6 +20,7 @@ public interface MailService {
      * @param email E-mail address of the recipient.
      * @param token E-mail change token.
      */
+    @Async
     void sendMailWithEmailChangeToken(String email, String token);
 
     /**
@@ -24,6 +28,7 @@ public interface MailService {
      * @param email E-mail address of the recipient.
      * @param newPassword A new password.
      */
+    @Async
     void sendMailWithNewPassword(String email, String newPassword);
 
     /**
@@ -31,5 +36,6 @@ public interface MailService {
      * @param email E-mail address of the recipient.
      * @param username The user's name.
      */
+    @Async
     void sendMailWithUsername(String email, String username);
 }

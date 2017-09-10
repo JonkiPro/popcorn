@@ -1,4 +1,4 @@
-package com.service.app.dto.in;
+package com.service.app.rest.request;
 
 import com.service.app.validator.annotation.ExistsEmail;
 import com.service.app.validator.annotation.IsValidEmail;
@@ -20,6 +20,6 @@ public class ChangeEmailDTO {
     @NotEmpty
     @IsValidEmail
     @ExistsEmail(ifExistsReturn = false)
-    @ApiModelProperty(notes = "The user's new email", required = true)
+    @ApiModelProperty(notes = "The user's new e-mail", required = true)
     private String email;
 }

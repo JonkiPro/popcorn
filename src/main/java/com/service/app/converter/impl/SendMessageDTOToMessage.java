@@ -1,7 +1,7 @@
 package com.service.app.converter.impl;
 
 import com.service.app.converter.UnidirectionalConverter;
-import com.service.app.dto.in.SendMessageDTO;
+import com.service.app.rest.request.SendMessageDTO;
 import com.service.app.entity.Message;
 import com.service.app.service.AuthorizationService;
 import com.service.app.service.UserService;

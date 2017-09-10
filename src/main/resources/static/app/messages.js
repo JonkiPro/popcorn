@@ -42,12 +42,12 @@ app.controller('MessagesController', function ($scope, $http) {
         })
             .then(function (response) {
                 $scope.messages = response.data;
-                $scope.numberOfMessages = response.data.length;
+                $scope.numberOfMessages = '(' + response.data.length + ')';
                 $scope.noResults = '';
             })
             .catch(function () {
                 $scope.messages = null;
-                $scope.numberOfMessages = '0';
+                $scope.numberOfMessages = '(0)';
                 $scope.noResults = 'No results found!';
             });
     }
@@ -74,12 +74,12 @@ app.controller('MessagesController', function ($scope, $http) {
         })
             .then(function (response) {
                 $scope.messages = response.data;
-                $scope.numberOfMessages = response.data.length;
+                $scope.numberOfMessages = '(' + response.data.length + ')';
                 $scope.noResults = '';
             })
             .catch(function () {
                 $scope.messages = null;
-                $scope.numberOfMessages = '0';
+                $scope.numberOfMessages = '(0)';
                 $scope.noResults = 'No results found!';
             });
     }

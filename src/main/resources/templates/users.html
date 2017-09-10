@@ -30,15 +30,15 @@
                                                  data-ng-keyup="getAllByUsernameByPageSize()" class="form-control input-search"
                                                  style="width: 50px; display: inline;"/>
                 <span style="float: right;margin-right: 90px;">
-                    <b><span th:text="#{users.users}">Users</span>:</b> {{numberOfUsers}}
+                    <b><span th:text="#{users.users}">Users</span>:</b> <span ng-bind="numberOfUsers"></span>
                     <br />
-                    <b><span th:text="#{users.pages}">Pages</span>:</b> {{numberOfPages}}
+                    <b><span th:text="#{users.pages}">Pages</span>:</b> <span ng-bind="numberOfPages"></span>
                 </span>
             </div>
         </div>
         <div class="row well displayProfiles">
             <div class="row">
-                {{noResults}}
+                <span ng-bind="noResults"></span>
                 <div class="col-sm-4" data-ng-repeat="user in users">
                     <div class="card">
                         <div class="avatar">

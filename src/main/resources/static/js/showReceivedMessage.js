@@ -43,9 +43,12 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             error: function (error) {
                 var obj = JSON.parse(error.responseText);
-                console.log('Error: ' + obj);
-                console.log('Obj length: ' +  obj.field_errors.length);
-                console.log('Element: ' +  obj.field_errors[0].message);
+                for(var i = 0; i < obj.field_errors.length; ++i) {
+                    var objError = obj.field_errors[i];
+
+                    $('#' + objError.field)
+                        .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
+                }
             }
         });
     }

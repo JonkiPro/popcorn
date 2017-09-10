@@ -16,10 +16,10 @@
 
         <div class="row">
             <div class="col-sm-10">
-                <h1 class="username"><label>{{profile.username}}</label></h1>
+                <h1 class="username"><label ng-bind="profile.username"></label></h1>
                 <div sec:authorize="isAuthenticated()" class="btn-group">
                     <button data-ng-click="sendAction()" data-ng-model="btnAction" class="btn btn-info">
-                        <span class="glyphicon glyphicon-user"></span> {{btnText}}
+                        <span class="glyphicon glyphicon-user"></span> <span ng-bind="btnText"></span>
                     </button>
                     <a data-ng-href="/message/new?username={{profile.username}}">
                         <button type="button" class="btn btn-success">
@@ -39,7 +39,7 @@
                 <!--left col-->
                 <ul class="list-group">
                     <li class="list-group-item text-muted" contenteditable="false"><span th:text="#{profile.title}">Profile</span></li>
-                    <li class="list-group-item text-right"><span class="pull-left"><strong class=""><span th:text="#{profile.username}">Username</span></strong></span>{{profile.username}}</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong class=""><span th:text="#{profile.username}">Username</span></strong></span><span ng-bind="profile.username"></span></li>
                     <li class="list-group-item text-right"><span class="pull-left"><strong class="">Xxxxxx</strong></span>xxx</li>
                     <li class="list-group-item text-right"><span class="pull-left"><strong class="">Xxxxxx</strong></span>xxx</li>
                 </ul>

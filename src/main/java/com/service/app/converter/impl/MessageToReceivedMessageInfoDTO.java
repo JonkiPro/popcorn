@@ -1,7 +1,7 @@
 package com.service.app.converter.impl;
 
 import com.service.app.converter.UnidirectionalConverter;
-import com.service.app.dto.out.ReceivedMessageInfoDTO;
+import com.service.app.rest.response.ReceivedMessageInfoDTO;
 import com.service.app.entity.Message;
 import com.service.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

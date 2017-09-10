@@ -1,6 +1,6 @@
 package com.service.app.rest.controller;
 
-import com.service.app.dto.out.RelationshipStatusDTO;
+import com.service.app.rest.response.RelationshipStatusDTO;
 import com.service.app.entity.Friendship;
 import com.service.app.entity.Invitation;
 import com.service.app.service.AuthorizationService;

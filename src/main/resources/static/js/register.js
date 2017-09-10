@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     $('#registrationForm').validate({
+        ignore: ".ignore",
         rules: {
             username: {
                 noWhitespace: true,
@@ -54,6 +55,11 @@ document.addEventListener('DOMContentLoaded', function () {
             passwordAgain: {
                 required: true,
                 equalTo: '#password'
+            },
+            hiddenRecaptcha: {
+                required: function () {
+                    return grecaptcha.getResponse() === '';
+                }
             }
         },
         messages: {
@@ -62,9 +68,48 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             email: {
                 remote: $.validator.format('Email {0} exists in the database')
+            },
+            hiddenRecaptcha: {
+                required: 'Incorrect reCaptcha'
             }
-        }
+        },
+        submitHandler: function () { register(); }
     });
+
+    function register() {
+        var registerDTO = {"username":$('#username').val(),
+                            "email":$('#email').val(),
+                            "password":$('#password').val(),
+                            "passwordAgain":$('#passwordAgain').val(),
+                            "reCaptcha":grecaptcha.getResponse()};
+        $.ajax({
+            type: 'POST',
+            url: '/register',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify(registerDTO),
+            success: function (result) {
+                window.location.replace("/signIn");
+            },
+            error: function (error) {
+                var obj = JSON.parse(error.responseText);
+                for(var i = 0; i < obj.field_errors.length; ++i) {
+                    var objError = obj.field_errors[i];
+
+                    if(objError.field === "reCaptcha") {
+                        grecaptcha.reset();
+                        $('#recaptcha')
+                            .after('<label id="hiddenRecaptcha-error" class="error" for="hiddenRecaptcha">' + objError.message + '</label>');
+                    } else {
+                        $('#' + objError.field)
+                            .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
+                        $('#form-' + objError.field)
+                            .addClass('has-warning');
+                    }
+                }
+            }
+        });
+    }
 
     $.validator.addMethod( "noWhitespace", function( value, element ) {
         return this.optional( element ) || /^\S+$/i.test( value );
@@ -79,3 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
             || value.length >= 6 && /\d/.test(value) && /[a-z]/i.test(value)
     }, "Your password must be at least 6 characters long and contain at least one letter and one number" );
 });
+
+function recaptchaCallback() {
+    $('#hiddenRecaptcha').valid();
+}

@@ -15,19 +15,16 @@
         <div class="col-md-6 panel1">
             <div class="panel panel-primary">
                 <div class="panel-body">
-                    <div th:if="${success}" class="alert alert-dismissable alert-success">
-                        <span th:text="#{settings.successChangeEmail}">An e-mail has been successfully sent on your new e-mail. Please allow a few minutes for it to get to your inbox!</span>
-                    </div>
                     <form role="form" id="changeEmailForm">
                         <div class="form-group">
                             <h2><span th:text="#{settings.changeEmail}">Change e-mail</span></h2>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" id="form-password">
                             <label class="control-label" for="password" th:text="#{settings.password}">Password</label>
                             <input name="password" id="password" type="password" maxlength="36" class="form-control"
                                    th:placeholder="#{settings.password}"/>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" id="form-email">
                             <label class="control-label" for="email" th:text="#{settings.newEmail}">New e-mail</label>
                             <input name="email" id="email" type="email" class="form-control"
                                    th:placeholder="#{settings.newEmail}"/>
@@ -43,24 +40,21 @@
         <div class="col-md-6 panel2">
             <div class="panel panel-primary">
                 <div class="panel-body">
-                    <div th:if="${success}" class="alert alert-dismissable alert-success">
-                        <span th:text="#{settings.successChangePassword}">Your password has been changed.</span>
-                    </div>
                     <form role="form" id="changePasswordForm">
                         <div class="form-group">
                             <h2><span th:text="#{settings.changePassword}">Change password</span></h2>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" id="form-oldPassword">
                             <label class="control-label" for="oldPassword" th:text="#{settings.password}">Password</label>
                             <input name="oldPassword" id="oldPassword" type="password" maxlength="36" class="form-control"
                                    th:placeholder="#{settings.password}"/>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" id="form-newPassword">
                             <label class="control-label" for="newPassword" th:text="#{settings.newPassword}">New password</label>
                             <input name="newPassword" id="newPassword" type="password" maxlength="36" class="form-control"
                                    th:placeholder="#{settings.newPassword}"/>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" id="form-newPasswordAgain">
                             <label class="control-label" for="newPasswordAgain" th:text="#{settings.newPasswordAgain}">New password again</label>
                             <input name="newPasswordAgain" id="newPasswordAgain" type="password" maxlength="36" class="form-control"
                                    th:placeholder="#{settings.newPasswordAgain}"/>

@@ -13,16 +13,15 @@
 
     <nav class="navbar navbar-default" role="navigation">
         <div class="container">
-            <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="btn-compose pull-left">
                 <a type="button" class="btn btn-success navbar-btn" th:href="@{/message/new}">
-                    <span class="glyphicon glyphicon-pencil"></span> <span th:text="#{newMessage.btnNewMessage}">New message</span></a>
+                    <span class="glyphicon glyphicon-pencil"></span> <span th:text="#{newMessage.btnNewMessage}">New message</span>
+                </a>
             </div>
             <ul class="nav navbar-nav">
                 <li><a th:href="@{/messages}"><span th:text="#{newMessage.btnMessages}">Messages</span></a></li>
             </ul>
         </div>
-        <!-- /.container-fluid -->
     </nav>
 
     <div class="tab-content">
@@ -31,7 +30,7 @@
             <div class="col-md-12">
                 <form role="form" id="sendMessageForm">
                     <div class="form-group">
-                        <input name="username" id="username" type="text" class="form-control" th:placeholder="#{newMessage.inputTo}"/>
+                        <input name="to" id="to" type="text" class="form-control" th:placeholder="#{newMessage.inputTo}"/>
                     </div>
                     <div class="form-group">
                         <input name="subject" id="subject" type="text" class="form-control" maxlength="255" th:placeholder="#{newMessage.inputSubject}"/>

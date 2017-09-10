@@ -1,7 +1,7 @@
 package com.service.app.converter.impl;
 
 import com.service.app.converter.UnidirectionalConverter;
-import com.service.app.dto.in.RegisterDTO;
+import com.service.app.rest.request.RegisterDTO;
 import com.service.app.utils.EncryptUtils;
 import com.service.app.entity.User;
 import org.springframework.stereotype.Component;

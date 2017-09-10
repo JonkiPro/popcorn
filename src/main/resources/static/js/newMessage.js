@@ -14,14 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $('#sendMessageForm').validate({
         rules: {
-            username: {
+            to: {
                 required: true,
                 remote: {
                     url: '/checkUserData/checkUsername',
                     type: "GET",
                     data: {
                         username: function () {
-                            return $('#username').val();
+                            return $('#to').val();
                         }
                     }
                 }
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         messages: {
-            username: {
+            to: {
                 remote: $.validator.format('User {0} doesn`t exist')
             }
         },
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function sendMessage() {
-        var sendMessageDTO = { "to":$('#username').val(),
+        var sendMessageDTO = { "to":$('#to').val(),
                                "subject":$('#subject').val(),
                                "text":$('#text').val()};
         $.ajax({
@@ -56,15 +56,18 @@ document.addEventListener('DOMContentLoaded', function () {
             dataType: "json",
             data: JSON.stringify(sendMessageDTO),
             success: function () {
-                $('#username').val('');
+                $('#to').val('');
                 $('#subject').val('');
                 $('#text').val('');
             },
             error: function (error) {
                 var obj = JSON.parse(error.responseText);
-                console.log('Error: ' + obj);
-                console.log('Obj length: ' +  obj.field_errors.length);
-                console.log('Element: ' +  obj.field_errors[0].message);
+                for(var i = 0; i < obj.field_errors.length; ++i) {
+                    var objError = obj.field_errors[i];
+
+                    $('#' + objError.field)
+                        .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
+                }
             }
         });
     }
