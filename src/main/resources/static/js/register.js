@@ -88,8 +88,8 @@ document.addEventListener('DOMContentLoaded', function () {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(registerDTO),
-            success: function (result) {
-                window.location.replace("/signIn");
+            success: function (result, status, xhr) {
+                window.location.replace(xhr.getResponseHeader('Location'));
             },
             error: function (error) {
                 var obj = JSON.parse(error.responseText);

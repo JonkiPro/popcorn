@@ -55,8 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(sendMessageDTO),
-            success: function () {
-                window.location.replace("/profile/" + $('#to').val());
+            success: function (result, status, xhr) {
+                window.location.replace(xhr.getResponseHeader('Location'));
             },
             error: function (error) {
                 var obj = JSON.parse(error.responseText);

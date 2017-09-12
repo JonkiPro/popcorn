@@ -8,17 +8,16 @@ import com.service.app.service.MailService;
 import com.service.app.service.UserService;
 import com.service.app.utils.RandomUtils;
 import com.service.app.validator.component.RegisterPasswordsValidator;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.util.Optional;
@@ -44,10 +43,12 @@ public class RegisterRestController {
     }
 
     @ApiOperation(value = "Register the user", code = 201)
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Incorrect data in the form") })
     @PostMapping
     public
     HttpEntity<Boolean> register(
-            @RequestBody @Valid RegisterDTO registerDTO
+            @ApiParam(value = "Registration form", required = true) @RequestBody @Valid RegisterDTO registerDTO,
+            UriComponentsBuilder uriComponentsBuilder
     ) {
         User user = converterRegisterDTOToUser.convert(registerDTO);
         user.setActivationToken(RandomUtils.randomToken());
@@ -57,15 +58,18 @@ public class RegisterRestController {
 
         userService.saveUser(user);
 
-        return new ResponseEntity<>(true, HttpStatus.CREATED);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(uriComponentsBuilder.path("/signIn").build().toUri());
+
+        return new ResponseEntity<>(true, httpHeaders, HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "Activate the user with token.")
+    @ApiOperation(value = "Activate the user with token")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "Token not found") })
     @PutMapping(value = "/token/{token}")
     public
     HttpEntity<Boolean> confirmAccount(
-            @PathVariable String token
+            @ApiParam(value = "Account activation token", required = true) @PathVariable String token
     ) {
         Optional<User> userOptional = userService.findByActivationToken(token);
 

@@ -7,7 +7,7 @@ import com.service.app.service.MailService;
 import com.service.app.service.UserService;
 import com.service.app.utils.EncryptUtils;
 import com.service.app.utils.RandomUtils;
-import io.swagger.annotations.Api;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +29,15 @@ public class ForgotRestController {
     @Autowired
     private MailService mailService;
 
+    @ApiOperation(value = "Recover username and send it to the e-mail address")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 400, message = "Incorrect data in the form")
+    })
     @PutMapping(value = "/forgotUsername")
     public
     HttpEntity<Boolean> forgotUsername(
-            @RequestBody @Valid ForgotUsernameDTO forgotUsernameDTO
+            @ApiParam(value = "Username recovery form", required = true) @RequestBody @Valid ForgotUsernameDTO forgotUsernameDTO
     ) {
         Optional<User> userOptional = userService.findByEmail(forgotUsernameDTO.getEmail());
 
@@ -47,10 +52,15 @@ public class ForgotRestController {
         return ResponseEntity.ok(true);
     }
 
+    @ApiOperation(value = "Generate a new password for the user and send it to the e-mail address")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 400, message = "Incorrect data in the form")
+    })
     @PutMapping(value = "/forgotPassword")
     public
     HttpEntity<Boolean> forgotPassword(
-            @RequestBody @Valid ForgotPasswordDTO forgotPasswordDTO
+            @ApiParam(value = "Password recovery form", required = true) @RequestBody @Valid ForgotPasswordDTO forgotPasswordDTO
     ) {
         Optional<User> userOptional = userService.findByUsernameAndEmail(forgotPasswordDTO.getUsername(), forgotPasswordDTO.getEmail());
 

@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.util.Date;
@@ -49,11 +51,18 @@ public class MessageRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public
     HttpEntity<Boolean> sendMessage(
-            @ApiParam(value = "Message", required = true) @RequestBody @Valid SendMessageDTO sendMessageDTO
+            @ApiParam(value = "Message", required = true) @RequestBody @Valid SendMessageDTO sendMessageDTO,
+            UriComponentsBuilder uriComponentsBuilder
     ) {
         messageService.saveMessage(converterSendMessageDTOToMessage.convert(sendMessageDTO));
 
-        return new ResponseEntity<>(true, HttpStatus.CREATED);
+        UriComponents uriComponents
+                = uriComponentsBuilder.path("/profile/{username}").buildAndExpand(sendMessageDTO.getTo());
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(uriComponents.toUri());
+
+        return new ResponseEntity<>(true, httpHeaders, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Get all sent messages by user ID")
