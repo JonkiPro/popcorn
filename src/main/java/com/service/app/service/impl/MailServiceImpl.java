@@ -39,7 +39,7 @@ public class MailServiceImpl implements MailService{
             helper.setSubject("Complete registration");
             helper.setText("To activation your account, click the link below:<br />"
                     + "<a href='" + "http://localhost:8080" + "/register/thanks?token=" + token + "'>" +
-                    "localhost:8080" + "/register/thanks?token=" + token +
+                    "Click here to complete your registration" +
                     "</a>", true);
 
             sendMail(message);
@@ -62,7 +62,7 @@ public class MailServiceImpl implements MailService{
             helper.setSubject("Change e-mail");
             helper.setText("Change e-mail address, click the link below:<br />"
                     + "<a href='" + "http://localhost:8080" + "/settings/changeEmail/thanks?token=" + token + "'>" +
-                    "localhost:8080" + "/settings/changeEmail/thanks?token=" + token +
+                    "Click here to complete the change of your e-mail" +
                     "</a>", true);
 
             sendMail(message);

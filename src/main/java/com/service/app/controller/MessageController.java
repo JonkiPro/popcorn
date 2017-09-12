@@ -54,7 +54,7 @@ public class MessageController {
     }
 
     /**
-     * @param id The message ID;
+     * @param id The message ID.
      * @param modelMap {@link ModelMap}
      * @return Returns the ModelAndView for the selected message.
      */
@@ -76,7 +76,7 @@ public class MessageController {
 
     /**
      * This method checks to see if the message belongs to the user.
-     * @param messageId The message ID;
+     * @param messageId The message ID.
      */
     private void validAccessToMessage(Long messageId) {
         List<Message> messageList = messageService.findBySender(authorizationService.getUserId());

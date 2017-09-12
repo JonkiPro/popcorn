@@ -1,19 +1,17 @@
 package com.service.app.rest.controller;
 
-import com.service.app.exception.TokenNotFoundException;
 import com.service.app.rest.request.ChangeEmailDTO;
 import com.service.app.rest.request.ChangePasswordDTO;
 import com.service.app.entity.User;
 import com.service.app.service.MailService;
 import com.service.app.service.UserService;
 import com.service.app.utils.EncryptUtils;
+import com.service.app.utils.RandomUtils;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -43,7 +41,7 @@ public class SettingsRestController {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
-            user.setEmailChangeToken(EncryptUtils.encrypt(user.getUsername()));
+            user.setEmailChangeToken(RandomUtils.randomToken());
             user.setNewEmail(changeEmailDTO.getEmail());
 
             mailService.sendMailWithEmailChangeToken(user.getEmail(), user.getEmailChangeToken());
@@ -75,32 +73,28 @@ public class SettingsRestController {
         return ResponseEntity.ok(true);
     }
 
-    @GetMapping("/changeEmail/thanks")
+    @ApiOperation(value = "Activates e-mail change with token.")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "Token not found") })
+    @PreAuthorize("permitAll()")
+    @PutMapping(value = "/changeEmail/token/{token}")
     public
-    ResponseEntity<?> emailChangeToken(
-            @RequestParam("token") String token,
-            UriComponentsBuilder uriComponentsBuilder
+    HttpEntity<Boolean> emailChangeToken(
+            @PathVariable String token
     ) {
         Optional<User> userOptional = userService.findByEmailChangeToken(token);
 
-        if(userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            user.setEmail(user.getNewEmail());
-            user.setEmailChangeToken(null);
-            user.setNewEmail(null);
-
-            userService.saveUser(user);
-        } else {
-            throw new TokenNotFoundException();
+        if(!userOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
 
-        UriComponents uriComponents = uriComponentsBuilder.path("/").build();
+        User user = userOptional.get();
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(uriComponents.toUri());
+        user.setEmail(user.getNewEmail());
+        user.setEmailChangeToken(null);
+        user.setNewEmail(null);
 
-        return new ResponseEntity<>(httpHeaders, HttpStatus.MOVED_PERMANENTLY);
+        userService.saveUser(user);
+
+        return ResponseEntity.ok(true);
     }
 }

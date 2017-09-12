@@ -37,7 +37,7 @@ public class ForgotRestController {
         Optional<User> userOptional = userService.findByEmail(forgotUsernameDTO.getEmail());
 
         if(!userOptional.isPresent()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
 
         User user = userOptional.get();
@@ -55,7 +55,7 @@ public class ForgotRestController {
         Optional<User> userOptional = userService.findByUsernameAndEmail(forgotPasswordDTO.getUsername(), forgotPasswordDTO.getEmail());
 
         if(!userOptional.isPresent()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
 
         User user = userOptional.get();

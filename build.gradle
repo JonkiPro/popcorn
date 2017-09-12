@@ -31,7 +31,7 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	//
 
-	// Spring Boot
+	// Spring Boot Configuration Processor
 	compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '1.5.6.RELEASE'
 	//
 
