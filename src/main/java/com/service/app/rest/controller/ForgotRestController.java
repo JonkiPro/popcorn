@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 @RestController
 @PreAuthorize("hasRole('ROLE_ANONYMOUS')")
+@RequestMapping(value = "/api/v1.0/users/attributes")
 @Api(value = "Forgot API", description = "Provides a list of methods for reminding username and password")
 public class ForgotRestController {
 
@@ -34,7 +36,7 @@ public class ForgotRestController {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 400, message = "Incorrect data in the form")
     })
-    @PutMapping(value = "/forgotUsername")
+    @PutMapping(value = "/username_recovery")
     public
     HttpEntity<Boolean> forgotUsername(
             @ApiParam(value = "Username recovery form", required = true) @RequestBody @Valid ForgotUsernameDTO forgotUsernameDTO
@@ -57,7 +59,7 @@ public class ForgotRestController {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 400, message = "Incorrect data in the form")
     })
-    @PutMapping(value = "/forgotPassword")
+    @PutMapping(value = "/password_reset")
     public
     HttpEntity<Boolean> forgotPassword(
             @ApiParam(value = "Password recovery form", required = true) @RequestBody @Valid ForgotPasswordDTO forgotPasswordDTO

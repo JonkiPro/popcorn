@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                  "email":$('#email').val()};
         $.ajax({
             type: 'PUT',
-            url: '/forgotPassword',
+            url: '/api/v1.0/users/attributes/password_reset',
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(forgotPasswordDTO),

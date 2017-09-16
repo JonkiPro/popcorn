@@ -43,7 +43,7 @@ public class SettingsController {
         HttpEntity<Object> entity = new HttpEntity<>(new HttpHeaders());
 
         UriComponents uriComponents
-                = uriComponentsBuilder.path("/settings/changeEmail/token/{token}").buildAndExpand(token);
+                = uriComponentsBuilder.path("/api/v1.0/settings/changeEmail/token/{token}").buildAndExpand(token);
 
         ResponseEntity<Boolean> response;
 

@@ -6,6 +6,8 @@ import com.service.app.service.InvitationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service("invitationService")
 public class InvitationServiceImpl implements InvitationService {
 
@@ -27,7 +29,7 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
-    public Invitation findInvitation(Long fromId, Long toId) {
+    public Optional<Invitation> findInvitation(Long fromId, Long toId) {
         return invitationRepository.findOneByFromIdAndToId(fromId, toId);
     }
 

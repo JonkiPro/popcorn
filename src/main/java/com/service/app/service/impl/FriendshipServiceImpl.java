@@ -1,10 +1,15 @@
 package com.service.app.service.impl;
 
 import com.service.app.entity.Friendship;
+import com.service.app.entity.Invitation;
 import com.service.app.repository.FriendshipRepository;
+import com.service.app.repository.InvitationRepository;
 import com.service.app.service.FriendshipService;
+import com.service.app.service.InvitationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service("friendshipService")
 public class FriendshipServiceImpl implements FriendshipService {
@@ -19,6 +24,8 @@ public class FriendshipServiceImpl implements FriendshipService {
     @Override
     public void saveFriendship(Friendship friendship) {
         friendshipRepository.save(friendship);
+        friendshipRepository
+                .save(new Friendship(friendship.getToId(), friendship.getFromId()));
     }
 
     @Override
@@ -27,12 +34,17 @@ public class FriendshipServiceImpl implements FriendshipService {
     }
 
     @Override
-    public Friendship findFriendship(Long fromId, Long toId) {
+    public Optional<Friendship> findFriendship(Long fromId, Long toId) {
         return friendshipRepository.findOneByFromIdAndToId(fromId, toId);
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void removeFriendship(Friendship friendship) {
-        friendshipRepository.delete(friendship);
+        Long fromId = friendship.getFromId();
+        Long toId = friendship.getToId();
+
+        friendshipRepository.delete(this.findFriendship(fromId, toId).get());
+        friendshipRepository.delete(this.findFriendship(toId, fromId).get());
     }
 }

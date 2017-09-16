@@ -1,13 +1,10 @@
 package com.service.app.rest.controller;
 
 import com.service.app.converter.UnidirectionalConverter;
+import com.service.app.exception.ResourceForbiddenException;
 import com.service.app.rest.request.SendMessageDTO;
-import com.service.app.rest.response.ReceivedMessageDTO;
-import com.service.app.rest.response.ReceivedMessageInfoDTO;
-import com.service.app.rest.response.SentMessageDTO;
-import com.service.app.rest.response.SentMessageInfoDTO;
+import com.service.app.rest.response.*;
 import com.service.app.entity.Message;
-import com.service.app.exception.AccessToMessageForbiddenException;
 import com.service.app.service.AuthorizationService;
 import com.service.app.service.MessageService;
 import io.swagger.annotations.*;
@@ -19,14 +16,12 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
-@RequestMapping(value = "/messages", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1.0/messages", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "Message API", description = "Provides a list of methods that manage messages")
 public class MessageRestController {
 
@@ -45,15 +40,19 @@ public class MessageRestController {
     @Autowired
     private UnidirectionalConverter<Message, ReceivedMessageDTO> converterMessageToReceivedMessageDTO;
 
-    @ApiOperation(value = "Save message", code = 201)
-    @ApiResponses(value = { @ApiResponse(code = 400, message = "Incorrect data in the form") })
-    @PostMapping(value = "/sendMessage")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation(value = "Save message")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Incorrect data in the form"),
+            @ApiResponse(code = 403, message = "Authorised user")
+    })
+    @PostMapping
     public
-    HttpEntity<Boolean> sendMessage(
+    HttpEntity<Boolean> addMessage(
             @ApiParam(value = "Message", required = true) @RequestBody @Valid SendMessageDTO sendMessageDTO,
             UriComponentsBuilder uriComponentsBuilder
     ) {
+        this.validUsername(sendMessageDTO.getTo());
+
         messageService.saveMessage(converterSendMessageDTOToMessage.convert(sendMessageDTO));
 
         UriComponents uriComponents
@@ -65,142 +64,112 @@ public class MessageRestController {
         return new ResponseEntity<>(true, httpHeaders, HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "Get all sent messages by user ID")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
-    @GetMapping(value = "/getSentMessages")
-    public
-    HttpEntity<List<SentMessageInfoDTO>> getSentMessageInfoDTO() {
-        List<Message> messageList = messageService.findBySender(authorizationService.getUserId());
-
-        return !messageList.isEmpty() ?
-                ResponseEntity.ok().body(converterMessageToSentMessageInfoDTO.convertAll(messageList)) : ResponseEntity.notFound().build();
-    }
-
-    @ApiOperation(value = "Get all received messages by user ID")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
-    @GetMapping(value = "/getReceivedMessages")
-    public
-    HttpEntity<List<ReceivedMessageInfoDTO>> getReceivedMessageInfoDTO() {
-        List<Message> messageList = messageService.findByRecipient(authorizationService.getUserId());
-
-        return !messageList.isEmpty() ?
-                ResponseEntity.ok().body(converterMessageToReceivedMessageInfoDTO.convertAll(messageList)) : ResponseEntity.notFound().build();
-    }
-
-    @ApiOperation(value = "Remove sent message by ID")
-    @ApiResponses(value = { @ApiResponse(code = 403, message = "No messages found or you have not accessed") })
-    @DeleteMapping(value = "/removeSentMessage")
-    public
-    HttpEntity<Boolean> removeSentMessage(
-            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
-    ) {
-        return messageService.findBySender(authorizationService.getUserId()).stream().anyMatch(message -> message.getId().equals(id)) ?
-                ResponseEntity.ok().body(messageService.removeSentMessage(id)) : new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
-    }
-
-    @ApiOperation(value = "Remove received message by ID")
-    @ApiResponses(value = { @ApiResponse(code = 403, message = "No messages found or you have not accessed") })
-    @DeleteMapping(value = "/removeReceivedMessage")
-    public
-    HttpEntity<Boolean> removeReceivedMessage(
-            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
-    ) {
-        return messageService.findByRecipient(authorizationService.getUserId()).stream().anyMatch(message -> message.getId().equals(id)) ?
-                ResponseEntity.ok().body(messageService.removeReceivedMessage(id)) : new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
-    }
-
-    @ApiOperation(value = "Search sent messages by phrase")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
-    @GetMapping(value = "/searchSentMessages")
-    public
-    HttpEntity<List<SentMessageInfoDTO>> searchSentMessage(
-            @ApiParam(value = "Search for a phrase", required = true) @RequestParam String q
-    ) {
-        List<Message> messageList = messageService.findSentMessagesByContaining(authorizationService.getUserId(), q);
-
-        return !messageList.isEmpty() ?
-                ResponseEntity.ok().body(converterMessageToSentMessageInfoDTO.convertAll(messageList)) : ResponseEntity.notFound().build();
-    }
-
-    @ApiOperation(value = "Search received messages by phrase")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
-    @GetMapping(value = "/searchReceivedMessages")
-    public
-    HttpEntity<List<ReceivedMessageInfoDTO>> searchReceivedMessage(
-            @ApiParam(value = "Search for a phrase", required = true) @RequestParam String q
-    ) {
-        List<Message> messageList = messageService.findReceivedMessagesByContaining(authorizationService.getUserId(), q);
-
-        return !messageList.isEmpty() ?
-                ResponseEntity.ok().body(converterMessageToReceivedMessageInfoDTO.convertAll(messageList)) : ResponseEntity.notFound().build();
-    }
-
     @ApiOperation(value = "Get sent message by ID")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
-    @GetMapping(value = "/getSentMessage")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No message found") })
+    @GetMapping(value = "/sent/{id}")
     public
-    HttpEntity<SentMessageDTO> getSentMessageDTO(
-            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
+    HttpEntity<SentMessageDTO> getSentMessage(
+            @ApiParam(value = "The message ID", required = true) @PathVariable Long id
     ) {
-        Optional<Message> messageOptional = messageService.findByIdAndSender(id, authorizationService.getUserId());
-
-        return messageOptional
+        return messageService.findByIdAndSender(id, authorizationService.getUserId())
                 .map(message -> ResponseEntity.ok().body(converterMessageToSentMessageDTO.convert(message)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "Get received message by ID")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
-    @GetMapping(value = "/getReceivedMessage")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No message found") })
+    @GetMapping(value = "/received/{id}")
     public
-    HttpEntity<ReceivedMessageDTO> getReceivedMessageDTO(
-            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
+    HttpEntity<ReceivedMessageDTO> getReceivedMessage(
+            @ApiParam(value = "The message ID", required = true) @PathVariable Long id
     ) {
-        Optional<Message> messageOptional = messageService.findByIdAndRecipient(id, authorizationService.getUserId());
-
-        return messageOptional
+        return messageService.findByIdAndRecipient(id, authorizationService.getUserId())
                 .map(message -> ResponseEntity.ok().body(converterMessageToReceivedMessageDTO.convert(message)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @ApiOperation(value = "Set the date to read the message by ID")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "No messages found") })
-    @PutMapping(value = "/setDateOfRead")
-    @SuppressWarnings("ConstantConditions")
+    @ApiOperation(value = "Remove sent message by ID")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No message found") })
+    @DeleteMapping(value = "/sent/{id}")
     public
-    HttpEntity<Date> setDateOfRead(
-            @ApiParam(value = "The message ID", required = true) @RequestParam Long id
+    HttpEntity<Boolean> removeSentMessage(
+            @ApiParam(value = "The message ID", required = true) @PathVariable Long id
     ) {
-        this.validAccessToMessage(id);
-
-        Optional<Message> messageOptional = messageService.findByIdAndRecipient(id, authorizationService.getUserId());
-
-        Message message;
-
-        try {
-            message = messageOptional.get();
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-
-        message.setDateOfRead(new Date());
-
-        messageService.saveMessage(message);
-
-        return ResponseEntity.ok(message.getDateOfRead());
+        return messageService.findBySender(authorizationService.getUserId()).stream().anyMatch(message -> message.getId().equals(id)) ?
+                ResponseEntity.ok().body(messageService.removeSentMessage(id)) : ResponseEntity.notFound().build();
     }
 
-    /**
-     * This method checks to see if the message belongs to the user.
-     * @param messageId The message ID.
-     */
-    private void validAccessToMessage(Long messageId) {
-        List<Message> messageList = messageService.findBySender(authorizationService.getUserId());
-        messageList.addAll(messageService.findByRecipient(authorizationService.getUserId()));
+    @ApiOperation(value = "Remove received message by ID")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No message found") })
+    @DeleteMapping(value = "/received/{id}")
+    public
+    HttpEntity<Boolean> removeReceivedMessage(
+            @ApiParam(value = "The message ID", required = true) @PathVariable Long id
+    ) {
+        return messageService.findByRecipient(authorizationService.getUserId()).stream().anyMatch(message -> message.getId().equals(id)) ?
+                ResponseEntity.ok().body(messageService.removeReceivedMessage(id)) : ResponseEntity.notFound().build();
+    }
 
-        messageList.stream()
-                .filter(v -> messageId.equals(v.getId()))
-                .findAny()
-                .orElseThrow(AccessToMessageForbiddenException::new);
+    @ApiOperation(value = "Get sent messages")
+    @GetMapping(value = "/sent")
+    public
+    HttpEntity<List<SentMessageInfoDTO>> getSentMessages(
+            @ApiParam(value = "Search for a phrase") @RequestParam(required = false) String q
+    ) {
+        return Optional
+                .ofNullable(q)
+                .map(var -> {
+                    List<Message> messageList
+                            = messageService.findSentMessagesByContaining(authorizationService.getUserId(), q);
+
+                    return ResponseEntity
+                            .ok()
+                            .body(converterMessageToSentMessageInfoDTO.convertAll(messageList));
+                })
+                .orElseGet(() -> {
+                    List<Message> messageList
+                            = messageService.findBySender(authorizationService.getUserId());
+
+                    return ResponseEntity
+                            .ok()
+                            .body(converterMessageToSentMessageInfoDTO.convertAll(messageList));
+                });
+    }
+
+    @ApiOperation(value = "Get received messages")
+    @GetMapping(value = "/received")
+    public
+    HttpEntity<List<ReceivedMessageInfoDTO>> getReceivedMessages(
+            @ApiParam(value = "Search for a phrase") @RequestParam(required = false) String q
+    ) {
+        return Optional
+                .ofNullable(q)
+                .map(var -> {
+                    List<Message> messageList
+                            = messageService.findReceivedMessagesByContaining(authorizationService.getUserId(), q);
+
+                    return ResponseEntity
+                            .ok()
+                            .body(converterMessageToReceivedMessageInfoDTO.convertAll(messageList));
+                })
+                .orElseGet(() -> {
+                    List<Message> messageList
+                            = messageService.findByRecipient(authorizationService.getUserId());
+
+                    return ResponseEntity
+                            .ok()
+                            .body(converterMessageToReceivedMessageInfoDTO.convertAll(messageList));
+                });
+    }
+
+
+    /**
+     * This method validates whether the username is not the name of the authorised user.
+     * @param username The user's name.
+     * @throws ResourceForbiddenException if the username is the same as the authorised user's name
+     */
+    private void validUsername(String username) {
+        if(username.equals(authorizationService.getUserUsername()))
+            throw new ResourceForbiddenException("You cannot provide an authorised user name");
     }
 }

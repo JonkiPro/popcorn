@@ -1,6 +1,5 @@
 package com.service.app.rest.controller;
 
-import com.service.app.exception.ProfileNotFoundException;
 import com.service.app.rest.response.UserInfoDTO;
 import com.service.app.rest.response.UserProfileDTO;
 import com.service.app.entity.User;
@@ -18,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @PreAuthorize("permitAll()")
-@RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1.0/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "User API", description = "Provides a list of methods that retrieve users and their data")
 public class UserRestController {
 
@@ -29,19 +28,8 @@ public class UserRestController {
     @Autowired
     private UnidirectionalConverter<User, UserProfileDTO> converterUserToUserProfileDTO;
 
-    @ApiOperation(value = "Get the number of users by fragment of username")
-    @GetMapping(value = "/getNumberOfUsersByUsername")
-    @ResponseStatus(HttpStatus.OK)
-    public
-    HttpEntity<Long> getNumberOfUsersByUsername(
-            @ApiParam(value = "Fragment of username", required = true) @RequestParam String username
-    ) {
-        return ResponseEntity.ok().body(userService.countByUsernameContaining(username));
-    }
-
     @ApiOperation(value = "Get list of users by phrase")
-    @GetMapping(value = "/getUsers")
-    @ResponseStatus(HttpStatus.OK)
+    @GetMapping
     public
     HttpEntity<List<UserInfoDTO>> getUsers(
             @ApiParam(value = "Search for a phrase") @RequestParam(required = false) String q,
@@ -59,14 +47,24 @@ public class UserRestController {
 
     @ApiOperation(value = "Get user profile by username")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
-    @GetMapping(value = "/getProfile")
+    @GetMapping(value = "/account/{username}")
     public
     HttpEntity<UserProfileDTO> getProfile(
-            @ApiParam(value = "The user's name", required = true) @RequestParam String username
+            @ApiParam(value = "The user's name", required = true) @PathVariable String username
     ) {
         return Optional
                 .ofNullable(userService.findOneByUsername(username))
                 .map(user -> ResponseEntity.ok().body(converterUserToUserProfileDTO.convert(user)))
-                .orElseThrow(ProfileNotFoundException::new);
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @ApiOperation(value = "Get the number of users by fragment of username")
+    @GetMapping(value = "/number")
+    @ResponseStatus(HttpStatus.OK)
+    public
+    HttpEntity<Long> getNumberOfUsers(
+            @ApiParam(value = "Fragment of username", required = true) @RequestParam String username
+    ) {
+        return ResponseEntity.ok().body(userService.countByUsernameContaining(username));
     }
 }

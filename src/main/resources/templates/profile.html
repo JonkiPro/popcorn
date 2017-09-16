@@ -17,11 +17,11 @@
         <div class="row">
             <div class="col-sm-10">
                 <h1 class="username"><label ng-bind="profile.username"></label></h1>
-                <div sec:authorize="isAuthenticated()" class="btn-group">
+                <div sec:authorize="isAuthenticated()" data-ng-show="authorisedUser" id="div-auth" class="btn-group ng-cloak">
                     <button data-ng-click="sendAction()" data-ng-model="btnAction" class="btn btn-info">
                         <span class="glyphicon glyphicon-user"></span> <span ng-bind="btnText"></span>
                     </button>
-                    <a data-ng-href="/message/new?username={{profile.username}}">
+                    <a data-ng-href="/messages/new?username={{profile.username}}">
                         <button type="button" class="btn btn-success">
                             <span class="glyphicon glyphicon-envelope"></span> <span th:text="#{profile.btnSendMessage}">Send a message!</span>
                         </button>
@@ -164,5 +164,6 @@
     <script type="text/javascript" th:src="#{bootstrap.js}"></script>
     <script type="text/javascript" th:src="#{angular.js}"></script>
     <script type="text/javascript" src="../static/app/profile.js" th:src="@{/app/profile.js}"></script>
+    <script sec:authorize="isAuthenticated()" type="text/javascript" src="../static/app/profile_status.js" th:src="@{/app/profile_status.js}"></script>
 </body>
 </html>

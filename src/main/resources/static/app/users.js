@@ -10,7 +10,7 @@ app.controller('UsersController', function ($scope, $http) {
     if(angular.element('#search-value').val() === '') {
         angular.element('#search-value').val('');
         $scope.pageSize = 1;
-        $scope.page=1;
+        $scope.page = 1;
     }
 
     init();
@@ -21,7 +21,7 @@ app.controller('UsersController', function ($scope, $http) {
 
     function getAllByUsername() {
         $http({
-            url: '/users/getUsers',
+            url: '/api/v1.0/users',
             method: "GET",
             params: {
                 q: angular.element('#search-value').val(),
@@ -34,7 +34,7 @@ app.controller('UsersController', function ($scope, $http) {
             });
 
         $http({
-            url: '/users/getNumberOfUsersByUsername',
+            url: '/api/v1.0/users/number',
             method: "GET",
             params: {
                 username: angular.element('#search-value').val()
@@ -65,15 +65,17 @@ app.controller('UsersController', function ($scope, $http) {
                     $scope.noResults = '';
                 } else {
                     $scope.numberOfUsers = 0;
-                    $scope.numberOfPages = 1;
+                    $scope.numberOfPages = 0;
                     $scope.noResults = 'No results found!';
+                    $scope.btnPrev = false;
+                    $scope.btnNext = false;
                 }
             });
     }
 
     function getUser() {
         return $http({
-            url: '/users/getUsers',
+            url: '/api/v1.0/users',
             method: "GET",
             params: {
                 q: angular.element('#search-value').val(),
@@ -87,14 +89,14 @@ app.controller('UsersController', function ($scope, $http) {
     }
 
     $scope.getAllByUsernameByPageSize = function () {
-        if (parseInt($scope.pageSize) < 1) {
+        if (parseInt($scope.pageSize) < 1 || !$scope.pageSize) {
             $scope.pageSize = 1;
         }
         getAllByUsername();
     };
 
     $scope.getAllByUsernameByPage = function () {
-        if (parseInt($scope.page) < 1) {
+        if (parseInt($scope.page) < 1 || !$scope.page) {
             $scope.page = 1;
         } else if (parseInt($scope.page) > parseInt($scope.numberOfPages)) {
             $scope.page = $scope.numberOfPages;

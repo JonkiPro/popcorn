@@ -22,11 +22,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 minlength: 6,
                 maxlength: 36,
                 remote : {
-                    url: '/checkUserData/checkUsernameAtRegistering',
+                    url: '/api/v1.0/users/check/username',
                     type: "GET",
                     data: {
                         username: function() {
                             return $('#username').val();
+                        },
+                        negation: function () {
+                            return true;
                         }
                     }
                 }
@@ -36,11 +39,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 required: true,
                 email: true,
                 remote : {
-                    url: '/checkUserData/checkEmailAtRegistering',
+                    url: '/api/v1.0/users/check/email',
                     type: "GET",
                     data: {
                         email: function() {
                             return $('#email').val();
+                        },
+                        negation: function () {
+                            return true;
                         }
                     }
                 }
@@ -84,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             "reCaptcha":grecaptcha.getResponse()};
         $.ajax({
             type: 'POST',
-            url: '/register',
+            url: '/api/v1.0/register',
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(registerDTO),

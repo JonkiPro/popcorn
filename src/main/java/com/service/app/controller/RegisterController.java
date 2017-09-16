@@ -42,7 +42,7 @@ public class RegisterController {
         HttpEntity<Object> entity = new HttpEntity<>(new HttpHeaders());
 
         UriComponents uriComponents
-                = uriComponentsBuilder.path("/register/token/{token}").buildAndExpand(token);
+                = uriComponentsBuilder.path("/api/v1.0/register/token/{token}").buildAndExpand(token);
 
         ResponseEntity<Boolean> response;
 
@@ -58,5 +58,10 @@ public class RegisterController {
 
         /* IF 200 */
         return new ModelAndView("redirect:/signIn");
+    }
+
+    @GetMapping(value = "/successfully")
+    public ModelAndView registerSuccessfully() {
+        return new ModelAndView("registerSuccessfully");
     }
 }

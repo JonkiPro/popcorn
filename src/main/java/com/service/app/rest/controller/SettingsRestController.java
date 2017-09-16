@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
-@RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1.0/users/account/update", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "Settings API", description = "Provides a list of methods that manage settings")
 public class SettingsRestController {
 
@@ -30,7 +30,7 @@ public class SettingsRestController {
 
     @ApiOperation(value = "It changes the user's email and sends a token to the mail")
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Incorrect data in the form") })
-    @PutMapping(value = "/changeEmail")
+    @PutMapping(value = "/email")
     public
     HttpEntity<Boolean> changeEmail(
             @ApiParam(value = "Form of e-mail change", required = true) @RequestBody @Valid ChangeEmailDTO changeEmailDTO,
@@ -54,7 +54,7 @@ public class SettingsRestController {
 
     @ApiOperation(value = "It changes the user's password")
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Incorrect data in the form") })
-    @PutMapping(value = "/changePassword")
+    @PutMapping(value = "/password")
     public
     HttpEntity<Boolean> changePassword(
             @ApiParam(value = "Form of password change", required = true) @RequestBody @Valid ChangePasswordDTO changePasswordDTO,
@@ -73,13 +73,13 @@ public class SettingsRestController {
         return ResponseEntity.ok(true);
     }
 
-    @ApiOperation(value = "Activates e-mail change with token.")
+    @ApiOperation(value = "Activates e-mail change with token")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "Token not found") })
     @PreAuthorize("permitAll()")
-    @PutMapping(value = "/changeEmail/token/{token}")
+    @PutMapping(value = "/email/token/{token}")
     public
     HttpEntity<Boolean> emailChangeToken(
-            @PathVariable String token
+            @ApiParam(value = "E-mail change token", required = true) @PathVariable String token
     ) {
         Optional<User> userOptional = userService.findByEmailChangeToken(token);
 

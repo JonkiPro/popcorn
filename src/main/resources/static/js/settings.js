@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             password: {
                 required: true,
                 remote: {
-                    url: '/checkUserData/checkPassword',
+                    url: '/api/v1.0/users/check/password',
                     type: "GET",
                     data: {
                         password: function () {
@@ -29,11 +29,14 @@ document.addEventListener('DOMContentLoaded', function () {
             email: {
                 required: true,
                 remote: {
-                    url: '/checkUserData/checkEmailAtRegistering',
+                    url: '/api/v1.0/users/check/email',
                     type: "GET",
                     data: {
                         email: function () {
                             return $('#email').val();
+                        },
+                        negation: function () {
+                            return true;
                         }
                     }
                 }
@@ -55,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
                               "email":$('#email').val()};
         $.ajax({
             type: 'PUT',
-            url: '/settings/changeEmail',
+            url: '/api/v1.0/users/account/update/email',
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(changeEmailDTO),
@@ -89,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
             oldPassword: {
                 required: true,
                 remote: {
-                    url: '/checkUserData/checkPassword',
+                    url: '/api/v1.0/users/check/password',
                     type: "GET",
                     data: {
                         password: function () {
@@ -105,11 +108,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 maxlength: 36,
                 strongPassword: true,
                 remote: {
-                    url: '/checkUserData/checkPasswordIsTheSame',
+                    url: '/api/v1.0/users/check/password',
                     type: "GET",
                     data: {
                         password: function () {
                             return $('#newPassword').val();
+                        },
+                        negation: function () {
+                            return true;
                         }
                     }
                 }
@@ -136,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                  "newPasswordAgain":$('#newPasswordAgain').val()};
         $.ajax({
             type: 'PUT',
-            url: '/settings/changePassword',
+            url: '/api/v1.0/users/account/update/password',
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(changePasswordDTO),

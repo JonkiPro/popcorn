@@ -6,5 +6,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @NoArgsConstructor
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class ProfileNotFoundException extends RuntimeException {
+public class AccountNotFoundException extends RuntimeException {
 }

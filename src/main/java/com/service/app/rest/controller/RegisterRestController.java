@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @RestController
 @PreAuthorize("hasRole('ROLE_ANONYMOUS')")
-@RequestMapping(value = "/register")
+@RequestMapping(value = "/api/v1.0/register")
 @Api(value = "Register API", description = "Provides a list of methods for registration")
 public class RegisterRestController {
 
@@ -59,7 +59,7 @@ public class RegisterRestController {
         userService.saveUser(user);
 
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(uriComponentsBuilder.path("/signIn").build().toUri());
+        httpHeaders.setLocation(uriComponentsBuilder.path("/register/successfully").build().toUri());
 
         return new ResponseEntity<>(true, httpHeaders, HttpStatus.CREATED);
     }

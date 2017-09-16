@@ -12,11 +12,8 @@ app.controller('ShowSentMessageController', function ($scope, $http) {
 
     function getMessage(messageId) {
         $http({
-            url: '/messages/getSentMessage',
-            method: "GET",
-            params: {
-                id: messageId
-            }
+            url: '/api/v1.0/messages/sent/' + messageId,
+            method: "GET"
         })
             .then(function (response) {
                 $scope.message = response.data;
@@ -28,11 +25,8 @@ app.controller('ShowSentMessageController', function ($scope, $http) {
 
     $scope.removeMessage = function () {
         $http({
-            url: '/messages/removeSentMessage',
-            method: "DELETE",
-            params: {
-                id: messageId
-            }
+            url: '/api/v1.0/messages/sent/' + messageId,
+            method: "DELETE"
         })
             .then(function () {
                 window.location.replace('/messages');

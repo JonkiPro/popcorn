@@ -14,7 +14,7 @@
     <nav class="navbar navbar-default" role="navigation">
         <div class="container">
             <div class="btn-compose pull-left">
-                <a type="button" class="btn btn-success navbar-btn" th:href="@{/message/new}">
+                <a type="button" class="btn btn-success navbar-btn" th:href="@{/messages/new}">
                     <span class="glyphicon glyphicon-pencil"></span> <span th:text="#{messages.btnNewMessage}">New message</span>
                 </a>
             </div>
@@ -35,8 +35,8 @@
                     </form>
                     <label><span ng-bind="noResults"></span></label>
                     <ul class="mail-list" data-ng-repeat="message in messages">
-                        <li>
-                            <a data-ng-href="/message/{{message.id}}">
+                        <li class="ng-cloak">
+                            <a data-ng-href="/messages/{{message.id}}">
                                 <span class="mail-sender">{{message.sender}}</span>
                                 <span class="mail-sender">{{message.recipient}}</span>
                                 <span class="mail-subject">{{message.subject}}</span>

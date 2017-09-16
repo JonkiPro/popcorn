@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                "text":$('#text').val()};
         $.ajax({
             type: 'POST',
-            url: '/messages/sendMessage',
+            url: '/api/v1.0/messages',
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(sendMessageDTO),

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="#{bootstrap.css}"/>
+    <title th:text="#{registerSuccessfully.topic}">Title</title>
+</head>
+<body>
+    <div class="alert alert-success">
+        <strong th:text="#{registerSuccessfully.success}">Success!</strong>
+        <span th:text="#{registerSuccessfully.statement}">An activation link has been sent to your e-mail.</span>
+    </div>
+
+    <script type="text/javascript">
+        setTimeout(function () {
+            window.location.replace('/signIn');
+        }, 2000)
+    </script>
+</body>
+</html>

@@ -6,6 +6,7 @@ import com.service.app.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,34 +37,26 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public boolean removeReceivedMessage(Long id) {
-        Optional<Message> messageOptional = this.findById(id);
+        return this.findById(id)
+                .map(message -> {
+                    message.setVisibleForRecipient(false);
 
-        if(messageOptional.isPresent()) {
-            Message message = messageOptional.get();
-            message.setVisibleForRecipient(false);
+                    this.saveMessage(message);
 
-            this.saveMessage(message);
-
-            return true;
-        } else {
-            return false;
-        }
+                    return true;
+                }).orElse(false);
     }
 
     @Override
     public boolean removeSentMessage(Long id) {
-        Optional<Message> messageOptional = this.findById(id);
+        return this.findById(id)
+                .map(message -> {
+                    message.setVisibleForSender(false);
 
-        if(messageOptional.isPresent()) {
-            Message message = messageOptional.get();
-            message.setVisibleForSender(false);
+                    this.saveMessage(message);
 
-            this.saveMessage(message);
-
-            return true;
-        } else {
-            return false;
-        }
+                    return true;
+                }).orElse(false);
     }
 
     @Override
@@ -73,7 +66,18 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Optional<Message> findByIdAndRecipient(Long id, Long recipient) {
-        return messageRepository.findByIdAndRecipientAndIsVisibleForRecipientTrue(id, recipient);
+        Optional<Message> messageOptional
+                =  messageRepository.findByIdAndRecipientAndIsVisibleForRecipientTrue(id, recipient);
+
+        messageOptional.ifPresent(message -> {
+            if(message.getDateOfRead() == null) {
+                message.setDateOfRead(new Date());
+
+                this.saveMessage(message);
+            }
+        });
+
+        return messageOptional;
     }
 
     @Override

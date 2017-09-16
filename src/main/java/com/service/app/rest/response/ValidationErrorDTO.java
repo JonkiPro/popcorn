@@ -16,10 +16,10 @@ public class ValidationErrorDTO {
 
     @JsonProperty("field_errors")
     @ApiModelProperty(notes = "The list of errors")
-    private List<ErrorMessageDTO> fieldErrors = new ArrayList<>();
+    private List<ErrorFieldDTO> fieldErrors = new ArrayList<>();
 
     public void addFieldError(String path, String message) {
-        ErrorMessageDTO error = new ErrorMessageDTO(path, message);
+        ErrorFieldDTO error = new ErrorFieldDTO(path, message);
         fieldErrors.add(error);
     }
 }

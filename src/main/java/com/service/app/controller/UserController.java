@@ -1,6 +1,6 @@
 package com.service.app.controller;
 
-import com.service.app.exception.ProfileNotFoundException;
+import com.service.app.exception.AccountNotFoundException;
 import com.service.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,6 +50,6 @@ public class UserController {
         userService.findAll().stream()
                 .filter(v -> username.equals(v.getUsername()))
                 .findAny()
-                .orElseThrow(ProfileNotFoundException::new);
+                .orElseThrow(AccountNotFoundException::new);
     }
 }

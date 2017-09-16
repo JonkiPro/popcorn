@@ -10,4 +10,10 @@ public interface AuthorizationService {
      * @return Returns the user ID.
      */
     Long getUserId();
+
+    /**
+     * This method returns the user username.
+     * @return Returns the user username.
+     */
+    String getUserUsername();
 }

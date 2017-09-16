@@ -40,7 +40,7 @@
             <div class="row">
                 <span ng-bind="noResults"></span>
                 <div class="col-sm-4" data-ng-repeat="user in users">
-                    <div class="card">
+                    <div class="card ng-cloak">
                         <div class="avatar">
                             <img src="" alt=""/>
                         </div>
@@ -55,10 +55,10 @@
             <hr/>
             <div id="container">
                 <div id="left" class="label-prev">
-                    <button data-ng-click="getPrevUsers()" data-ng-show="btnPrev" class="btn btn-primary"><span th:text="#{users.btnPrev}">prev</span></button>
+                    <button data-ng-click="getPrevUsers()" data-ng-show="btnPrev" class="btn btn-primary ng-cloak"><span th:text="#{users.btnPrev}">prev</span></button>
                 </div>
                 <div id="right" class="label-next">
-                    <button data-ng-click="getNextUsers()" data-ng-show="btnNext" class="btn btn-primary"><span th:text="#{users.btnNext}">next</span></button>
+                    <button data-ng-click="getNextUsers()" data-ng-show="btnNext" class="btn btn-primary ng-cloak"><span th:text="#{users.btnNext}">next</span></button>
                 </div>
                 <div id="center">
                     <label><span th:text="#{users.page}">Page</span>:</label> <input data-numbers-only="true" data-ng-model="page"

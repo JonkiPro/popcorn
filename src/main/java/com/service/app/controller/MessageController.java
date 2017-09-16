@@ -1,7 +1,7 @@
 package com.service.app.controller;
 
 import com.service.app.entity.Message;
-import com.service.app.exception.AccessToMessageForbiddenException;
+import com.service.app.exception.MessageNotFoundException;
 import com.service.app.service.AuthorizationService;
 import com.service.app.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -18,6 +19,7 @@ import java.util.Objects;
 
 @Controller
 @PreAuthorize("hasRole('ROLE_USER')")
+@RequestMapping(value = "/messages")
 public class MessageController {
 
     @Autowired
@@ -28,7 +30,7 @@ public class MessageController {
     /**
      * @return Returns the ModelAndView for the list of messages.
      */
-    @GetMapping("/messages")
+    @GetMapping
     public ModelAndView messages() {
         return new ModelAndView("messages");
     }
@@ -38,7 +40,7 @@ public class MessageController {
      * @param modelMap {@link ModelMap}
      * @return Returns the ModelAndView to create new messages.
      */
-    @GetMapping("/message/new")
+    @GetMapping("/new")
     public ModelAndView newMessage(
             @RequestParam(required = false) String username,
             ModelMap modelMap
@@ -58,7 +60,7 @@ public class MessageController {
      * @param modelMap {@link ModelMap}
      * @return Returns the ModelAndView for the selected message.
      */
-    @GetMapping("/message/{id}")
+    @GetMapping("/{id}")
     public ModelAndView showMessage(
             @PathVariable Long id,
             ModelMap modelMap
@@ -85,6 +87,6 @@ public class MessageController {
         messageList.stream()
                 .filter(v -> messageId.equals(v.getId()))
                 .findAny()
-                .orElseThrow(AccessToMessageForbiddenException::new);
+                .orElseThrow(MessageNotFoundException::new);
     }
 }

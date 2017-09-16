@@ -4,7 +4,7 @@ app.controller('MessagesController', function ($scope, $http) {
 
     var selectedType = 'received';
     var givenValue = '';
-    var url = '/messages/getReceivedMessages';
+    var url = '/api/v1.0/messages/received';
 
     init();
 
@@ -15,7 +15,7 @@ app.controller('MessagesController', function ($scope, $http) {
     }
 
     $scope.getReceivedMessages = function () {
-        url = '/messages/getReceivedMessages';
+        url = '/api/v1.0/messages/received';
         selectedType = 'received';
         $scope.typeOfMessages = 'Received messages';
 
@@ -23,7 +23,7 @@ app.controller('MessagesController', function ($scope, $http) {
     };
 
     $scope.getSentMessages = function () {
-        url = '/messages/getSentMessages';
+        url = '/api/v1.0/messages/sent';
         selectedType = 'sent';
         $scope.typeOfMessages = 'Sent messages';
 
@@ -43,12 +43,12 @@ app.controller('MessagesController', function ($scope, $http) {
             .then(function (response) {
                 $scope.messages = response.data;
                 $scope.numberOfMessages = '(' + response.data.length + ')';
-                $scope.noResults = '';
-            })
-            .catch(function () {
-                $scope.messages = null;
-                $scope.numberOfMessages = '(0)';
-                $scope.noResults = 'No results found!';
+
+                if(response.data.length === 0) {
+                    $scope.noResults = 'No results found!';
+                } else {
+                    $scope.noResults = '';
+                }
             });
     }
 
@@ -56,9 +56,9 @@ app.controller('MessagesController', function ($scope, $http) {
         givenValue = angular.element('#search-value').val();
 
         if(selectedType === 'received') {
-            url = '/messages/searchReceivedMessages';
+            url = '/api/v1.0/messages/received';
         } else if(selectedType === 'sent') {
-            url = '/messages/searchSentMessages';
+            url = '/api/v1.0/messages/sent';
         }
 
         getMessagesByText();
@@ -75,12 +75,12 @@ app.controller('MessagesController', function ($scope, $http) {
             .then(function (response) {
                 $scope.messages = response.data;
                 $scope.numberOfMessages = '(' + response.data.length + ')';
-                $scope.noResults = '';
-            })
-            .catch(function () {
-                $scope.messages = null;
-                $scope.numberOfMessages = '(0)';
-                $scope.noResults = 'No results found!';
+
+                if(response.data.length === 0) {
+                    $scope.noResults = 'No results found!';
+                } else {
+                    $scope.noResults = '';
+                }
             });
     }
 });

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 required: true,
                 email: true,
                 remote : {
-                    url: '/checkUserData/checkEmail',
+                    url: '/api/v1.0/users/check/email',
                     type: "GET",
                     data: {
                         email: function() {
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var forgotUsernameDTO = {"email":$('#email').val()};
         $.ajax({
             type: 'PUT',
-            url: '/forgotUsername',
+            url: '/api/v1.0/users/attributes/username_recovery',
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(forgotUsernameDTO),

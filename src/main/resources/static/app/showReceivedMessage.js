@@ -12,18 +12,11 @@ app.controller('ShowReceivedMessageController', function ($scope, $http) {
 
     function getMessage(messageId) {
         $http({
-            url: '/messages/getReceivedMessage',
-            method: "GET",
-            params: {
-                id: messageId
-            }
+            url: '/api/v1.0/messages/received/' + messageId,
+            method: "GET"
         })
             .then(function (response) {
                 $scope.message = response.data;
-
-                if(response.data.date_of_read === null) {
-                    setDateOfRead();
-                }
             })
             .catch(function () {
                 console.log('failed');
@@ -32,27 +25,11 @@ app.controller('ShowReceivedMessageController', function ($scope, $http) {
 
     $scope.removeMessage = function () {
         $http({
-            url: '/messages/removeReceivedMessage',
-            method: "DELETE",
-            params: {
-                id: messageId
-            }
+            url: '/api/v1.0/messages/received/' + messageId,
+            method: "DELETE"
         })
             .then(function () {
                 window.location.replace('/messages');
             });
     };
-
-    function setDateOfRead() {
-        $http({
-            url: '/messages/setDateOfRead',
-            method: "PUT",
-            params: {
-                id: messageId
-            }
-        })
-            .then(function (response) {
-                $scope.message.date_of_read = response.data;
-            });
-    }
 });

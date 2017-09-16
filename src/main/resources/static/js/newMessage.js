@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             to: {
                 required: true,
                 remote: {
-                    url: '/checkUserData/checkUsername',
+                    url: '/api/v1.0/users/check/username',
                     type: "GET",
                     data: {
                         username: function () {
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                "text":$('#text').val()};
         $.ajax({
             type: 'POST',
-            url: '/messages/sendMessage',
+            url: '/api/v1.0/messages',
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(sendMessageDTO),
@@ -59,8 +59,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 $('#to').val('');
                 $('#subject').val('');
                 $('#text').val('');
+
+                $('#sendMessageForm')
+                    .before('<div class="alert alert-dismissable alert-success">'
+                        + '<span th:text="#{newMessage.success}">The message was sent!</span>'
+                        + '</div>');
+
+                setTimeout('hiddenAlertAfterSeconds()', 2000);
             },
             error: function (error) {
+                if(error.status === 403) {
+                    $('#to')
+                        .after('<label id="to-error" class="error" for="to">' + 'You cannot send a message to yourself.' + '</label>');
+
+                    return;
+                }
                 var obj = JSON.parse(error.responseText);
                 for(var i = 0; i < obj.field_errors.length; ++i) {
                     var objError = obj.field_errors[i];
@@ -72,3 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+function hiddenAlertAfterSeconds() {
+    $('.alert').remove();
+}
