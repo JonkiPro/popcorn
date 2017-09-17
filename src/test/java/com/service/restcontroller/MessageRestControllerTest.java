@@ -3,7 +3,7 @@ package com.service.restcontroller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.service.app.entity.Message;
+import com.service.app.rest.request.SendMessageDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,18 +40,11 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
     }
 
     @Test
-    public void testGetSentMessage() throws Exception {
-        mockMvc
-                .perform(get("/messages/getSentMessage")
-                            .param("id", "1")
-                        .with(user("JonkiPro").password("password1").roles("USER")))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
-    }
-
-    @Test
-    public void testBadSendMessage() throws Exception {
-        Message message = new Message();
+    public void testSendMessage() throws Exception {
+        SendMessageDTO message = new SendMessageDTO();
+        message.setTo("JonkiPro2");
+        message.setSubject("Hello");
+        message.setText("World!");
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
@@ -59,9 +52,82 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
         String requestJson = ow.writeValueAsString(message);
 
         mockMvc
-                .perform(post("/messages/sendMessage")
-                             .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                             .content(requestJson))
+                .perform(post("/api/v1.0/messages/")
+                        .with(user("JonkiPro").password("password1").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .content(requestJson))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void testBadSendMessage() throws Exception {
+        SendMessageDTO message = new SendMessageDTO();
+        message.setTo("JonkiPro2");
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+        String requestJson = ow.writeValueAsString(message);
+
+        mockMvc
+                .perform(post("/api/v1.0/messages/")
+                        .with(user("JonkiPro").password("password1").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .content(requestJson))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testGetSentMessage() throws Exception {
+        mockMvc
+                .perform(get("/api/v1.0/messages/sent/{id}", 1)
+                        .with(user("JonkiPro").password("password1").roles("USER")))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+    }
+
+    @Test
+    public void testNotFoundSentMessage() throws Exception {
+        mockMvc
+                .perform(get("/api/v1.0/messages/sent/{id}", 2)
+                        .with(user("JonkiPro").password("password1").roles("USER")))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testGetReceivedMessage() throws Exception {
+        mockMvc
+                .perform(get("/api/v1.0/messages/received/{id}", 2)
+                        .with(user("JonkiPro").password("password1").roles("USER")))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+    }
+
+    @Test
+    public void testNotFoundReceivedMessage() throws Exception {
+        mockMvc
+                .perform(get("/api/v1.0/messages/received/{id}", 1)
+                        .with(user("JonkiPro").password("password1").roles("USER")))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testGetSentMessagesIsZero() throws Exception {
+        mockMvc
+                .perform(get("/api/v1.0/messages/sent")
+                            .param("q", "qwerty")
+                        .with(user("JonkiPro").password("password1").roles("USER")))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
+    }
+
+    @Test
+    public void testGetReceivedMessagesIsZero() throws Exception {
+        mockMvc
+                .perform(get("/api/v1.0/messages/received")
+                            .param("q", "qwerty")
+                        .with(user("JonkiPro").password("password1").roles("USER")))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 }

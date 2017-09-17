@@ -35,7 +35,7 @@ public class CheckUserDataRestControllerTest {
         String username = "JonkiPro";
 
         mockMvc
-                .perform(get("/checkUserData/checkUsername")
+                .perform(get("/api/v1.0/users/check/username")
                             .param("username", username))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));

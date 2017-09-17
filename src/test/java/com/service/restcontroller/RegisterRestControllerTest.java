@@ -16,12 +16,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RegisterControllerTest {
+public class RegisterRestControllerTest {
 
     @Autowired
     private WebApplicationContext context;
@@ -39,6 +39,10 @@ public class RegisterControllerTest {
     @Test
     public void testBadRegistration() throws Exception {
         RegisterDTO registerDTO = new RegisterDTO();
+        registerDTO.setUsername("JonkiPro");
+        registerDTO.setEmail("jonkipro@email.com");
+        registerDTO.setPassword("password1");
+        registerDTO.setPasswordAgain("password1");
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
@@ -46,9 +50,16 @@ public class RegisterControllerTest {
         String requestJson = ow.writeValueAsString(registerDTO);
 
         mockMvc
-                .perform(post("/register")
+                .perform(post("/api/v1.0/register")
                              .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                              .content(requestJson))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testNotFoundToken() throws Exception {
+        mockMvc
+                .perform(put("/api/v1.0/register/token/{token}", "someToken"))
+                .andExpect(status().isNotFound());
     }
 }
