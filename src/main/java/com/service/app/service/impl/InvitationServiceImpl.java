@@ -1,6 +1,7 @@
 package com.service.app.service.impl;
 
 import com.service.app.entity.Invitation;
+import com.service.app.entity.User;
 import com.service.app.repository.InvitationRepository;
 import com.service.app.service.InvitationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +25,13 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
-    public boolean existsInvitation(Long fromId, Long toId) {
-        return invitationRepository.existsByFromIdAndToId(fromId, toId);
+    public boolean existsInvitation(User fromUser, User toUser) {
+        return invitationRepository.existsByFromUserAndToUser(fromUser, toUser);
     }
 
     @Override
-    public Optional<Invitation> findInvitation(Long fromId, Long toId) {
-        return invitationRepository.findOneByFromIdAndToId(fromId, toId);
+    public Optional<Invitation> findInvitation(User fromUser, User toUser) {
+        return invitationRepository.findOneByFromUserAndToUser(fromUser, toUser);
     }
 
     @Override

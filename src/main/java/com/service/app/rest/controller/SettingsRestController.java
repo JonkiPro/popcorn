@@ -36,18 +36,14 @@ public class SettingsRestController {
             @ApiParam(value = "Form of e-mail change", required = true) @RequestBody @Valid ChangeEmailDTO changeEmailDTO,
             Principal principal
     ) {
-        Optional<User> userOptional = userService.findByUsername(principal.getName());
+        User user = userService.findOneByUsername(principal.getName());
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
+        user.setEmailChangeToken(RandomUtils.randomToken());
+        user.setNewEmail(changeEmailDTO.getEmail());
 
-            user.setEmailChangeToken(RandomUtils.randomToken());
-            user.setNewEmail(changeEmailDTO.getEmail());
+        mailService.sendMailWithEmailChangeToken(user.getEmail(), user.getEmailChangeToken());
 
-            mailService.sendMailWithEmailChangeToken(user.getEmail(), user.getEmailChangeToken());
-
-            userService.saveUser(user);
-        }
+        userService.saveUser(user);
 
         return ResponseEntity.ok(true);
     }
@@ -60,15 +56,11 @@ public class SettingsRestController {
             @ApiParam(value = "Form of password change", required = true) @RequestBody @Valid ChangePasswordDTO changePasswordDTO,
             Principal principal
     ) {
-        Optional<User> userOptional = userService.findByUsername(principal.getName());
+        User user = userService.findOneByUsername(principal.getName());
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
+        user.setPassword(EncryptUtils.encrypt(changePasswordDTO.getNewPassword()));
 
-            user.setPassword(EncryptUtils.encrypt(changePasswordDTO.getNewPassword()));
-
-            userService.saveUser(user);
-        }
+        userService.saveUser(user);
 
         return ResponseEntity.ok(true);
     }
@@ -83,18 +75,16 @@ public class SettingsRestController {
     ) {
         Optional<User> userOptional = userService.findByEmailChangeToken(token);
 
-        if(!userOptional.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        return userOptional
+                .map(user -> {
+                    user.setEmail(user.getNewEmail());
+                    user.setEmailChangeToken(null);
+                    user.setNewEmail(null);
 
-        User user = userOptional.get();
+                    userService.saveUser(user);
 
-        user.setEmail(user.getNewEmail());
-        user.setEmailChangeToken(null);
-        user.setNewEmail(null);
-
-        userService.saveUser(user);
-
-        return ResponseEntity.ok(true);
+                    return ResponseEntity.ok(true);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

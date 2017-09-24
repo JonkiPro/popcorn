@@ -43,15 +43,13 @@ public class ForgotRestController {
     ) {
         Optional<User> userOptional = userService.findByEmail(forgotUsernameDTO.getEmail());
 
-        if(!userOptional.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        return userOptional
+                .map(user -> {
+                    mailService.sendMailWithUsername(user.getEmail(), user.getUsername());
 
-        User user = userOptional.get();
-
-        mailService.sendMailWithUsername(user.getEmail(), user.getUsername());
-
-        return ResponseEntity.ok(true);
+                    return ResponseEntity.ok(true);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "Generate a new password for the user and send it to the e-mail address")
@@ -66,20 +64,18 @@ public class ForgotRestController {
     ) {
         Optional<User> userOptional = userService.findByUsernameAndEmail(forgotPasswordDTO.getUsername(), forgotPasswordDTO.getEmail());
 
-        if(!userOptional.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        return userOptional
+                .map(user -> {
+                    String newPassword = RandomUtils.randomPassword();
 
-        User user = userOptional.get();
+                    user.setPassword(EncryptUtils.encrypt(newPassword));
 
-        String newPassword = RandomUtils.randomPassword();
+                    mailService.sendMailWithNewPassword(user.getEmail(), newPassword);
 
-        user.setPassword(EncryptUtils.encrypt(newPassword));
+                    userService.saveUser(user);
 
-        mailService.sendMailWithNewPassword(user.getEmail(), newPassword);
-
-        userService.saveUser(user);
-
-        return ResponseEntity.ok(true);
+                    return ResponseEntity.ok(true);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

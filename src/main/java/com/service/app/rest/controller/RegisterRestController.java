@@ -3,7 +3,7 @@ package com.service.app.rest.controller;
 import com.service.app.converter.UnidirectionalConverter;
 import com.service.app.entity.User;
 import com.service.app.rest.request.RegisterDTO;
-import com.service.app.security.SecurityRole;
+import com.service.app.security.role.SecurityRole;
 import com.service.app.service.MailService;
 import com.service.app.service.UserService;
 import com.service.app.utils.RandomUtils;
@@ -52,7 +52,7 @@ public class RegisterRestController {
     ) {
         User user = converterRegisterDTOToUser.convert(registerDTO);
         user.setActivationToken(RandomUtils.randomToken());
-        user.setAuthorities(SecurityRole.ROLE_USER.toString());
+        user.setAuthorities(SecurityRole.ROLE_USER);
 
         mailService.sendMailWithActivationToken(user.getEmail(), user.getActivationToken());
 
@@ -73,17 +73,15 @@ public class RegisterRestController {
     ) {
         Optional<User> userOptional = userService.findByActivationToken(token);
 
-        if(!userOptional.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        return userOptional
+                .map(user -> {
+                    user.setActivationToken(null);
+                    user.setEnabled(true);
 
-        User user = userOptional.get();
+                    userService.saveUser(user);
 
-        user.setActivationToken(null);
-        user.setEnabled(true);
-
-        userService.saveUser(user);
-
-        return ResponseEntity.ok(true);
+                    return ResponseEntity.ok(true);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

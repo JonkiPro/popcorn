@@ -1,6 +1,7 @@
 package com.service.app.service.impl;
 
 import com.service.app.entity.Message;
+import com.service.app.entity.User;
 import com.service.app.repository.MessageRepository;
 import com.service.app.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,12 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<Message> findByRecipient(Long recipient) {
+    public List<Message> findByRecipient(User recipient) {
         return messageRepository.findByRecipientAndIsVisibleForRecipientTrueOrderByIdDesc(recipient);
     }
 
     @Override
-    public List<Message> findBySender(Long sender) {
+    public List<Message> findBySender(User sender) {
         return messageRepository.findBySenderAndIsVisibleForSenderTrueOrderByIdDesc(sender);
     }
 
@@ -65,7 +66,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Optional<Message> findByIdAndRecipient(Long id, Long recipient) {
+    public Optional<Message> findByIdAndRecipient(Long id, User recipient) {
         Optional<Message> messageOptional
                 =  messageRepository.findByIdAndRecipientAndIsVisibleForRecipientTrue(id, recipient);
 
@@ -81,17 +82,17 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Optional<Message> findByIdAndSender(Long id, Long sender) {
+    public Optional<Message> findByIdAndSender(Long id, User sender) {
         return messageRepository.findByIdAndSenderAndIsVisibleForSenderTrue(id, sender);
     }
 
     @Override
-    public List<Message> findReceivedMessagesByContaining(Long recipient, String containing) {
+    public List<Message> findReceivedMessagesByContaining(User recipient, String containing) {
         return messageRepository.findReceivedMessagesByContaining(recipient, "%"+containing.trim()+"%", "%"+containing.trim()+"%");
     }
 
     @Override
-    public List<Message> findSentMessagesByContaining(Long sender, String containing) {
+    public List<Message> findSentMessagesByContaining(User sender, String containing) {
         return messageRepository.findSentMessagesByContaining(sender, "%"+containing.trim()+"%", "%"+containing.trim()+"%");
     }
 }

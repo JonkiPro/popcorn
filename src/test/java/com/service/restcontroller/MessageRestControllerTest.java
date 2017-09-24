@@ -31,6 +31,10 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
 
     private MockMvc mockMvc;
 
+    private final String USERNAME = "JonkiPro";
+    private final String PASSWORD = "password1";
+    private final String ROLE = "USER";
+
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders
@@ -53,7 +57,7 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
 
         mockMvc
                 .perform(post("/api/v1.0/messages/")
-                        .with(user("JonkiPro").password("password1").roles("USER"))
+                        .with(user(USERNAME).password(PASSWORD).roles(ROLE))
                         .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                         .content(requestJson))
                 .andExpect(status().isCreated());
@@ -71,7 +75,7 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
 
         mockMvc
                 .perform(post("/api/v1.0/messages/")
-                        .with(user("JonkiPro").password("password1").roles("USER"))
+                        .with(user(USERNAME).password(PASSWORD).roles(ROLE))
                         .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                         .content(requestJson))
                 .andExpect(status().isBadRequest());
@@ -81,7 +85,7 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
     public void testGetSentMessage() throws Exception {
         mockMvc
                 .perform(get("/api/v1.0/messages/sent/{id}", 1)
-                        .with(user("JonkiPro").password("password1").roles("USER")))
+                        .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
     }
@@ -90,7 +94,7 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
     public void testNotFoundSentMessage() throws Exception {
         mockMvc
                 .perform(get("/api/v1.0/messages/sent/{id}", 2)
-                        .with(user("JonkiPro").password("password1").roles("USER")))
+                        .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isNotFound());
     }
 
@@ -98,7 +102,7 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
     public void testGetReceivedMessage() throws Exception {
         mockMvc
                 .perform(get("/api/v1.0/messages/received/{id}", 2)
-                        .with(user("JonkiPro").password("password1").roles("USER")))
+                        .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
     }
@@ -107,7 +111,7 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
     public void testNotFoundReceivedMessage() throws Exception {
         mockMvc
                 .perform(get("/api/v1.0/messages/received/{id}", 1)
-                        .with(user("JonkiPro").password("password1").roles("USER")))
+                        .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isNotFound());
     }
 
@@ -116,7 +120,7 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
         mockMvc
                 .perform(get("/api/v1.0/messages/sent")
                             .param("q", "qwerty")
-                        .with(user("JonkiPro").password("password1").roles("USER")))
+                        .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("[]"));
     }
@@ -126,7 +130,7 @@ public class MessageRestControllerTest extends AbstractJUnit4SpringContextTests 
         mockMvc
                 .perform(get("/api/v1.0/messages/received")
                             .param("q", "qwerty")
-                        .with(user("JonkiPro").password("password1").roles("USER")))
+                        .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("[]"));
     }

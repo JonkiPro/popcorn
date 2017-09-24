@@ -20,11 +20,10 @@ public class SendMessageDTOToMessage implements UnidirectionalConverter<SendMess
     final private boolean VISIBLE_FOR_RECIPIENT = true;
 
     @Override
-    @SuppressWarnings("ConstantConditions")
     public Message convert(SendMessageDTO sendMessageDTO) {
         Message message = new Message();
-        message.setSender(authorizationService.getUserId());
-        message.setRecipient(userService.findByUsername(sendMessageDTO.getTo()).get().getId());
+        message.setSender(authorizationService.getUser());
+        message.setRecipient(userService.findOneByUsername(sendMessageDTO.getTo()));
         message.setSubject(sendMessageDTO.getSubject());
         message.setText(sendMessageDTO.getText());
         message.setVisibleForSender(VISIBLE_FOR_SENDER);

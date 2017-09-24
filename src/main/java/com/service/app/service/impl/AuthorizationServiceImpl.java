@@ -1,5 +1,6 @@
 package com.service.app.service.impl;
 
+import com.service.app.entity.User;
 import com.service.app.service.AuthorizationService;
 import com.service.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,12 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public Long getUserId() {
-        return userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get().getId();
+    public User getUser() {
+        return userService.findOneByUsername(this.getUsername());
     }
 
     @Override
-    public String getUserUsername() {
+    public String getUsername() {
         return ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
     }
 }

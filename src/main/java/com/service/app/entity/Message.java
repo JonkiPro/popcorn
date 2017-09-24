@@ -17,24 +17,30 @@ public class Message {
     @GeneratedValue
     private Long id;
 
-    private Long sender;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User sender;
 
-    private Long recipient;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User recipient;
 
+    @Column(nullable = false)
     private String subject;
 
+    @Column(length = 4000, nullable = false)
     private String text;
 
     @CreatedDate
-    @Column(updatable = false)
+    @Column(updatable = false, nullable = false)
     private Date date;
 
     @Column(name = "date_of_read")
     private Date dateOfRead;
 
-    @Column(name = "visible_for_sender")
+    @Column(name = "visible_for_sender", nullable = false)
     private boolean isVisibleForSender;
 
-    @Column(name = "visible_for_recipient")
+    @Column(name = "visible_for_recipient", nullable = false)
     private boolean isVisibleForRecipient;
 }

@@ -69,7 +69,7 @@ public class MessageController {
 
         modelMap.addAttribute("messageId", id);
 
-        if(messageService.findByRecipient(authorizationService.getUserId()).stream().anyMatch(message -> message.getId().equals(id))) {
+        if(messageService.findByRecipient(authorizationService.getUser()).stream().anyMatch(message -> message.getId().equals(id))) {
             return new ModelAndView("showReceivedMessage", modelMap);
         } else {
             return new ModelAndView("showSentMessage", modelMap);
@@ -81,8 +81,8 @@ public class MessageController {
      * @param messageId The message ID.
      */
     private void validAccessToMessage(Long messageId) {
-        List<Message> messageList = messageService.findBySender(authorizationService.getUserId());
-        messageList.addAll(messageService.findByRecipient(authorizationService.getUserId()));
+        List<Message> messageList = messageService.findBySender(authorizationService.getUser());
+        messageList.addAll(messageService.findByRecipient(authorizationService.getUser()));
 
         messageList.stream()
                 .filter(v -> messageId.equals(v.getId()))

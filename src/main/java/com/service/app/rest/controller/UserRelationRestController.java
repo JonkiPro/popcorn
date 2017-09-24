@@ -48,21 +48,20 @@ public class UserRelationRestController {
     ) {
         this.validUsername(username);
 
-        // Get authorization User ID
-        Long fromId = authorizationService.getUserId();
-        // Get User ID by username
-        Long toId = userService.findByUsername(username)
-                        .map(User::getId)
+        // Get authorization User
+        User fromUser = authorizationService.getUser();
+        // Get User by username
+        User toUser = userService.findByUsername(username)
                         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        this.validFriendship(fromId, toId);
+        this.validFriendship(fromUser, toUser);
 
-        return invitationService.findInvitation(toId, fromId)
+        return invitationService.findInvitation(toUser, fromUser)
                 .map(invitation -> {
                     // Remove invitation
                     invitationService.removeInvitation(invitation);
                     // Save friendship
-                    friendshipService.saveFriendship(new Friendship(fromId, toId));
+                    friendshipService.saveFriendship(new Friendship(fromUser, toUser));
 
                     return ResponseEntity.status(HttpStatus.CREATED).body(true);
                 }).orElseGet(() -> ResponseEntity.notFound().build());
@@ -80,14 +79,13 @@ public class UserRelationRestController {
     ) {
         this.validUsername(username);
 
-        // Get authorization User ID
-        Long fromId = authorizationService.getUserId();
-        // Get User ID by username
-        Long toId = userService.findByUsername(username)
-                        .map(User::getId)
+        // Get authorization User
+        User fromUser = authorizationService.getUser();
+        // Get User by username
+        User toUser = userService.findByUsername(username)
                         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        return friendshipService.findFriendship(fromId, toId)
+        return friendshipService.findFriendship(fromUser, toUser)
                 .map(friendship -> {
                     // Remove friendship
                     friendshipService.removeFriendship(friendship);
@@ -109,18 +107,17 @@ public class UserRelationRestController {
     ) {
         this.validUsername(username);
 
-        // Get authorization User ID
-        Long fromId = authorizationService.getUserId();
-        // Get User ID by username
-        Long toId = userService.findByUsername(username)
-                        .map(User::getId)
+        // Get authorization User
+        User fromUser = authorizationService.getUser();
+        // Get User by username
+        User toUser = userService.findByUsername(username)
                         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        this.validInvitation(fromId, toId);
-        this.validFriendship(fromId, toId);
+        this.validInvitation(fromUser, toUser);
+        this.validFriendship(fromUser, toUser);
 
         // Save invitation
-        invitationService.saveInvitation(new Invitation(fromId, toId));
+        invitationService.saveInvitation(new Invitation(fromUser, toUser));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(true);
     }
@@ -138,15 +135,14 @@ public class UserRelationRestController {
     ) {
         this.validUsername(username);
 
-        // Get authorization User ID
-        Long fromId = authorizationService.getUserId();
-        // Get User ID by username
-        Long toId = userService.findByUsername(username)
-                        .map(User::getId)
+        // Get authorization User
+        User fromUser = authorizationService.getUser();
+        // Get User by username
+        User toUser = userService.findByUsername(username)
                         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (action.equals("remove")) {
-            return invitationService.findInvitation(fromId, toId)
+            return invitationService.findInvitation(fromUser, toUser)
                     .map(invitation -> {
                         // Remove invitation
                         invitationService.removeInvitation(invitation);
@@ -154,7 +150,7 @@ public class UserRelationRestController {
                         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(true);
                     }).orElseGet(() -> ResponseEntity.notFound().build());
         } else /* if action.equals("reject") */ {
-            return invitationService.findInvitation(toId, fromId)
+            return invitationService.findInvitation(toUser, fromUser)
                     .map(invitation -> {
                         // Remove invitation
                         invitationService.removeInvitation(invitation);
@@ -177,18 +173,17 @@ public class UserRelationRestController {
         this.validUsername(username);
 
         String status;
-        // Get authorization User ID
-        Long fromId = authorizationService.getUserId();
-        // Get User ID by username
-        Long toId = userService.findByUsername(username)
-                        .map(User::getId)
+        // Get authorization User
+        User fromUser = authorizationService.getUser();
+        // Get User by username
+        User toUser = userService.findByUsername(username)
                         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (friendshipService.existsFriendship(fromId, toId)) {
+        if (friendshipService.existsFriendship(fromUser, toUser)) {
             status = RelationshipStatus.FRIEND.toString();
-        } else if (invitationService.existsInvitation(fromId, toId)) {
+        } else if (invitationService.existsInvitation(fromUser, toUser)) {
             status = RelationshipStatus.INVITATION_FROM_YOU.toString();
-        } else if (invitationService.existsInvitation(toId, fromId)) {
+        } else if (invitationService.existsInvitation(toUser, fromUser)) {
             status = RelationshipStatus.INVITATION_TO_YOU.toString();
         } else {
             status = RelationshipStatus.UNKNOWN.toString();
@@ -204,32 +199,32 @@ public class UserRelationRestController {
      * @throws ResourceForbiddenException if the username is the same as the authorised user's name
      */
     private void validUsername(String username) {
-        if(username.equals(authorizationService.getUserUsername()))
+        if(username.equals(authorizationService.getUsername()))
             throw new ResourceForbiddenException("You cannot provide an authorised user name");
     }
 
     /**
      * This method validates whether an invitation already exists.
-     * @param fromID The user's ID.
-     * @param toID The user's ID.
+     * @param fromUser The user's.
+     * @param toUser The user's.
      * @throws ResourceConflictException if there is a conflict with the invitation
      */
-    private void validInvitation(Long fromID, Long toID) {
-        if(invitationService.findInvitation(fromID, toID).isPresent())
+    private void validInvitation(User fromUser, User toUser) {
+        if(invitationService.findInvitation(fromUser, toUser).isPresent())
             throw new ResourceConflictException("The invitation has already been sent to this user");
-        if(invitationService.findInvitation(toID, fromID).isPresent())
+        if(invitationService.findInvitation(toUser, fromUser).isPresent())
             throw new ResourceConflictException("This user has already sent you an invitation");
     }
 
     /**
      * This method validates whether an friendship already exists.
-     * @param fromID The user's ID.
-     * @param toID The user's ID.
+     * @param fromUser The user's.
+     * @param toUser The user's.
      * @throws ResourceConflictException if there is a conflict with the friendship
      */
-    private void validFriendship(Long fromID, Long toID) {
-        if(friendshipService.findFriendship(fromID, toID).isPresent()
-                || friendshipService.findFriendship(toID, fromID).isPresent())
+    private void validFriendship(User fromUser, User toUser) {
+        if(friendshipService.findFriendship(fromUser, toUser).isPresent()
+                || friendshipService.findFriendship(toUser, fromUser).isPresent())
             throw new ResourceConflictException("Users are friends");
     }
 }

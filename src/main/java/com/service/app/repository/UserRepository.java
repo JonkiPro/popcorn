@@ -15,13 +15,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByActivationToken(String activationToken);
     Optional<User> findByEmailChangeToken(String emailChangeToken);
-    Optional<User> findByUsernameIgnoreCase(String username);
-    Optional<User> findByEmailIgnoreCase(String email);
+    Optional<User> findByUsernameIgnoreCaseAndEnabledTrue(String username);
+    Optional<User> findByEmailIgnoreCaseAndEnabledTrue(String email);
     Optional<User> findById(Long id);
 
-    Optional<User> findByUsernameIgnoreCaseAndEmailIgnoreCase(String username, String email);
+    Optional<User> findByUsernameIgnoreCaseAndEmailIgnoreCaseAndEnabledTrue(String username, String email);
 
-    List<User> findAll();
+    List<User> findAllByEnabledTrue();
 
     Page<User> findAllByEnabledTrue(Pageable pageable);
 
@@ -29,5 +29,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Long countByUsernameContainingIgnoreCaseAndEnabledTrue(String username);
 
-    User findOneByUsernameIgnoreCase(String username);
+    User findOneByUsernameIgnoreCaseAndEnabledTrue(String username);
 }

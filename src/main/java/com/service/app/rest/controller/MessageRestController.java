@@ -71,7 +71,7 @@ public class MessageRestController {
     HttpEntity<SentMessageDTO> getSentMessage(
             @ApiParam(value = "The message ID", required = true) @PathVariable Long id
     ) {
-        return messageService.findByIdAndSender(id, authorizationService.getUserId())
+        return messageService.findByIdAndSender(id, authorizationService.getUser())
                 .map(message -> ResponseEntity.ok().body(converterMessageToSentMessageDTO.convert(message)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -83,7 +83,7 @@ public class MessageRestController {
     HttpEntity<ReceivedMessageDTO> getReceivedMessage(
             @ApiParam(value = "The message ID", required = true) @PathVariable Long id
     ) {
-        return messageService.findByIdAndRecipient(id, authorizationService.getUserId())
+        return messageService.findByIdAndRecipient(id, authorizationService.getUser())
                 .map(message -> ResponseEntity.ok().body(converterMessageToReceivedMessageDTO.convert(message)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -95,7 +95,7 @@ public class MessageRestController {
     HttpEntity<Boolean> removeSentMessage(
             @ApiParam(value = "The message ID", required = true) @PathVariable Long id
     ) {
-        return messageService.findBySender(authorizationService.getUserId()).stream().anyMatch(message -> message.getId().equals(id)) ?
+        return messageService.findBySender(authorizationService.getUser()).stream().anyMatch(message -> message.getId().equals(id)) ?
                 ResponseEntity.ok().body(messageService.removeSentMessage(id)) : ResponseEntity.notFound().build();
     }
 
@@ -106,7 +106,7 @@ public class MessageRestController {
     HttpEntity<Boolean> removeReceivedMessage(
             @ApiParam(value = "The message ID", required = true) @PathVariable Long id
     ) {
-        return messageService.findByRecipient(authorizationService.getUserId()).stream().anyMatch(message -> message.getId().equals(id)) ?
+        return messageService.findByRecipient(authorizationService.getUser()).stream().anyMatch(message -> message.getId().equals(id)) ?
                 ResponseEntity.ok().body(messageService.removeReceivedMessage(id)) : ResponseEntity.notFound().build();
     }
 
@@ -120,7 +120,7 @@ public class MessageRestController {
                 .ofNullable(q)
                 .map(var -> {
                     List<Message> messageList
-                            = messageService.findSentMessagesByContaining(authorizationService.getUserId(), q);
+                            = messageService.findSentMessagesByContaining(authorizationService.getUser(), q);
 
                     return ResponseEntity
                             .ok()
@@ -128,7 +128,7 @@ public class MessageRestController {
                 })
                 .orElseGet(() -> {
                     List<Message> messageList
-                            = messageService.findBySender(authorizationService.getUserId());
+                            = messageService.findBySender(authorizationService.getUser());
 
                     return ResponseEntity
                             .ok()
@@ -146,7 +146,7 @@ public class MessageRestController {
                 .ofNullable(q)
                 .map(var -> {
                     List<Message> messageList
-                            = messageService.findReceivedMessagesByContaining(authorizationService.getUserId(), q);
+                            = messageService.findReceivedMessagesByContaining(authorizationService.getUser(), q);
 
                     return ResponseEntity
                             .ok()
@@ -154,7 +154,7 @@ public class MessageRestController {
                 })
                 .orElseGet(() -> {
                     List<Message> messageList
-                            = messageService.findByRecipient(authorizationService.getUserId());
+                            = messageService.findByRecipient(authorizationService.getUser());
 
                     return ResponseEntity
                             .ok()
@@ -169,7 +169,7 @@ public class MessageRestController {
      * @throws ResourceForbiddenException if the username is the same as the authorised user's name
      */
     private void validUsername(String username) {
-        if(username.equals(authorizationService.getUserUsername()))
+        if(username.equals(authorizationService.getUsername()))
             throw new ResourceForbiddenException("You cannot provide an authorised user name");
     }
 }

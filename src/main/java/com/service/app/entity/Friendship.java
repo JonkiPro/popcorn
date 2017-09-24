@@ -15,14 +15,16 @@ public class Friendship {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "from_id")
-    private Long fromId;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User fromUser;
 
-    @Column(name = "to_id")
-    private Long toId;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User toUser;
 
-    public Friendship(Long fromId, Long toId) {
-        this.fromId = fromId;
-        this.toId = toId;
+    public Friendship(User fromUser, User toUser) {
+        this.fromUser = fromUser;
+        this.toUser = toUser;
     }
 }

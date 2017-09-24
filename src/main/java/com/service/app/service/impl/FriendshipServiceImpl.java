@@ -1,11 +1,9 @@
 package com.service.app.service.impl;
 
 import com.service.app.entity.Friendship;
-import com.service.app.entity.Invitation;
+import com.service.app.entity.User;
 import com.service.app.repository.FriendshipRepository;
-import com.service.app.repository.InvitationRepository;
 import com.service.app.service.FriendshipService;
-import com.service.app.service.InvitationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,26 +23,26 @@ public class FriendshipServiceImpl implements FriendshipService {
     public void saveFriendship(Friendship friendship) {
         friendshipRepository.save(friendship);
         friendshipRepository
-                .save(new Friendship(friendship.getToId(), friendship.getFromId()));
+                .save(new Friendship(friendship.getToUser(), friendship.getFromUser()));
     }
 
     @Override
-    public boolean existsFriendship(Long fromId, Long toId) {
-        return friendshipRepository.existsByFromIdAndToId(fromId, toId);
+    public boolean existsFriendship(User fromUser, User toUser) {
+        return friendshipRepository.existsByFromUserAndToUser(fromUser, toUser);
     }
 
     @Override
-    public Optional<Friendship> findFriendship(Long fromId, Long toId) {
-        return friendshipRepository.findOneByFromIdAndToId(fromId, toId);
+    public Optional<Friendship> findFriendship(User fromUser, User toUser) {
+        return friendshipRepository.findOneByFromUserAndToUser(fromUser, toUser);
     }
 
     @Override
     @SuppressWarnings("ConstantConditions")
     public void removeFriendship(Friendship friendship) {
-        Long fromId = friendship.getFromId();
-        Long toId = friendship.getToId();
+        User fromUser = friendship.getFromUser();
+        User toUser = friendship.getToUser();
 
-        friendshipRepository.delete(this.findFriendship(fromId, toId).get());
-        friendshipRepository.delete(this.findFriendship(toId, fromId).get());
+        friendshipRepository.delete(this.findFriendship(fromUser, toUser).get());
+        friendshipRepository.delete(this.findFriendship(toUser, fromUser).get());
     }
 }

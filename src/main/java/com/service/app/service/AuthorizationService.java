@@ -1,19 +1,21 @@
 package com.service.app.service;
 
+import com.service.app.entity.User;
+
 /**
  * The service works on authorized data.
  */
 public interface AuthorizationService {
 
     /**
-     * This method returns the user ID.
-     * @return Returns the user ID.
+     * This method returns the user.
+     * @return Returns the user.
      */
-    Long getUserId();
+    User getUser();
 
     /**
-     * This method returns the user username.
-     * @return Returns the user username.
+     * This method returns the username.
+     * @return Returns the username.
      */
-    String getUserUsername();
+    String getUsername();
 }

@@ -1,6 +1,6 @@
 package com.service.config;
 
-import com.service.app.security.CustomAuthenticationSuccessHandler;
+import com.service.app.security.handler.CustomAuthenticationSuccessHandler;
 import com.service.config.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

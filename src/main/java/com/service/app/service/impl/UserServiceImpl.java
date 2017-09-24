@@ -48,12 +48,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsernameIgnoreCase(username.trim());
+        return userRepository.findByUsernameIgnoreCaseAndEnabledTrue(username.trim());
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmailIgnoreCase(email.trim());
+        return userRepository.findByEmailIgnoreCaseAndEnabledTrue(email.trim());
     }
 
     @Override
@@ -63,12 +63,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByUsernameAndEmail(String username, String email) {
-        return userRepository.findByUsernameIgnoreCaseAndEmailIgnoreCase(username.trim(), email.trim());
+        return userRepository.findByUsernameIgnoreCaseAndEmailIgnoreCaseAndEnabledTrue(username.trim(), email.trim());
     }
 
     @Override
     public List<User> findAll() {
-        return userRepository.findAll();
+        return userRepository.findAllByEnabledTrue();
     }
 
     @Override
@@ -88,6 +88,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findOneByUsername(String username) {
-        return userRepository.findOneByUsernameIgnoreCase(username.trim());
+        return userRepository.findOneByUsernameIgnoreCaseAndEnabledTrue(username.trim());
     }
 }
