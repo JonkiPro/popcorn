@@ -24,8 +24,18 @@ spring.mail:
     starttls.enable: true
 
 #server
-server.session:
-  timeout: 25200
+server:
+  port: 8443
+  session.timeout: 25200
+  ssl:
+    key-store: classpath:keystore/keyStore.jks
+    key-store-password: JonkiPro
+    key-password: JonkiPro
+    key-alias: some_alias
+    enabled: true
+
+#security require SSL
+security.require-ssl: true
 
 #messages
 spring.messages:

@@ -15,11 +15,11 @@
 ### PostgreSQL
 *  Create a user with all permissions. <b>username:</b> <i>root</i>, <b>password:</b> <i>root</i>
 *  Create a database. <b>name:</b> <i>database</i>, <b>owner:</b> <i>root</i>
-## Running
+## Running (protected by SSL)
 *  Right click on class name and "Run".
-*  Visit [http://localhost:8080/].
+*  Visit [https://localhost:8443/].
 ### REST
-*  Visit [http://localhost:8080/swagger-ui.html].
+*  Visit [https://localhost:8443/swagger-ui.html].
 ## Tech Stack
 *  Java
 *  Spring
@@ -48,5 +48,5 @@
 
 
 
-[http://localhost:8080/]: <http://localhost:8080/>
-[http://localhost:8080/swagger-ui.html]: <http://localhost:8080/swagger-ui.html>
+[https://localhost:8443/]: <https://localhost:8443/>
+[https://localhost:8443/swagger-ui.html]: <https://localhost:8443/swagger-ui.html>
