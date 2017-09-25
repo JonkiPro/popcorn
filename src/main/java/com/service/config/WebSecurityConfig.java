@@ -1,6 +1,7 @@
 package com.service.config;
 
-import com.service.app.security.handler.CustomAuthenticationSuccessHandler;
+import com.service.app.security.handler.RestAuthenticationSuccessHandler;
+import com.service.app.security.handler.RestAuthenticationFailureHandler;
 import com.service.config.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -29,12 +31,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private SecurityProperties securityProperties;
-
+    @Autowired
+    private UserDetailsService userDetailsService;
     @Autowired
     private DataSource dataSource;
-
     @Autowired
-    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private RestAuthenticationSuccessHandler restAuthenticationSuccessHandler;
+    @Autowired
+    private RestAuthenticationFailureHandler restAuthenticationFailureHandler;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,8 +47,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .formLogin()
                         .loginPage(securityProperties.getLoginPage())
-                        .successHandler(customAuthenticationSuccessHandler)
-                        .failureUrl(securityProperties.getFailureUrl())
+                        .successHandler(restAuthenticationSuccessHandler)
+                        .failureHandler(restAuthenticationFailureHandler)
                         .usernameParameter(securityProperties.getUsernameParameter())
                         .passwordParameter(securityProperties.getPasswordParameter())
                 .and()
@@ -71,11 +75,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.jdbcAuthentication()
-                .passwordEncoder(passwordEncoder())
-                .dataSource(dataSource)
-                .usersByUsernameQuery(securityProperties.getUsersByUsernameQuery())
-                .authoritiesByUsernameQuery(securityProperties.getAuthoritiesByUsernameQuery());
+        auth
+                .userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Bean

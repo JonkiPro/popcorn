@@ -205,8 +205,8 @@ public class UserRelationRestController {
 
     /**
      * This method validates whether an invitation already exists.
-     * @param fromUser The user's.
-     * @param toUser The user's.
+     * @param fromUser From the user.
+     * @param toUser To the user.
      * @throws ResourceConflictException if there is a conflict with the invitation
      */
     private void validInvitation(User fromUser, User toUser) {
@@ -218,8 +218,8 @@ public class UserRelationRestController {
 
     /**
      * This method validates whether an friendship already exists.
-     * @param fromUser The user's.
-     * @param toUser The user's.
+     * @param fromUser From the user.
+     * @param toUser To the user.
      * @throws ResourceConflictException if there is a conflict with the friendship
      */
     private void validFriendship(User fromUser, User toUser) {

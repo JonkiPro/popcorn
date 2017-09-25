@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -39,9 +40,10 @@ public class User {
 
     private boolean enabled;
 
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SecurityRole authorities;
+    private Set<SecurityRole> authorities;
 
     @CreatedDate
     @Column(name = "registration_date", updatable = false, nullable = false)

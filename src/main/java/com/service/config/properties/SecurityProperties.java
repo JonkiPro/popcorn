@@ -12,7 +12,6 @@ public class SecurityProperties {
 
     // Form Login
     private String loginPage;
-    private String failureUrl;
     private String usernameParameter;
     private String passwordParameter;
 
@@ -31,10 +30,6 @@ public class SecurityProperties {
     private String rememberMeParameter;
     private String rememberMeCookieName;
     private int tokenValiditySeconds;
-
-    // Authentication Manager
-    private String usersByUsernameQuery;
-    private String authoritiesByUsernameQuery;
 
     // Password Encoder
     private int strengthPasswordEncoder;

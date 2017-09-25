@@ -1,5 +1,5 @@
 /**
- * Spring Security - handlers and roles of authorization.
+ * Spring Security extensions.
  */
 
 package com.service.app.security;

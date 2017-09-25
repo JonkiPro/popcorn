@@ -11,20 +11,17 @@
         <div class="row">
             <div class="panel panel-primary">
                 <div class="panel-body">
-                    <div th:if="${param.error}" class="alert alert-dismissable alert-danger">
-                        <span th:text="#{signIn.error}">The username or password is incorrect!</span>
-                    </div>
-                    <form th:action="@{/signIn}" method="POST" role="form" id="signInForm">
+                    <form role="form" id="signInForm">
                         <div class="form-group">
                             <h2><span th:text="#{signIn.title}">Sign in</span></h2>
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="username"><span th:text="#{signIn.username}">Username</span></label>
-                            <input th:name="username" id="username" type="text" maxlength="36" class="form-control" th:placeholder="#{signIn.username}"/>
+                            <input name="username" id="username" type="text" maxlength="36" class="form-control" th:placeholder="#{signIn.username}"/>
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="password"><span th:text="#{signIn.password}">Password</span></label>
-                            <input th:name="password" id="password" type="password" maxlength="36" class="form-control" th:placeholder="#{signIn.password}"/>
+                            <input name="password" id="password" type="password" maxlength="36" class="form-control" th:placeholder="#{signIn.password}"/>
                         </div>
                         <label for="remember" class="btn btn-primary">
                             <span th:text="#{signIn.rememberMe}">Remember Me</span>

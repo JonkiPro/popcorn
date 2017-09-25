@@ -2,7 +2,6 @@ package com.service.app.rest.controller;
 
 import com.service.app.rest.request.ForgotPasswordDTO;
 import com.service.app.rest.request.ForgotUsernameDTO;
-import com.service.app.entity.User;
 import com.service.app.service.MailService;
 import com.service.app.service.UserService;
 import com.service.app.utils.EncryptUtils;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 @RestController
 @PreAuthorize("hasRole('ROLE_ANONYMOUS')")
@@ -41,9 +39,7 @@ public class ForgotRestController {
     HttpEntity<Boolean> forgotUsername(
             @ApiParam(value = "Username recovery form", required = true) @RequestBody @Valid ForgotUsernameDTO forgotUsernameDTO
     ) {
-        Optional<User> userOptional = userService.findByEmail(forgotUsernameDTO.getEmail());
-
-        return userOptional
+        return userService.findByEmail(forgotUsernameDTO.getEmail())
                 .map(user -> {
                     mailService.sendMailWithUsername(user.getEmail(), user.getUsername());
 
@@ -62,9 +58,7 @@ public class ForgotRestController {
     HttpEntity<Boolean> forgotPassword(
             @ApiParam(value = "Password recovery form", required = true) @RequestBody @Valid ForgotPasswordDTO forgotPasswordDTO
     ) {
-        Optional<User> userOptional = userService.findByUsernameAndEmail(forgotPasswordDTO.getUsername(), forgotPasswordDTO.getEmail());
-
-        return userOptional
+        return userService.findByUsernameAndEmail(forgotPasswordDTO.getUsername(), forgotPasswordDTO.getEmail())
                 .map(user -> {
                     String newPassword = RandomUtils.randomPassword();
 

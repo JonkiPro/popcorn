@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.util.Optional;
+import java.util.EnumSet;
 
 @RestController
 @PreAuthorize("hasRole('ROLE_ANONYMOUS')")
@@ -52,7 +52,7 @@ public class RegisterRestController {
     ) {
         User user = converterRegisterDTOToUser.convert(registerDTO);
         user.setActivationToken(RandomUtils.randomToken());
-        user.setAuthorities(SecurityRole.ROLE_USER);
+        user.setAuthorities(EnumSet.of(SecurityRole.ROLE_USER));
 
         mailService.sendMailWithActivationToken(user.getEmail(), user.getActivationToken());
 
@@ -71,9 +71,7 @@ public class RegisterRestController {
     HttpEntity<Boolean> confirmAccount(
             @ApiParam(value = "Account activation token", required = true) @PathVariable String token
     ) {
-        Optional<User> userOptional = userService.findByActivationToken(token);
-
-        return userOptional
+        return userService.findByActivationToken(token)
                 .map(user -> {
                     user.setActivationToken(null);
                     user.setEnabled(true);

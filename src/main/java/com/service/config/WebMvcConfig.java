@@ -1,6 +1,6 @@
 package com.service.config;
 
-import com.service.app.incereptor.RequestProcessingTimeInterceptor;
+import com.service.app.interceptor.RequestProcessingTimeInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;

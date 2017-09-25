@@ -3,7 +3,6 @@ security:
   pattern: /
 #form login
   login-page: /signIn
-  failure-url: /signIn?error=true
   username-parameter: username
   password-parameter: password
 #logout
@@ -19,9 +18,6 @@ security:
   remember-me-parameter: remember-me
   remember-me-cookie-name: remember_me_cookie
   token-validity-seconds: 86400
-#authentication manager
-  users-by-username-query: SELECT username, password, enabled FROM users WHERE username=?
-  authorities-by-username-query: SELECT username, authorities FROM users WHERE username=?
 #password encoder
   strength-password-encoder: 12
 

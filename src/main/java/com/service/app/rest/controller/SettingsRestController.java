@@ -15,12 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Optional;
 
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping(value = "/api/v1.0/users/account/update", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "Settings API", description = "Provides a list of methods that manage settings")
+@Api(value = "Settings API", description = "Provides a list of methods that manage user settings")
 public class SettingsRestController {
 
     @Autowired
@@ -73,9 +72,7 @@ public class SettingsRestController {
     HttpEntity<Boolean> emailChangeToken(
             @ApiParam(value = "E-mail change token", required = true) @PathVariable String token
     ) {
-        Optional<User> userOptional = userService.findByEmailChangeToken(token);
-
-        return userOptional
+        return userService.findByEmailChangeToken(token)
                 .map(user -> {
                     user.setEmail(user.getNewEmail());
                     user.setEmailChangeToken(null);
