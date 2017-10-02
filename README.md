@@ -15,7 +15,7 @@
 ### PostgreSQL
 *  Create a user with all permissions. <b>username:</b> <i>root</i>, <b>password:</b> <i>root</i>
 *  Create a database. <b>name:</b> <i>database</i>, <b>owner:</b> <i>root</i>
-## Running (protected by SSL)
+## Running
 *  Right click on class name and "Run".
 *  Visit [https://localhost:8443/].
 ### REST

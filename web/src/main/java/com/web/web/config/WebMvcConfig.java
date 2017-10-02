@@ -1,0 +1,42 @@
+package com.web.web.config;
+
+import com.web.web.interceptor.RequestProcessingTimeInterceptor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.nio.charset.StandardCharsets;
+
+/**
+ * Configuration for Spring MVC.
+ */
+@Configuration
+public class WebMvcConfig extends WebMvcConfigurerAdapter  {
+
+    /**
+     * Add an interceptor.
+     *
+     * @param registry Register of interceptors
+     */
+    @Override
+    public void addInterceptors(final InterceptorRegistry registry) {
+        registry.addInterceptor(new RequestProcessingTimeInterceptor());
+    }
+
+    /**
+     * Character encoding filter that forces content-type in response to be UTF-8.
+     *
+     * @return The encoding filter
+     */
+    @Bean
+    public CharacterEncodingFilter characterEncodingFilter() {
+        final CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        characterEncodingFilter.setEncoding(StandardCharsets.UTF_8.name());
+        // This effectively obliterates any upstream default and/or encoding detectors
+        // As a result, everything is served as UTF-8
+        characterEncodingFilter.setForceEncoding(true);
+        return characterEncodingFilter;
+    }
+}

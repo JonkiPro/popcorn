@@ -1,0 +1,55 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.7.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+group = 'com.core'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	/*******************************
+	 * Compile Dependencies
+	 *******************************/
+
+	compile project(':common')
+
+	// Spring Libs
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-mail')
+	compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '4.2.3.RELEASE'
+	compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '1.5.7.RELEASE'
+	//
+
+	// PostgreSQL
+	compile group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
+	//
+
+	// Lombok
+	compileOnly('org.projectlombok:lombok')
+	//
+
+	/*******************************
+	 * Test Dependencies
+	 *******************************/
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.8.47'
+	testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
+}

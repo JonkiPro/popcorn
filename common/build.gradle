@@ -1,0 +1,43 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.7.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+group = 'com.common'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	/*******************************
+	 * Compile Dependencies
+	 *******************************/
+
+	compile("com.fasterxml.jackson.core:jackson-databind")
+	compile("org.hibernate:hibernate-validator")
+	compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
+
+	// Lombok
+	compileOnly('org.projectlombok:lombok')
+	//
+
+	// Swagger Libs
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
+	//
+}

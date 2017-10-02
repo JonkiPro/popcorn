@@ -1,0 +1,28 @@
+security:
+#pattern
+  pattern: /
+#form login
+  login-page: /signIn
+  username-parameter: username
+  password-parameter: password
+#logout
+  invalidate-http-session: true
+  clear-authentication: true
+  logout-request-matcher: /logout
+  logout-success-url: /
+#session management
+  invalid-session-url: /signIn
+  maximum-sessions: 1
+  expired-url: /signIn
+#remember me
+  remember-me-parameter: remember-me
+  remember-me-cookie-name: remember_me_cookie
+  token-validity-seconds: 86400
+#password encoder
+  strength-password-encoder: 12
+
+
+#reCaptcha
+app.reCaptcha:
+  api-url: https://www.google.com/recaptcha/api/siteverify
+  secret-key: 6LeTEjAUAAAAAB23AV1aokKfDYhfP-HLIV90DRWq

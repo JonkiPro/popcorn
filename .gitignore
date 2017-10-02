@@ -1,5 +1,8 @@
 # gradle config
 .gradle/
+*/gradle
+*/gradlew
+*/gradlew.bat
 
 # Intellij Idea project files
 .idea/
