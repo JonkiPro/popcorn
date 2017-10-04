@@ -10,8 +10,10 @@ import com.core.jpa.service.FriendshipPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
@@ -21,6 +23,13 @@ import java.util.Optional;
  */
 @Service("friendshipPersistenceService")
 @Slf4j
+@Transactional(
+        rollbackFor = {
+                ResourceNotFoundException.class,
+                ResourceConflictException.class,
+                ConstraintViolationException.class
+        }
+)
 @Validated
 public class FriendshipPersistenceServiceImpl implements FriendshipPersistenceService {
 

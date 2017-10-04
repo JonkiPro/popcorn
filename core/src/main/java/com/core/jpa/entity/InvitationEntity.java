@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -16,9 +17,12 @@ import java.util.Date;
 @Data
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
-public class InvitationEntity {
+public class InvitationEntity implements Serializable {
+
+    private static final long serialVersionUID = 563181989395575248L;
 
     @Id
+    @Column(updatable = false)
     @GeneratedValue
     private Long id;
 

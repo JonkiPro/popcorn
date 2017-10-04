@@ -15,9 +15,11 @@ import com.core.service.MailService;
 import com.core.utils.EncryptUtils;
 import com.core.utils.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -30,6 +32,14 @@ import java.util.EnumSet;
  */
 @Service("userPersistenceService")
 @Slf4j
+@Transactional(
+        rollbackFor = {
+                ResourceBadRequestException.class,
+                ResourceNotFoundException.class,
+                ResourceConflictException.class,
+                ConstraintViolationException.class
+        }
+)
 @Validated
 public class UserPersistenceServiceImpl implements UserPersistenceService {
 

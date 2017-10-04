@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Representation of the friendship.
@@ -12,9 +13,12 @@ import javax.persistence.*;
 @Table(name = "friendship")
 @Data
 @NoArgsConstructor
-public class FriendshipEntity {
+public class FriendshipEntity implements Serializable {
+
+    private static final long serialVersionUID = 5729044871052669360L;
 
     @Id
+    @Column(updatable = false)
     @GeneratedValue
     private Long id;
 

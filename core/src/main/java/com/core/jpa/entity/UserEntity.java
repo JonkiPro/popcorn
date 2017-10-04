@@ -3,6 +3,7 @@ package com.core.jpa.entity;
 import com.common.dto.User;
 import com.common.dto.SecurityRole;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,10 +18,14 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
-public class UserEntity {
+public class UserEntity extends BaseEntity {
+
+    private static final long serialVersionUID = -1588795025690250131L;
 
     @Id
+    @Column(updatable = false)
     @GeneratedValue
     private Long id;
 

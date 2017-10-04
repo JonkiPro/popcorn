@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  */
 @Service("userSearchService")
 @Slf4j
+@Transactional(readOnly = true)
 @Validated
 public class UserSearchServiceImpl implements UserSearchService {
 
@@ -149,7 +151,7 @@ public class UserSearchServiceImpl implements UserSearchService {
     @Override
     public String getUserPassword(
             @NotBlank @Pattern(regexp = "[a-zA-Z0-9_-]{6,36}") final String username
-    ) {
+    ) throws ResourceNotFoundException {
         log.info("Called with username {}", username);
 
         return this.userRepository.findByUsernameIgnoreCaseAndEnabledTrue(username)

@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -16,9 +17,12 @@ import java.util.Date;
 @Table(name = "messages")
 @Data
 @EntityListeners(AuditingEntityListener.class)
-public class MessageEntity {
+public class MessageEntity implements Serializable {
+
+    private static final long serialVersionUID = 6761068804530627981L;
 
     @Id
+    @Column(updatable = false)
     @GeneratedValue
     private Long id;
 

@@ -8,6 +8,7 @@ import com.core.jpa.service.FriendshipSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
@@ -19,6 +20,7 @@ import java.util.Optional;
  */
 @Service("friendshipSearchService")
 @Slf4j
+@Transactional(readOnly = true)
 @Validated
 public class FriendshipSearchServiceImpl implements FriendshipSearchService {
 

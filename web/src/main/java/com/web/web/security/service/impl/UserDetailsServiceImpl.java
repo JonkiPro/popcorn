@@ -1,7 +1,6 @@
 package com.web.web.security.service.impl;
 
 import com.core.jpa.entity.UserEntity;
-import com.common.exception.ResourceNotFoundException;
 import com.core.jpa.repository.UserRepository;
 import com.common.dto.SecurityRole;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +48,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         Optional<UserEntity> userOptional = userRepository.findByUsernameIgnoreCaseAndEnabledTrue(username);
 
-        userOptional.orElseThrow(() -> new ResourceNotFoundException("Incorrect data!"));
+        userOptional.orElseThrow(() -> new UsernameNotFoundException("No user found with username " + username));
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         for(SecurityRole role : userOptional.get().getAuthorities()) {
