@@ -19,10 +19,11 @@ public interface MessagePersistenceService {
      * Create message with DTO data.
      *
      * @param sendMessageDTO DTO with message data
+     * @return The id of the message created
      * @throws ResourceNotFoundException if no user found
      * @throws ResourceConflictException if any data conflict
      */
-    void createMessage(
+    Long createMessage(
             @Min(1) final Long senderId,
             @NotNull @Valid final SendMessageDTO sendMessageDTO
     ) throws ResourceNotFoundException, ResourceConflictException;

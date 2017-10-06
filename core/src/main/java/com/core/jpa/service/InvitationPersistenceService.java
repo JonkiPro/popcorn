@@ -17,10 +17,11 @@ public interface InvitationPersistenceService {
      *
      * @param fromId From the user ID
      * @param toId To the user ID
+     * @return The id of the invitation created
      * @throws ResourceNotFoundException if no user found
      * @throws ResourceConflictException if invitation exists
      */
-    void createInvitation(
+    Long createInvitation(
             @Min(1) final Long fromId,
             @Min(1) final Long toId
     ) throws ResourceNotFoundException, ResourceConflictException;

@@ -7,6 +7,7 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("permitAll()")
-@RequestMapping(value = "/api/v1.0/users", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1.0/users")
 @Slf4j
 @Api(value = "UserEntity API", description = "Provides a list of methods that retrieve users and their data")
 public class UserRestController {
@@ -41,9 +42,10 @@ public class UserRestController {
     }
 
     @ApiOperation(value = "Get list of users by phrase")
-    @GetMapping
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public
-    HttpEntity<List<UserResource>> getUsers(
+    List<UserResource> getUsers(
             @ApiParam(value = "Search for a phrase") @RequestParam(required = false) final String q,
             @ApiParam(value = "Page number") @RequestParam(required = false, defaultValue = "1") final int page,
             @ApiParam(value = "Number of items per page") @RequestParam(required = false, defaultValue = "1") final int pageSize,
@@ -51,7 +53,7 @@ public class UserRestController {
     ) {
         log.info("Called with q {}, page {}, pageSize {}, sort {}", q, page, pageSize, sort);
 
-        return ResponseEntity.ok().body(Optional.ofNullable(q)
+        return Optional.ofNullable(q)
                 .map(v ->
                         this.userSearchService
                                 .getAllUsersByUsername(q, page - 1, pageSize, new Sort(Sort.Direction.ASC, sort))
@@ -65,30 +67,31 @@ public class UserRestController {
                                 .stream()
                                 .map(this.userResourceAssembler::toResource)
                                 .collect(Collectors.toList())
-                ));
+                );
     }
 
     @ApiOperation(value = "Get user profile by username")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
-    @GetMapping(value = "/account/{username}")
+    @GetMapping(value = "/account/{username}", produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public
-    HttpEntity<UserResource> getProfile(
+    UserResource getProfile(
             @ApiParam(value = "The user's name", required = true) @PathVariable final String username
     ) {
         log.info("Called with username {}", username);
 
-        return ResponseEntity.ok()
-                .body(this.userResourceAssembler.toResource(this.userSearchService.getUserByUsername(username)));
+        return this.userResourceAssembler.toResource(this.userSearchService.getUserByUsername(username));
     }
 
     @ApiOperation(value = "Get the number of users by fragment of username")
-    @GetMapping(value = "/number")
+    @GetMapping(value = "/number", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public
-    HttpEntity<Long> getNumberOfUsers(
+    Long getNumberOfUsers(
             @ApiParam(value = "Fragment of username", required = true) @RequestParam final String username
     ) {
         log.info("Called with username {}", username);
 
-        return ResponseEntity.ok().body(this.userSearchService.getUserCountByUsername(username));
+        return this.userSearchService.getUserCountByUsername(username);
     }
 }

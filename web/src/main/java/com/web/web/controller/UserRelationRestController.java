@@ -1,8 +1,6 @@
 package com.web.web.controller;
 
 import com.common.dto.User;
-import com.common.exception.ResourceConflictException;
-import com.common.exception.ResourceNotFoundException;
 import com.core.jpa.service.*;
 import com.common.exception.ResourceForbiddenException;
 import com.common.dto.RelationshipStatus;
@@ -10,11 +8,10 @@ import com.web.web.security.service.AuthorizationService;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
@@ -57,16 +54,18 @@ public class UserRelationRestController {
         this.friendshipSearchService = friendshipSearchService;
     }
 
-    @ApiOperation(value = "Save friendship")
+    @ApiOperation(value = "Create friendship")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No user found or no invitation found"),
             @ApiResponse(code = 403, message = "Forbidden command"),
             @ApiResponse(code = 409, message = "The friendship exists")
     })
-    @PostMapping("/friends/{username}")
+    @PostMapping(value = "/friends/{username}")
+    @ResponseStatus(HttpStatus.CREATED)
     public
-    HttpEntity<Boolean> saveFriendship(
-            @ApiParam(value = "The user's name", required = true) @PathVariable final String username
+    ResponseEntity<Void> createFriendship(
+            @ApiParam(value = "The user's name", required = true) @PathVariable final String username,
+            final UriComponentsBuilder uriComponentsBuilder
     ) {
         log.info("Called with username {}", username);
 
@@ -82,17 +81,21 @@ public class UserRelationRestController {
         // Save the friendship
         this.friendshipPersistenceService.createFriendship(fromUser.getId(), toUser.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(true);
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(uriComponentsBuilder.path("/friends/{username}").buildAndExpand(username).toUri());
+
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "Remove friendship")
+    @ApiOperation(value = "Delete friendship")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No user found or no friendship found"),
             @ApiResponse(code = 403, message = "Forbidden command")
     })
-    @DeleteMapping("/friends/{username}")
+    @DeleteMapping(value = "/friends/{username}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public
-    HttpEntity<Boolean> removeFriendship(
+    void deleteFriendship(
             @ApiParam(value = "The user's name", required = true) @PathVariable final String username
     ) {
         log.info("Called with username {}", username);
@@ -106,20 +109,20 @@ public class UserRelationRestController {
 
         // Delete the friendship
         this.friendshipPersistenceService.deleteFriendship(fromUser.getId(), toUser.getId());
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(true);
     }
 
-    @ApiOperation(value = "Save invitation")
+    @ApiOperation(value = "Create an invitation")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No user found"),
             @ApiResponse(code = 403, message = "Forbidden command"),
             @ApiResponse(code = 409, message = "The invitation exists")
     })
-    @PostMapping("/invitations/{username}")
+    @PostMapping(value = "/invitations/{username}")
+    @ResponseStatus(HttpStatus.CREATED)
     public
-    HttpEntity<Boolean> sendInvitation(
-            @ApiParam(value = "The user's name", required = true) @PathVariable final String username
+    ResponseEntity<Void> createInvitation(
+            @ApiParam(value = "The user's name", required = true) @PathVariable final String username,
+            final UriComponentsBuilder uriComponentsBuilder
     ) {
         log.info("Called with username {}", username);
 
@@ -133,17 +136,21 @@ public class UserRelationRestController {
         // Save the invitation
         this.invitationPersistenceService.createInvitation(fromUser.getId(), toUser.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(true);
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(uriComponentsBuilder.path("/invitations/{username}").buildAndExpand(username).toUri());
+
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "Remove/reject invitation")
+    @ApiOperation(value = "Delete/reject invitation")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No user found or no invitation found"),
             @ApiResponse(code = 403, message = "Forbidden command")
     })
-    @DeleteMapping("/invitations/{username}")
+    @DeleteMapping(value = "/invitations/{username}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public
-    HttpEntity<Boolean> removeInvitation(
+    void deleteInvitation(
             @ApiParam(value = "The user's name", required = true) @PathVariable final String username,
             @ApiParam(value = "Type of action: remove or reject", required = true) @RequestParam final String action
     ) {
@@ -163,8 +170,6 @@ public class UserRelationRestController {
             // Delete the invitation
             this.invitationPersistenceService.deleteInvitation(toUser.getId(), fromUser.getId());
         }
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(true);
     }
 
     @ApiOperation(value = "Get the relationship status between users")
@@ -172,9 +177,10 @@ public class UserRelationRestController {
             @ApiResponse(code = 404, message = "No user found"),
             @ApiResponse(code = 403, message = "Forbidden command")
     })
-    @GetMapping("/status/{username}")
+    @GetMapping(value = "/status/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public
-    ResponseEntity<RelationshipStatus> getStatus(
+    RelationshipStatus getStatus(
             @ApiParam(value = "The user's name", required = true) @PathVariable final String username
     ) {
         log.info("Called with username {}", username);
@@ -197,7 +203,7 @@ public class UserRelationRestController {
             status = RelationshipStatus.UNKNOWN;
         }
 
-        return ResponseEntity.ok().body(status);
+        return status;
     }
 
 

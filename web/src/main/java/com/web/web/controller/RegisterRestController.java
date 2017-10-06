@@ -56,9 +56,10 @@ public class RegisterRestController {
             @ApiResponse(code = 400, message = "Incorrect data in the form or the username or e-mail exists"),
             @ApiResponse(code = 409, message = "The username or e-mail exists")
     })
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     public
-    HttpEntity<Boolean> register(
+    ResponseEntity<Void> register(
             @ApiParam(value = "Registration form", required = true) @RequestBody @Valid final RegisterDTO registerDTO,
             final UriComponentsBuilder uriComponentsBuilder
     ) {
@@ -69,24 +70,23 @@ public class RegisterRestController {
 
         this.userPersistenceService.createUser(registerDTO);
 
-        HttpHeaders httpHeaders = new HttpHeaders();
+        final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(uriComponentsBuilder.path("/register/successfully").build().toUri());
 
-        return new ResponseEntity<>(true, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Activate the user with token")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "Token not found") })
     @PutMapping(value = "/token/{token}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public
-    HttpEntity<Boolean> confirmAccount(
+    void confirmAccount(
             @ApiParam(value = "Account activation token", required = true) @PathVariable final String token
     ) {
         log.info("Called with token {}", token);
 
         this.userPersistenceService.activationUser(token);
-
-        return ResponseEntity.ok(true);
     }
 
 

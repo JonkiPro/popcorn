@@ -24,9 +24,10 @@ public interface UserPersistenceService {
      * Create user with DTO data.
      *
      * @param registerDTO DTO with user registration data
+     * @return The id of the user created
      * @throws ResourceConflictException if username or e-mail exists
      */
-    void createUser(
+    Long createUser(
             @NotNull @Valid final RegisterDTO registerDTO
     ) throws ResourceConflictException;
 

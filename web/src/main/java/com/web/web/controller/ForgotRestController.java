@@ -14,13 +14,10 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ResourceBundle;
@@ -60,20 +57,19 @@ public class ForgotRestController {
             @ApiResponse(code = 400, message = "Incorrect data in the form or the user with such an e-mail doesn't exist"),
             @ApiResponse(code = 404, message = "No user found")
     })
-    @PutMapping(value = "/username_recovery")
+    @PutMapping(value = "/username_recovery", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public
-    HttpEntity<Boolean> forgotUsername(
+    void forgotUsername(
             @ApiParam(value = "Username recovery form", required = true) @RequestBody @Valid final ForgotUsernameDTO forgotUsernameDTO
     ) {
         log.info("Called with {}", forgotUsernameDTO);
 
         this.validEmail(forgotUsernameDTO.getEmail());
 
-        User user = this.userSearchService.getUserByEmail(forgotUsernameDTO.getEmail());
+        final User user = this.userSearchService.getUserByEmail(forgotUsernameDTO.getEmail());
 
         this.mailService.sendMailWithUsername(user.getEmail(), user.getUsername());
-
-        return ResponseEntity.ok(true);
     }
 
     @ApiOperation(value = "Generate a new password for the user and send it to the e-mail address")
@@ -81,9 +77,10 @@ public class ForgotRestController {
             @ApiResponse(code = 400, message = "Incorrect data in the form"),
             @ApiResponse(code = 404, message = "No user found")
     })
-    @PutMapping(value = "/password_reset")
+    @PutMapping(value = "/password_reset", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public
-    HttpEntity<Boolean> forgotPassword(
+    void forgotPassword(
             @ApiParam(value = "Password recovery form", required = true) @RequestBody @Valid final ForgotPasswordDTO forgotPasswordDTO
     ) {
         log.info("Called with {}", forgotPasswordDTO);
@@ -91,8 +88,6 @@ public class ForgotRestController {
         this.validForgotPasswordDTO(forgotPasswordDTO);
 
         this.userPersistenceService.resetPassword(forgotPasswordDTO);
-
-        return ResponseEntity.ok(true);
     }
 
 

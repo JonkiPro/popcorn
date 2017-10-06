@@ -5,8 +5,8 @@ import com.core.utils.EncryptUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,42 +37,45 @@ public class CheckUserDataRestController {
     }
 
     @ApiOperation(value = "Check if the username exists")
-    @GetMapping("/username")
+    @GetMapping(value = "/username", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public
-    HttpEntity<Boolean> checkUsername(
+    boolean checkUsername(
             @ApiParam(value = "The user's name", required = true) @RequestParam final String username,
             @RequestParam(defaultValue = "false", required = false) final boolean negation
     ) {
         log.info("Called with username {}, negation {}", username, negation);
 
         if(!negation) {
-            return ResponseEntity.ok().body(userSearchService.getUserExistsByUsername(username));
+            return userSearchService.getUserExistsByUsername(username);
         } else {
-            return ResponseEntity.ok().body(!userSearchService.getUserExistsByUsername(username));
+            return !userSearchService.getUserExistsByUsername(username);
         }
     }
 
     @ApiOperation(value = "Check if the e-mail exists")
-    @GetMapping("/email")
+    @GetMapping(value = "/email", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public
-    HttpEntity<Boolean> checkEmail(
+    boolean checkEmail(
             @ApiParam(value = "The user's e-mail", required = true) @RequestParam final String email,
             @RequestParam(defaultValue = "false", required = false) final boolean negation
     ) {
         log.info("Called with email {}, negation {}", email, negation);
 
         if(!negation) {
-            return ResponseEntity.ok().body(userSearchService.getUserExistsByEmail(email));
+            return userSearchService.getUserExistsByEmail(email);
         } else {
-            return ResponseEntity.ok().body(!userSearchService.getUserExistsByEmail(email));
+            return !userSearchService.getUserExistsByEmail(email);
         }
     }
 
     @ApiOperation(value = "Check that the user's password is the same")
     @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/password")
+    @GetMapping(value = "/password", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public
-    HttpEntity<Boolean> checkPassword(
+    boolean checkPassword(
             @ApiParam(value = "The user's password", required = true) @RequestParam final String password,
             @RequestParam(defaultValue = "false", required = false) final boolean negation,
             final Principal principal
@@ -80,9 +83,9 @@ public class CheckUserDataRestController {
         log.info("Called with password {}, negation {}", password, negation);
 
         if(!negation) {
-            return ResponseEntity.ok().body(EncryptUtils.matches(password, userSearchService.getUserPassword(principal.getName())));
+            return EncryptUtils.matches(password, userSearchService.getUserPassword(principal.getName()));
         } else {
-            return ResponseEntity.ok().body(!(EncryptUtils.matches(password, userSearchService.getUserPassword(principal.getName()))));
+            return !(EncryptUtils.matches(password, userSearchService.getUserPassword(principal.getName())));
         }
     }
 }

@@ -61,10 +61,10 @@ public class FriendshipPersistenceServiceImpl implements FriendshipPersistenceSe
     ) throws ResourceNotFoundException, ResourceConflictException {
         log.info("Called with id {}, id {}", fromId, toId);
 
-        Optional<UserEntity> fromUser = this.userRepository.findByIdAndEnabledTrue(fromId);
+        final Optional<UserEntity> fromUser = this.userRepository.findByIdAndEnabledTrue(fromId);
         fromUser.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + fromId));
 
-        Optional<UserEntity> toUser = this.userRepository.findByIdAndEnabledTrue(toId);
+        final Optional<UserEntity> toUser = this.userRepository.findByIdAndEnabledTrue(toId);
         toUser.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + toId));
 
         if(this.friendshipRepository.existsByFromUserAndToUser(fromUser.get(), toUser.get())
@@ -86,10 +86,10 @@ public class FriendshipPersistenceServiceImpl implements FriendshipPersistenceSe
     ) throws ResourceNotFoundException {
         log.info("Called with id {}, id {}", fromId, toId);
 
-        Optional<UserEntity> fromUser = this.userRepository.findByIdAndEnabledTrue(fromId);
+        final Optional<UserEntity> fromUser = this.userRepository.findByIdAndEnabledTrue(fromId);
         fromUser.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + fromId));
 
-        Optional<UserEntity> toUser = this.userRepository.findByIdAndEnabledTrue(toId);
+        final Optional<UserEntity> toUser = this.userRepository.findByIdAndEnabledTrue(toId);
         toUser.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + toId));
 
         if(!this.friendshipRepository.existsByFromUserAndToUser(fromUser.get(), toUser.get())

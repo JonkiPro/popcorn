@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,7 +58,7 @@ public class MessageSearchServiceImpl implements MessageSearchService {
     ) throws ResourceNotFoundException {
         log.info("Called with messageId {}, userId {}", messageId, userId);
 
-        Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
+        final Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
         user.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
         return this.messageRepository.findByIdAndSenderAndIsVisibleForSenderTrue(messageId, user.get())
@@ -74,7 +75,7 @@ public class MessageSearchServiceImpl implements MessageSearchService {
     ) throws ResourceNotFoundException {
         log.info("Called with userId {}", userId);
 
-        Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
+        final Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
         user.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
         return this.messageRepository.findBySenderAndIsVisibleForSenderTrueOrderByIdDesc(user.get())
@@ -93,7 +94,7 @@ public class MessageSearchServiceImpl implements MessageSearchService {
     ) throws ResourceNotFoundException {
         log.info("Called with userId {}", userId);
 
-        Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
+        final Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
         user.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
         return this.messageRepository.findSentMessagesByContaining(user.get(), "%"+ content.trim()+"%", "%"+ content.trim()+"%")
@@ -106,18 +107,26 @@ public class MessageSearchServiceImpl implements MessageSearchService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = false)
     public MessageReceived getMessageReceived(
             @Min(1) final Long messageId,
             @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with messageId {}, userId {}", messageId, userId);
 
-        Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
+        final Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
         user.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
-        return this.messageRepository.findByIdAndRecipientAndIsVisibleForRecipientTrue(messageId, user.get())
-                .map(MessageEntity::getReceivedDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("No message found with id " + messageId));
+        final Optional<MessageEntity> message =  this.messageRepository.findByIdAndRecipientAndIsVisibleForRecipientTrue(messageId, user.get());
+        message.orElseThrow(() -> new ResourceNotFoundException("No message found with id " + messageId));
+
+        if(message.get().getDateOfRead() == null) {
+            message.get().setDateOfRead(new Date());
+
+            this.messageRepository.save(message.get());
+        }
+
+        return message.get().getReceivedDTO();
     }
 
     /**
@@ -129,7 +138,7 @@ public class MessageSearchServiceImpl implements MessageSearchService {
     ) throws ResourceNotFoundException {
         log.info("Called with userId {}", userId);
 
-        Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
+        final Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
         user.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
         return this.messageRepository.findByRecipientAndIsVisibleForRecipientTrueOrderByIdDesc(user.get())
@@ -148,7 +157,7 @@ public class MessageSearchServiceImpl implements MessageSearchService {
     ) throws ResourceNotFoundException {
         log.info("Called with userId {}", userId);
 
-        Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
+        final Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
         user.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
         return this.messageRepository.findReceivedMessagesByContaining(user.get(), "%"+ content.trim()+"%", "%"+ content.trim()+"%")
@@ -167,7 +176,7 @@ public class MessageSearchServiceImpl implements MessageSearchService {
     ) throws ResourceNotFoundException {
         log.info("Called with messageId {}, userId {}", messageId, userId);
 
-        Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
+        final Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
         user.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
         return this.messageRepository.existsByIdAndSenderAndIsVisibleForSenderTrue(messageId, user.get());
@@ -183,7 +192,7 @@ public class MessageSearchServiceImpl implements MessageSearchService {
     ) throws ResourceNotFoundException {
         log.info("Called with messageId {}, userId {}", messageId, userId);
 
-        Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
+        final Optional<UserEntity> user = this.userRepository.findByIdAndEnabledTrue(userId);
         user.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
         return this.messageRepository.existsByIdAndRecipientAndIsVisibleForRecipientTrue(messageId, user.get());

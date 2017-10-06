@@ -94,23 +94,24 @@ document.addEventListener('DOMContentLoaded', function () {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(registerDTO),
-            success: function (result, status, xhr) {
-                window.location.replace(xhr.getResponseHeader('Location'));
-            },
-            error: function (error) {
-                var obj = JSON.parse(error.responseText);
-                for(var i = 0; i < obj.field_errors.length; ++i) {
-                    var objError = obj.field_errors[i];
+            complete: function (event) {
+                if(event.status === 201) {
+                    window.location.replace(event.getResponseHeader('Location'));
+                } else {
+                    var obj = JSON.parse(event.responseText);
+                    for(var i = 0; i < obj.field_errors.length; ++i) {
+                        var objError = obj.field_errors[i];
 
-                    if(objError.field === "reCaptcha") {
-                        grecaptcha.reset();
-                        $('#recaptcha')
-                            .after('<label id="hiddenRecaptcha-error" class="error" for="hiddenRecaptcha">' + objError.message + '</label>');
-                    } else {
-                        $('#' + objError.field)
-                            .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
-                        $('#form-' + objError.field)
-                            .addClass('has-warning');
+                        if(objError.field === "reCaptcha") {
+                            grecaptcha.reset();
+                            $('#recaptcha')
+                                .after('<label id="hiddenRecaptcha-error" class="error" for="hiddenRecaptcha">' + objError.message + '</label>');
+                        } else {
+                            $('#' + objError.field)
+                                .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
+                            $('#form-' + objError.field)
+                                .addClass('has-warning');
+                        }
                     }
                 }
             }

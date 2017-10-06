@@ -65,7 +65,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public void createUser(
+    public Long createUser(
             @NotNull @Valid final RegisterDTO registerDTO
     ) throws ResourceConflictException {
         log.info("Called with ", registerDTO);
@@ -76,13 +76,13 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
             throw new ResourceConflictException("The e-mail " + registerDTO.getEmail() + " exists");
         }
 
-        UserEntity user = this.registerDtoToUserEntity(registerDTO);
+        final UserEntity user = this.registerDtoToUserEntity(registerDTO);
         user.setActivationToken(RandomUtils.randomToken());
         user.setAuthorities(EnumSet.of(SecurityRole.ROLE_USER));
 
         mailService.sendMailWithActivationToken(user.getEmail(), user.getActivationToken());
 
-        this.userRepository.save(user);
+        return this.userRepository.save(user).getId();
     }
 
     /**
@@ -94,7 +94,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
     ) throws ResourceNotFoundException {
         log.info("Called with token", token);
 
-        UserEntity user
+        final UserEntity user
                 = this.userRepository.findByActivationToken(token)
                          .orElseThrow(() -> new ResourceNotFoundException("No user found with token " + token));
 
@@ -113,7 +113,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
     ) throws ResourceNotFoundException {
         log.info("Called with ", forgotPasswordDTO);
 
-        UserEntity user
+        final UserEntity user
                 = this.userRepository
                      .findByUsernameIgnoreCaseAndEmailIgnoreCaseAndEnabledTrue(forgotPasswordDTO.getUsername(), forgotPasswordDTO.getEmail())
                          .orElseThrow(
@@ -123,7 +123,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
                                                                      + forgotPasswordDTO.getEmail())
                          );
 
-        String newPassword = RandomUtils.randomPassword();
+        final String newPassword = RandomUtils.randomPassword();
 
         user.setPassword(EncryptUtils.encrypt(newPassword));
 
@@ -142,7 +142,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
     ) throws ResourceNotFoundException, ResourceConflictException {
         log.info("Called with id {}, ", id, changeEmailDTO);
 
-        UserEntity user
+        final UserEntity user
                 = this.userRepository.findByIdAndEnabledTrue(id)
                          .orElseThrow(() -> new ResourceNotFoundException("No user found with id " + id));
 
@@ -168,7 +168,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
     ) throws ResourceNotFoundException, ResourceBadRequestException {
         log.info("Called with id {}, ", id, changePasswordDTO);
 
-        UserEntity user
+        final UserEntity user
                 = this.userRepository.findByIdAndEnabledTrue(id)
                          .orElseThrow(() -> new ResourceNotFoundException("No user found with id " + id));
 
@@ -190,7 +190,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
     ) throws ResourceNotFoundException {
         log.info("Called with token {}", token);
 
-        UserEntity user
+        final UserEntity user
                 = this.userRepository.findByEmailChangeToken(token)
                          .orElseThrow(() -> new ResourceNotFoundException("No user found with token " + token));
 
@@ -209,7 +209,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      * @return The user entity
      */
     private UserEntity registerDtoToUserEntity(final RegisterDTO registerDTO) {
-        UserEntity user = new UserEntity();
+        final UserEntity user = new UserEntity();
         user.setUsername(registerDTO.getUsername());
         user.setEmail(registerDTO.getEmail());
         user.setPassword(EncryptUtils.encrypt(registerDTO.getPassword()));

@@ -48,14 +48,14 @@ public class RegisterController {
         final UriComponents uriComponents
                 = uriComponentsBuilder.path("/api/v1.0/register/token/{token}").buildAndExpand(token);
 
-        ResponseEntity<Boolean> response;
+        ResponseEntity<Void> response;
 
         try {
             response = restTemplate
                     .exchange(uriComponents.toUri(),
                               HttpMethod.PUT,
                               entity,
-                              Boolean.class);
+                              Void.class);
         } catch (HttpClientErrorException e) /* IF 404 */ {
             return new ModelAndView("tokenNotFound");
         }

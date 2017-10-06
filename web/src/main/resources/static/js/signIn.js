@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
             error: function (error) {
                 $('#signInForm')
                     .before('<div class="alert alert-dismissable alert-danger">'
-                        + '<span th:text="#{forgotPassword.error}">The username or password is incorrect!</span>'
-                        + '</div>');
+                          + '<span th:text="#{forgotPassword.error}">The username or password is incorrect!</span>'
+                          + '</div>');
             }
         });
     }

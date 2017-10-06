@@ -55,31 +55,32 @@ document.addEventListener('DOMContentLoaded', function () {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(sendMessageDTO),
-            success: function () {
-                $('#to').val('');
-                $('#subject').val('');
-                $('#text').val('');
+            complete: function (event) {
+                if(event.status === 201) {
+                    $('#to').val('');
+                    $('#subject').val('');
+                    $('#text').val('');
 
-                $('#sendMessageForm')
-                    .before('<div class="alert alert-dismissable alert-success">'
-                        + '<span th:text="#{newMessage.success}">The message was sent!</span>'
-                        + '</div>');
+                    $('#sendMessageForm')
+                        .before('<div class="alert alert-dismissable alert-success">'
+                              + '<span th:text="#{newMessage.success}">The message was sent!</span>'
+                              + '</div>');
 
-                setTimeout('hiddenAlertAfterSeconds()', 2000);
-            },
-            error: function (error) {
-                if(error.status === 403) {
-                    $('#to')
-                        .after('<label id="to-error" class="error" for="to">' + 'You cannot send a message to yourself.' + '</label>');
+                    setTimeout('hiddenAlertAfterSeconds()', 2000);
+                } else {
+                    if(event.status === 403) {
+                        $('#to')
+                            .after('<label id="to-error" class="error" for="to">' + 'You cannot send a message to yourself.' + '</label>');
 
-                    return;
-                }
-                var obj = JSON.parse(error.responseText);
-                for(var i = 0; i < obj.field_errors.length; ++i) {
-                    var objError = obj.field_errors[i];
+                        return;
+                    }
+                    var obj = JSON.parse(event.responseText);
+                    for(var i = 0; i < obj.field_errors.length; ++i) {
+                        var objError = obj.field_errors[i];
 
-                    $('#' + objError.field)
-                        .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
+                        $('#' + objError.field)
+                            .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
+                    }
                 }
             }
         });

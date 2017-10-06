@@ -62,26 +62,27 @@ document.addEventListener('DOMContentLoaded', function () {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(changeEmailDTO),
-            success: function (result) {
-                $('#password').val('');
-                $('#email').val('');
+            complete: function (event) {
+                if(event.status === 204) {
+                    $('#password').val('');
+                    $('#email').val('');
 
-                $('#changeEmailForm')
-                    .before('<div class="alert alert-dismissable alert-success">'
+                    $('#changeEmailForm')
+                        .before('<div class="alert alert-dismissable alert-success">'
                             + '<span th:text="#{settings.successChangeEmail}">An e-mail has been successfully sent on your new e-mail. Please allow a few minutes for it to get to your inbox!</span>'
                             + '</div>');
 
-                setTimeout('hiddenAlertAfterSeconds()', 2000);
-            },
-            error: function (error) {
-                var obj = JSON.parse(error.responseText);
-                for(var i = 0; i < obj.field_errors.length; ++i) {
-                    var objError = obj.field_errors[i];
+                    setTimeout('hiddenAlertAfterSeconds()', 2000);
+                } else {
+                    var obj = JSON.parse(event.responseText);
+                    for(var i = 0; i < obj.field_errors.length; ++i) {
+                        var objError = obj.field_errors[i];
 
-                    $('#' + objError.field)
-                        .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
-                    $('#form-' + objError.field)
-                        .addClass('has-warning');
+                        $('#' + objError.field)
+                            .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
+                        $('#form-' + objError.field)
+                            .addClass('has-warning');
+                    }
                 }
             }
         });
@@ -146,27 +147,28 @@ document.addEventListener('DOMContentLoaded', function () {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(changePasswordDTO),
-            success: function (result) {
-                $('#oldPassword').val('');
-                $('#newPassword').val('');
-                $('#newPasswordAgain').val('');
+            complete: function (event) {
+                if(event.status === 204) {
+                    $('#oldPassword').val('');
+                    $('#newPassword').val('');
+                    $('#newPasswordAgain').val('');
 
-                $('#changePasswordForm')
-                    .before('<div class="alert alert-dismissable alert-success">'
+                    $('#changePasswordForm')
+                        .before('<div class="alert alert-dismissable alert-success">'
                             + '<span th:text="#{settings.successChangePassword}">Your password has been changed.</span>'
                             + '</div>');
 
-                setTimeout('hiddenAlertAfterSeconds()', 2000);
-            },
-            error: function (error) {
-                var obj = JSON.parse(error.responseText);
-                for(var i = 0; i < obj.field_errors.length; ++i) {
-                    var objError = obj.field_errors[i];
+                    setTimeout('hiddenAlertAfterSeconds()', 2000);
+                } else {
+                    var obj = JSON.parse(event.responseText);
+                    for(var i = 0; i < obj.field_errors.length; ++i) {
+                        var objError = obj.field_errors[i];
 
-                    $('#' + objError.field)
-                        .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
-                    $('#form-' + objError.field)
-                        .addClass('has-warning');
+                        $('#' + objError.field)
+                            .after('<label id="' + objError.field + '-error" class="error" for="' + objError.field + '">' + objError.message + '</label>');
+                        $('#form-' + objError.field)
+                            .addClass('has-warning');
+                    }
                 }
             }
         });

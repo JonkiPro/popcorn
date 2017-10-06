@@ -55,16 +55,16 @@ public class InvitationPersistenceServiceImpl implements InvitationPersistenceSe
      * {@inheritDoc}
      */
     @Override
-    public void createInvitation(
+    public Long createInvitation(
             @Min(1) final Long fromId,
             @Min(1) final Long toId
     ) throws ResourceNotFoundException, ResourceConflictException {
         log.info("Called with id {}, id {}", fromId, toId);
 
-        Optional<UserEntity> fromUser = this.userRepository.findByIdAndEnabledTrue(fromId);
+        final Optional<UserEntity> fromUser = this.userRepository.findByIdAndEnabledTrue(fromId);
         fromUser.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + fromId));
 
-        Optional<UserEntity> toUser = this.userRepository.findByIdAndEnabledTrue(toId);
+        final Optional<UserEntity> toUser = this.userRepository.findByIdAndEnabledTrue(toId);
         toUser.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + toId));
 
         if(this.invitationRepository.existsByFromUserAndToUser(fromUser.get(), toUser.get())
@@ -72,7 +72,7 @@ public class InvitationPersistenceServiceImpl implements InvitationPersistenceSe
             throw new ResourceConflictException("The invitation exists between id " + fromId + " id " + toId);
         }
 
-        this.invitationRepository.save(new InvitationEntity(fromUser.get(), toUser.get()));
+        return this.invitationRepository.save(new InvitationEntity(fromUser.get(), toUser.get())).getId();
     }
 
     /**
@@ -85,13 +85,13 @@ public class InvitationPersistenceServiceImpl implements InvitationPersistenceSe
     ) throws ResourceNotFoundException {
         log.info("Called with id {}, id {}", fromId, toId);
 
-        Optional<UserEntity> fromUser = this.userRepository.findByIdAndEnabledTrue(fromId);
+        final Optional<UserEntity> fromUser = this.userRepository.findByIdAndEnabledTrue(fromId);
         fromUser.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + fromId));
 
-        Optional<UserEntity> toUser = this.userRepository.findByIdAndEnabledTrue(toId);
+        final Optional<UserEntity> toUser = this.userRepository.findByIdAndEnabledTrue(toId);
         toUser.orElseThrow(() -> new ResourceNotFoundException("No user found with id " + toId));
 
-        Optional<InvitationEntity> invitation = this.invitationRepository.findOneByFromUserAndToUser(fromUser.get(), toUser.get());
+        final Optional<InvitationEntity> invitation = this.invitationRepository.findOneByFromUserAndToUser(fromUser.get(), toUser.get());
 
         invitation.orElseThrow(() -> new ResourceNotFoundException("No invitation found between id " + fromId + " id " + toId));
 

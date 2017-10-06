@@ -52,13 +52,13 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
     }
 
     @Override
-    public void createMessage(
+    public Long createMessage(
             @Min(1) final Long senderId,
             @NotNull @Valid SendMessageDTO sendMessageDTO
     ) throws ResourceNotFoundException, ResourceConflictException {
         log.info("Called with senderId {}, {}", senderId, sendMessageDTO);
 
-        MessageEntity message = this.sendMessageDtoToMessageEntity(sendMessageDTO);
+        final MessageEntity message = this.sendMessageDtoToMessageEntity(sendMessageDTO);
 
         message.setSender(this.userRepository.findByIdAndEnabledTrue(senderId)
                                 .orElseThrow(() -> new ResourceNotFoundException("No user found with id " + senderId)));
@@ -67,7 +67,7 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
             throw new ResourceConflictException("The recipient's ID can't be the same as the sender's ID");
         }
 
-        this.messageRepository.save(message);
+        return this.messageRepository.save(message).getId();
     }
 
     /**
@@ -80,11 +80,11 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
     ) throws ResourceNotFoundException {
         log.info("Called with id {}, userId {}", id, userId);
 
-        UserEntity user
+        final UserEntity user
                 = this.userRepository.findByIdAndEnabledTrue(userId)
                          .orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
-        MessageEntity message
+        final MessageEntity message
                 = this.messageRepository.findByIdAndSenderAndIsVisibleForSenderTrue(id, user)
                          .orElseThrow(() -> new ResourceNotFoundException("No message sent found with id " + id));
 
@@ -103,11 +103,11 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
     ) throws ResourceNotFoundException {
         log.info("Called with id {}, userId {}", id, userId);
 
-        UserEntity user
+        final UserEntity user
                 = this.userRepository.findByIdAndEnabledTrue(userId)
                          .orElseThrow(() -> new ResourceNotFoundException("No user found with id " + userId));
 
-        MessageEntity message
+        final MessageEntity message
                 = this.messageRepository.findByIdAndRecipientAndIsVisibleForRecipientTrue(id, user)
                          .orElseThrow(() -> new ResourceNotFoundException("No message received found with id " + id));
 
@@ -124,8 +124,11 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
      * @return The message entity
      */
     private MessageEntity sendMessageDtoToMessageEntity(final SendMessageDTO sendMessageDTO) {
-        MessageEntity message = new MessageEntity();
-        message.setRecipient(this.userRepository.findOneByUsernameIgnoreCaseAndEnabledTrue(sendMessageDTO.getTo()));
+        final UserEntity user = this.userRepository.findOneByUsernameIgnoreCaseAndEnabledTrue(sendMessageDTO.getTo());
+        if(user == null) throw new ResourceNotFoundException("No user found with username " + sendMessageDTO.getTo());
+
+        final MessageEntity message = new MessageEntity();
+        message.setRecipient(user);
         message.setSubject(sendMessageDTO.getSubject());
         message.setText(sendMessageDTO.getText());
         message.setVisibleForSender(true);
