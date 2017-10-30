@@ -6,12 +6,8 @@ spring.datasource:
   password: root
   schema: classpath:/db/init/schema.sql
 
-#settings hibernate
-spring.jpa:
-  hibernate.ddl-auto: update
-  properties.hibernate:
-    dialect: org.hibernate.dialect.PostgreSQLDialect
-    show_sql: true
+#EclipseLink
+eclipselink.persistenceUnitName: unit
 
 #settings mail
 spring.mail:

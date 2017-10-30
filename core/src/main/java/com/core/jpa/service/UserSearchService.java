@@ -49,7 +49,7 @@ public interface UserSearchService {
      * @param sort  Sort field
      * @return Users
      */
-    List<User> getAllUsersByUsername(
+    List<User> getAllUsers(
             final String username,
             @Min(0) final int page,
             @Min(1) final int pageSize,

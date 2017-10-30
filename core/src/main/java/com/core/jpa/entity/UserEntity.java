@@ -2,6 +2,7 @@ package com.core.jpa.entity;
 
 import com.common.dto.User;
 import com.common.dto.SecurityRole;
+import com.core.movie.UserMoviePermission;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.CreatedDate;
@@ -50,9 +51,21 @@ public class UserEntity extends BaseEntity {
     private boolean enabled;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name="users_authorities",
+            joinColumns=@JoinColumn(name="user_id")
+    )
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Set<SecurityRole> authorities;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name="users_movie_permissions",
+            joinColumns=@JoinColumn(name="user_id")
+    )
+    @Enumerated(EnumType.STRING)
+    private Set<UserMoviePermission> permissions;
 
     @CreatedDate
     @Column(name = "registration_date", updatable = false, nullable = false)
@@ -61,25 +74,6 @@ public class UserEntity extends BaseEntity {
     @LastModifiedDate
     @Column(name = "modified_date", nullable = false)
     private Date modifiedDate;
-
-    @Embedded
-    private Address address;
-
-
-
-        @Data
-        @Embeddable
-        public class Address {
-
-            private String country;
-
-            private String state;
-
-            private String city;
-
-            @Column(name = "zip_code")
-            private String zipCode;
-        }
 
 
 

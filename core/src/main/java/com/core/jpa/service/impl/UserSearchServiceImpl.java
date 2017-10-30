@@ -76,7 +76,7 @@ public class UserSearchServiceImpl implements UserSearchService {
      * {@inheritDoc}
      */
     @Override
-    public List<User> getAllUsersByUsername(
+    public List<User> getAllUsers(
             final String username,
             @Min(0) final int page,
             @Min(1) final int pageSize,

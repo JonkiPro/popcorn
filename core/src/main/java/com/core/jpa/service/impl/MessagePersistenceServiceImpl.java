@@ -51,6 +51,9 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
         this.userRepository = userRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long createMessage(
             @Min(1) final Long senderId,

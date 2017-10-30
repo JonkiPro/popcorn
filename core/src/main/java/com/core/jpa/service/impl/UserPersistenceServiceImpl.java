@@ -11,6 +11,7 @@ import com.core.jpa.entity.UserEntity;
 import com.core.jpa.repository.UserRepository;
 import com.core.jpa.service.UserPersistenceService;
 import com.common.dto.SecurityRole;
+import com.core.movie.UserMoviePermission;
 import com.core.service.MailService;
 import com.core.utils.EncryptUtils;
 import com.core.utils.RandomUtils;
@@ -199,6 +200,29 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
         user.setNewEmail(null);
 
         this.userRepository.save(user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createAdmin(
+            RegisterDTO registerDTO
+    ) throws ResourceConflictException {
+        log.info("Called with ", registerDTO);
+
+        if(userRepository.existsByUsernameIgnoreCase(registerDTO.getUsername())) {
+            throw new ResourceConflictException("The username " + registerDTO.getUsername() + " exists");
+        } else if(userRepository.existsByEmailIgnoreCase(registerDTO.getEmail())) {
+            throw new ResourceConflictException("The e-mail " + registerDTO.getEmail() + " exists");
+        }
+
+        final UserEntity user = this.registerDtoToUserEntity(registerDTO);
+        user.setAuthorities(EnumSet.of(SecurityRole.ROLE_USER, SecurityRole.ROLE_ADMIN));
+        user.setPermissions(EnumSet.of(UserMoviePermission.ALL));
+        user.setEnabled(true);
+
+        return this.userRepository.save(user).getId();
     }
 
 

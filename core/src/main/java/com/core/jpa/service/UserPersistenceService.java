@@ -86,4 +86,16 @@ public interface UserPersistenceService {
     void updateEmail(
             @NotBlank final String token
     ) throws ResourceNotFoundException;
+
+
+    /**
+     * Create user admin with DTO data.
+     *
+     * @param registerDTO DTO with user registration data
+     * @return The id of the user created
+     * @throws ResourceConflictException if username or e-mail exists
+     */
+    Long createAdmin(
+            final RegisterDTO registerDTO
+    ) throws ResourceConflictException;
 }

@@ -24,7 +24,7 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
      * @return Messages
      */
     @Modifying
-    @Query("SELECT e FROM MessageEntity e WHERE e.recipient = :recipient AND (UPPER(e.subject) LIKE UPPER(:subject) OR UPPER(e.text) LIKE UPPER(:text)) AND e.isVisibleForRecipient = true ORDER BY id DESC")
+    @Query("SELECT e FROM MessageEntity e WHERE e.recipient = :recipient AND (UPPER(e.subject) LIKE UPPER(:subject) OR UPPER(e.text) LIKE UPPER(:text)) AND e.isVisibleForRecipient = true ORDER BY e.id DESC")
     List<MessageEntity> findReceivedMessagesByContaining(@Param("recipient") UserEntity recipient, @Param("subject") String subject, @Param("text") String text);
 
     /**
@@ -36,7 +36,7 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
      * @return Messages
      */
     @Modifying
-    @Query("SELECT e FROM MessageEntity e WHERE e.sender = :sender AND (UPPER(e.subject) LIKE UPPER(:subject) OR UPPER(e.text) LIKE UPPER(:text)) AND e.isVisibleForSender = true ORDER BY id DESC")
+    @Query("SELECT e FROM MessageEntity e WHERE e.sender = :sender AND (UPPER(e.subject) LIKE UPPER(:subject) OR UPPER(e.text) LIKE UPPER(:text)) AND e.isVisibleForSender = true ORDER BY e.id DESC")
     List<MessageEntity> findSentMessagesByContaining(@Param("sender") UserEntity sender, @Param("subject") String subject, @Param("text") String text);
 
     /**

@@ -56,7 +56,7 @@ public class UserRestController {
         return Optional.ofNullable(q)
                 .map(v ->
                         this.userSearchService
-                                .getAllUsersByUsername(q, page - 1, pageSize, new Sort(Sort.Direction.ASC, sort))
+                                .getAllUsers(q, page - 1, pageSize, new Sort(Sort.Direction.ASC, sort))
                                 .stream()
                                 .map(this.userResourceAssembler::toResource)
                                 .collect(Collectors.toList())

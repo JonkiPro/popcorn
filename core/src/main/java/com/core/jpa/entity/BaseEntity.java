@@ -18,9 +18,12 @@ public class BaseEntity implements Serializable {
     @Column(updatable = false, nullable = false, unique = true)
     private String uuid;
 
+    /**
+     * Generate a UUID if it is null.
+     */
     @PrePersist
     protected void onCreateBaseEntity() {
-        // Make sure we have an id if one wasn't entered beforehand
+        // Make sure we have an uuid if one wasn't entered beforehand
         if (this.uuid == null) {
             this.uuid = UUID.randomUUID().toString();
         }

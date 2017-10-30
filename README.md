@@ -27,7 +27,7 @@
 *  Spring Boot
 *  Spring Data
 *  Spring Security
-*  Hibernate / JPA / ORM
+*  EclipseLink / JPA / ORM
 *  PostgreSQL / SQL
 *  Lombok
 *  Mail
