@@ -1,6 +1,7 @@
 package com.common.dto.request;
 
-import com.common.dto.request.validator.IsValidEmail;
+import com.common.dto.request.validator.ValidEmail;
+import com.common.dto.request.validator.PasswordsEqualConstraint;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,6 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Data
+@PasswordsEqualConstraint
 @ApiModel(description = "User registration data")
 public class RegisterDTO {
 
@@ -18,7 +20,7 @@ public class RegisterDTO {
     private String username;
 
     @NotBlank
-    @IsValidEmail
+    @ValidEmail
     @ApiModelProperty(notes = "The user's e-mail", required = true)
     private String email;
 

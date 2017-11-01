@@ -2,10 +2,8 @@ package com.core.jpa.service.impl;
 
 import com.common.dto.movie.*;
 import com.common.dto.request.MovieDTO;
-import com.common.dto.request.movie.BoxOffice;
-import com.common.dto.request.movie.OtherTitle;
-import com.common.dto.request.movie.ReleaseDate;
-import com.common.dto.request.movie.Site;
+import com.common.dto.request.movie.*;
+import com.common.exception.ResourceConflictException;
 import com.common.exception.ResourceForbiddenException;
 import com.common.exception.ResourceNotFoundException;
 import com.core.jpa.entity.ContributionEntity;
@@ -17,9 +15,12 @@ import com.core.jpa.service.MoviePersistenceService;
 import com.core.movie.EditStatus;
 import com.core.movie.MovieField;
 import com.core.movie.UserMoviePermission;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +32,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * JPA implementation of the Movie Persistence Service.
@@ -43,6 +43,7 @@ import java.util.Set;
         rollbackFor = {
                 ResourceForbiddenException.class,
                 ResourceNotFoundException.class,
+                ResourceConflictException.class,
                 ConstraintViolationException.class
         }
 )
@@ -115,7 +116,7 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
         final MovieEntity movie = this.findMovie(movieId, EditStatus.WAITING);
 
         if(!user.getPermissions().contains(UserMoviePermission.ALL)
-                || !user.getPermissions().contains(UserMoviePermission.NEW_MOVIE)) {
+                && !user.getPermissions().contains(UserMoviePermission.NEW_MOVIE)) {
             throw new ResourceForbiddenException("No permissions");
         }
 
@@ -128,7 +129,8 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
     @Override
     public void acceptContribution(
             @Min(1) final Long contributionId,
-            @Min(1) final Long userId
+            @Min(1) final Long userId,
+            final String comment
     ) throws ResourceForbiddenException, ResourceNotFoundException {
         log.info("Called with contributionId {}, userId {}", contributionId, userId);
 
@@ -139,6 +141,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
             throw new ResourceForbiddenException("No permissions");
         }
 
+        contribution.setComment(comment);
+        contribution.setVerificationDate(new Date());
+        contribution.setVerificationUser(user);
         contribution.setStatus(EditStatus.ACCEPTED);
 
         contribution.getIds().forEach(id -> {
@@ -174,7 +179,8 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
     @Override
     public void rejectContribution(
             @Min(1) final Long contributionId,
-            @Min(1) final Long userId
+            @Min(1) final Long userId,
+            final String comment
     ) throws ResourceForbiddenException, ResourceNotFoundException {
         log.info("Called with contributionId {}, userId {}", contributionId, userId);
 
@@ -185,6 +191,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
             throw new ResourceForbiddenException("No permissions");
         }
 
+        contribution.setComment(comment);
+        contribution.setVerificationDate(new Date());
+        contribution.setVerificationUser(user);
         contribution.setStatus(EditStatus.REJECTED);
 
         contribution.getIds().forEach(id -> {
@@ -197,9 +206,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     public void saveDescription(
-            final String description,
-            final Long movieId,
-            final Long userId
+            @NotBlank final String description,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with description {}, movieId {}, userId {}", description, movieId, userId);
 
@@ -217,9 +226,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     public void saveOtherTitles(
-            final Set<OtherTitle> otherTitles,
-            final Long movieId,
-            final Long userId
+            @NotEmpty final Set<OtherTitle> otherTitles,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with otherTitles {}, movieId {}, userId {}", otherTitles, movieId, userId);
 
@@ -242,9 +251,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     public void saveBoxOffices(
-            final Set<BoxOffice> boxOffices,
-            final Long movieId,
-            final Long userId
+            @NotEmpty final Set<BoxOffice> boxOffices,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with boxOffices {}, movieId {}, userId {}", boxOffices, movieId, userId);
 
@@ -267,9 +276,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     public void saveSites(
-            final Set<Site> sites,
-            final Long movieId,
-            final Long userId
+            @NotEmpty final Set<Site> sites,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with sites {}, movieId {}, userId {}", sites, movieId, userId);
 
@@ -292,9 +301,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     public void saveReleaseDates(
-            final Set<ReleaseDate> releaseDates,
-            final Long movieId,
-            final Long userId
+            @NotEmpty final Set<ReleaseDate> releaseDates,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with releaseDates {}, movieId {}, userId {}", releaseDates, movieId, userId);
 
@@ -318,9 +327,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     public void saveStoryline(
-            final String storyline,
-            final Long movieId,
-            final Long userId
+            @NotBlank final String storyline,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with storyline {}, movieId {}, userId {}", storyline, movieId, userId);
 
@@ -338,9 +347,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     public void saveCountries(
-            final Set<CountryType> countries,
-            final Long movieId,
-            final Long userId
+            @NotEmpty final Set<CountryType> countries,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with countries {}, movieId {}, userId {}", countries, movieId, userId);
 
@@ -363,9 +372,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     public void saveLanguages(
-            final Set<LanguageType> languages,
-            final Long movieId,
-            final Long userId
+            @NotEmpty final Set<LanguageType> languages,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with languages {}, movieId {}, userId {}", languages, movieId, userId);
 
@@ -388,9 +397,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     public void saveGenres(
-            final Set<GenreType> genres,
-            final Long movieId,
-            final Long userId
+            @NotEmpty final Set<GenreType> genres,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
     ) throws ResourceNotFoundException {
         log.info("Called with genres {}, movieId {}, userId {}", genres, movieId, userId);
 
@@ -410,6 +419,55 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveRating(
+            @NotNull @Valid Rate rate,
+            @Min(1) Long movieId,
+            @Min(1) Long userId
+    ) throws ResourceNotFoundException, ResourceConflictException {
+        log.info("Called with rate {}, movieId {}, userId {}", rate, movieId, userId);
+
+        final UserEntity user = this.findUser(userId);
+        final MovieEntity movie = this.findMovie(movieId, EditStatus.ACCEPTED);
+
+        final Set<MovieReleaseDate> releaseDates = movie.getReleaseDates();
+
+        Lists.newArrayList(releaseDates).sort(Comparator.comparing(MovieReleaseDate::getDate));
+
+        if(new Date().before(releaseDates.iterator().next().getDate())) {
+            throw new ResourceConflictException("The movie with id " + movieId + " had no premiere");
+        }
+
+        boolean rated = false;
+
+        final Set<MovieRate> ratings = movie.getRatings();
+        for(final MovieRate mRate : ratings) {
+            if(mRate.getUser().getId().equals(userId)) {
+                mRate.setRate(rate.getRate());
+
+                movie.setRating(this.calculationRating(ratings));
+
+                rated = true;
+
+                break;
+            }
+        }
+
+        if(!rated) {
+            final MovieRate movieRate = new MovieRate();
+            movieRate.setRate(rate.getRate());
+            movieRate.setMovie(movie);
+            movieRate.setUser(user);
+
+            movie.getRatings().add(movieRate);
+
+            movie.setRating(this.calculationRating(movie.getRatings()));
+        }
+    }
+
+    /**
      * Create a contributions for the new movie.
      *
      * @param movieDTO MovieDTO object
@@ -422,26 +480,33 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
             final UserEntity user
     ) {
         movieDTO.getDescription().ifPresent(description -> this.saveDescription(description, movie.getId(), user.getId()));
-        if(!movieDTO.getOtherTitles().isEmpty()) {
+        if(movieDTO.getOtherTitles() != null
+                && !movieDTO.getOtherTitles().isEmpty()) {
             this.saveOtherTitles(movieDTO.getOtherTitles(), movie.getId(), user.getId());
         }
-        if(!movieDTO.getBoxOffices().isEmpty()) {
+        if(movieDTO.getBoxOffices() != null
+                && !movieDTO.getBoxOffices().isEmpty()) {
             this.saveBoxOffices(movieDTO.getBoxOffices(), movie.getId(), user.getId());
         }
-        if(!movieDTO.getSites().isEmpty()) {
+        if(movieDTO.getSites() != null
+                && !movieDTO.getSites().isEmpty()) {
             this.saveSites(movieDTO.getSites(), movie.getId(), user.getId());
         }
-        if(!movieDTO.getReleaseDates().isEmpty()) {
+        if(movieDTO.getReleaseDates() != null
+                && !movieDTO.getReleaseDates().isEmpty()) {
             this.saveReleaseDates(movieDTO.getReleaseDates(), movie.getId(), user.getId());
         }
         movieDTO.getStoryline().ifPresent(storyline -> this.saveStoryline(storyline, movie.getId(), user.getId()));
-        if(!movieDTO.getCountries().isEmpty()) {
+        if(movieDTO.getCountries() != null
+                && !movieDTO.getCountries().isEmpty()) {
             this.saveCountries(movieDTO.getCountries(), movie.getId(), user.getId());
         }
-        if(!movieDTO.getLanguages().isEmpty()) {
+        if(movieDTO.getLanguages() != null
+                && !movieDTO.getLanguages().isEmpty()) {
             this.saveLanguages(movieDTO.getLanguages(), movie.getId(), user.getId());
         }
-        if(!movieDTO.getGenres().isEmpty()) {
+        if(movieDTO.getGenres() != null
+                && !movieDTO.getGenres().isEmpty()) {
             this.saveGenres(movieDTO.getGenres(), movie.getId(), user.getId());
         }
     }
@@ -524,5 +589,23 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
         return this.contributionRepository
                 .findByIdAndStatus(id, EditStatus.WAITING)
                 .orElseThrow(() -> new ResourceNotFoundException("No contribution found with id " + id));
+    }
+
+    /**
+     * Calculates the average rating for a movie.
+     *
+     * @param movieRates Rating list
+     * @return Average rating
+     */
+    private Float calculationRating(final Set<MovieRate> movieRates) {
+        Float averageRating = 0F;
+
+        for(final MovieRate movieRate : movieRates) {
+            averageRating += movieRate.getRate();
+        }
+
+        averageRating = averageRating / movieRates.size();
+
+        return averageRating;
     }
 }

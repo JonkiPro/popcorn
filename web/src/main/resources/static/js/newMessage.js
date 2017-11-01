@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     setTimeout('hiddenAlertAfterSeconds()', 2000);
                 } else {
-                    if(event.status === 403) {
+                    if(event.status === 403 || event.status === 409) {
                         $('#to')
                             .after('<label id="to-error" class="error" for="to">' + 'You cannot send a message to yourself.' + '</label>');
 

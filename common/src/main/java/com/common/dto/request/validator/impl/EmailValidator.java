@@ -1,17 +1,17 @@
 package com.common.dto.request.validator.impl;
 
-import com.common.dto.request.validator.IsValidEmail;
+import com.common.dto.request.validator.ValidEmail;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- * Validate e-mail address syntax. Implementation of the IsValidEmail annotation.
+ * Validate e-mail address syntax. Implementation of the ValidEmail annotation.
  */
-public class EmailValidator implements ConstraintValidator<IsValidEmail, String> {
+public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
 
     @Override
-    public void initialize(IsValidEmail constraintAnnotation) {}
+    public void initialize(ValidEmail constraintAnnotation) {}
 
     @Override
     public boolean isValid(String email, ConstraintValidatorContext context) {

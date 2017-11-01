@@ -4,10 +4,8 @@ import com.common.dto.movie.CountryType;
 import com.common.dto.movie.GenreType;
 import com.common.dto.movie.LanguageType;
 import com.common.dto.request.MovieDTO;
-import com.common.dto.request.movie.BoxOffice;
-import com.common.dto.request.movie.OtherTitle;
-import com.common.dto.request.movie.ReleaseDate;
-import com.common.dto.request.movie.Site;
+import com.common.dto.request.movie.*;
+import com.common.exception.ResourceConflictException;
 import com.common.exception.ResourceForbiddenException;
 import com.common.exception.ResourceNotFoundException;
 import org.hibernate.validator.constraints.NotBlank;
@@ -55,12 +53,14 @@ public interface MoviePersistenceService {
      *
      * @param contributionId The contribution ID
      * @param userId The user ID
+     * @param comment Comment for verification
      * @throws ResourceForbiddenException if no permissions
      * @throws ResourceNotFoundException if no contribution found or no user found
      */
     void acceptContribution(
             @Min(1) final Long contributionId,
-            @Min(1) final Long userId
+            @Min(1) final Long userId,
+            final String comment
     ) throws ResourceForbiddenException, ResourceNotFoundException;
 
     /**
@@ -81,12 +81,14 @@ public interface MoviePersistenceService {
      *
      * @param contributionId The contribution ID
      * @param userId The user ID
+     * @param comment Comment for verification
      * @throws ResourceForbiddenException if no permissions
      * @throws ResourceNotFoundException if no contribution found or no user found
      */
     void rejectContribution(
             @Min(1) final Long contributionId,
-            @Min(1) final Long userId
+            @Min(1) final Long userId,
+            final String comment
     ) throws ResourceForbiddenException, ResourceNotFoundException;
 
     /**
@@ -214,4 +216,19 @@ public interface MoviePersistenceService {
             @Min(1) final Long movieId,
             @Min(1) final Long userId
     ) throws ResourceNotFoundException;
+
+    /**
+     * Save the rating for the movie.
+     *
+     * @param rate Rating for the movie
+     * @param movieId The movie ID
+     * @param userId The user ID
+     * @throws ResourceNotFoundException if no movie found or no user found
+     * @throws ResourceConflictException if today's date is earlier than the release date of the movie
+     */
+    void saveRating(
+            @NotNull @Valid Rate rate,
+            @Min(1) final Long movieId,
+            @Min(1) final Long userId
+    ) throws ResourceNotFoundException, ResourceConflictException;
 }

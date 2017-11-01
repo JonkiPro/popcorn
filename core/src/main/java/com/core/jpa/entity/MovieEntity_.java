@@ -28,7 +28,8 @@ public abstract class MovieEntity_ {
     public static volatile SetAttribute<MovieEntity, MovieCountry> countries;
     public static volatile SetAttribute<MovieEntity, MovieLanguage> languages;
     public static volatile SetAttribute<MovieEntity, MovieGenre> genres;
-    public static volatile SetAttribute<MovieEntity, MovieRating> ratings;
+    public static volatile SetAttribute<MovieEntity, MovieRate> ratings;
     public static volatile SingularAttribute<MovieEntity, String> budget;
     public static volatile SingularAttribute<MovieEntity, EditStatus> status;
+    public static volatile SingularAttribute<MovieEntity, Float> rating;
 }

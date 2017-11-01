@@ -3,12 +3,14 @@ package com.web.web.config;
 import org.eclipse.persistence.internal.databaseaccess.DatabasePlatform;
 import org.eclipse.persistence.platform.database.MySQLPlatform;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.JpaDialect;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -25,6 +27,8 @@ import java.util.Map;
  * Database configuration.
  */
 @Configuration
+@EnableJpaRepositories(basePackages = "com.core.jpa.repository")
+@EntityScan(basePackages = "com.core.jpa.entity")
 public class WebDatasourceConfig {
 
     @Value("${eclipselink.persistenceUnitName}")

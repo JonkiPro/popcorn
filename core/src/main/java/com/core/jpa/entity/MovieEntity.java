@@ -62,12 +62,14 @@ public class MovieEntity implements Serializable {
     private Set<MovieGenre> genres;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieRating> ratings;
+    private Set<MovieRate> ratings;
 
     private String budget;
 
     @Enumerated(EnumType.STRING)
     private EditStatus status;
+
+    private Float rating;
 
     /**
      * Constructor - init all sets.

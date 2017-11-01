@@ -6,6 +6,7 @@ import com.common.dto.movie.GenreType;
 import com.common.dto.movie.LanguageType;
 import com.common.dto.movie.MovieType;
 import com.common.dto.request.MovieDTO;
+import com.common.dto.request.movie.Rate;
 import com.core.jpa.service.MoviePersistenceService;
 import com.core.jpa.service.MovieSearchService;
 import com.web.web.hateoas.assembler.MovieResourceAssembler;
@@ -31,6 +32,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 
@@ -112,11 +114,12 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void acceptContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable Long id
+            @ApiParam(value = "The contribution ID", required = true) @PathVariable Long id,
+            @ApiParam(value = "Comment for verification") @RequestParam(required = false) String comment
     ) {
         log.info("Called with id {}", id);
 
-        this.moviePersistenceService.acceptContribution(id, authorizationService.getUserId());
+        this.moviePersistenceService.acceptContribution(id, authorizationService.getUserId(), comment);
     }
 
     @ApiOperation(value = "Reject movie")
@@ -146,11 +149,12 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void rejectContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable Long id
+            @ApiParam(value = "The contribution ID", required = true) @PathVariable Long id,
+            @ApiParam(value = "Comment for verification") @RequestParam(required = false) String comment
     ) {
         log.info("Called with id {}", id);
 
-        this.moviePersistenceService.rejectContribution(id, authorizationService.getUserId());
+        this.moviePersistenceService.rejectContribution(id, authorizationService.getUserId(), comment);
     }
 
     @ApiOperation(value = "Get list of movies")
@@ -207,5 +211,23 @@ public class MovieRestController {
         log.info("Called with id {}", id);
 
         return this.movieResourceAssembler.toResource(this.movieSearchService.getMovie(id));
+    }
+
+    @ApiOperation(value = "Rate the movie")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No movie found"),
+            @ApiResponse(code = 409, message = "Today's date is earlier than the release date of the movie")
+    })
+    @PostMapping(value = "/{id}/rate", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public
+    void rateMovie(
+            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "Rating for the movie", required = true) @RequestBody @Valid final Rate rate
+
+    ) {
+        log.info("Called with id {}, rate {}", id, rate);
+
+        this.moviePersistenceService.saveRating(rate, id, this.authorizationService.getUserId());
     }
 }

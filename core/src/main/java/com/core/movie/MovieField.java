@@ -85,12 +85,6 @@ public enum MovieField {
         public Set<UserMoviePermission> getNecessaryPermissions() {
             return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.LANGUAGE);
         }
-    },
-    RATING(Values.RATING) {
-        @Override
-        public Set<UserMoviePermission> getNecessaryPermissions() {
-            return null;
-        }
     };
 
     /**
@@ -124,7 +118,6 @@ public enum MovieField {
         public static final String COUNTRY = "COUNTRY";
         public static final String GENRE = "GENRE";
         public static final String LANGUAGE = "LANGUAGE";
-        public static final String RATING = "RATING";
     }
 
     /**
