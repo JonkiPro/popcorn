@@ -1,21 +1,19 @@
 package com.core.jpa.service;
 
-import com.common.dto.movie.CountryType;
-import com.common.dto.movie.GenreType;
-import com.common.dto.movie.LanguageType;
+import com.common.dto.movie.*;
+import com.common.dto.movie.request.*;
 import com.common.dto.request.MovieDTO;
-import com.common.dto.request.movie.*;
 import com.common.exception.ResourceConflictException;
 import com.common.exception.ResourceForbiddenException;
 import com.common.exception.ResourceNotFoundException;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
+import com.core.jpa.entity.MovieEntity;
+import com.core.jpa.entity.UserEntity;
+import com.core.movie.VerificationStatus;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 /**
  * Interfaces for providing persistence functions for movies other than search.
@@ -36,186 +34,280 @@ public interface MoviePersistenceService {
     ) throws ResourceNotFoundException;
 
     /**
-     * Accept the movie.
+     * Update the movie status.
      *
      * @param movieId The movie ID
      * @param userId The user ID
+     * @param status Status for the movie
      * @throws ResourceForbiddenException if no permissions
      * @throws ResourceNotFoundException if no movie found or no user found
      */
-    void acceptMovie(
+    void updateMovieStatus(
             @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceForbiddenException, ResourceNotFoundException;
-
-    /**
-     * Accept the contribution with movie info ids.
-     *
-     * @param contributionId The contribution ID
-     * @param userId The user ID
-     * @param comment Comment for verification
-     * @throws ResourceForbiddenException if no permissions
-     * @throws ResourceNotFoundException if no contribution found or no user found
-     */
-    void acceptContribution(
-            @Min(1) final Long contributionId,
             @Min(1) final Long userId,
-            final String comment
+            @NotNull final VerificationStatus status
     ) throws ResourceForbiddenException, ResourceNotFoundException;
 
     /**
-     * Reject the movie.
+     * Save the other title for the movie.
      *
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceForbiddenException if no permissions
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param otherTitle The OtherTitle object to create and save
+     * @param movie The object of the movie to which the other title will be added and check the uniqueness
+     * @param user The user object to be set in the element
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
      */
-    void rejectMovie(
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceForbiddenException, ResourceNotFoundException;
+    Long createOtherTitle(
+            @NotNull @Valid final OtherTitle otherTitle,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException;
 
     /**
-     * Reject the contribution with movie info ids.
+     * Update the title of the movie.
      *
-     * @param contributionId The contribution ID
-     * @param userId The user ID
-     * @param comment Comment for verification
-     * @throws ResourceForbiddenException if no permissions
-     * @throws ResourceNotFoundException if no contribution found or no user found
+     * @param otherTitle  The OtherTitle object to update
+     * @param otherTitleId The ID of the other title
+     * @param movie A movie object to check the existence of the same title
+     * @throws ResourceConflictException if the element exists
      */
-    void rejectContribution(
-            @Min(1) final Long contributionId,
-            @Min(1) final Long userId,
-            final String comment
-    ) throws ResourceForbiddenException, ResourceNotFoundException;
+    void updateOtherTitle(
+            @NotNull @Valid final OtherTitle otherTitle,
+            @Min(1) final Long otherTitleId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
 
     /**
-     * Save movie description.
+     * Save the release date for the movie.
      *
-     * @param description The movie description
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param releaseDate The ReleaseDate object to create and save
+     * @param movie The object of the movie to which the release date will be added and check the uniqueness
+     * @param user The user object to be set in the element
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
      */
-    void saveDescription(
-            @NotBlank final String description,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException;
+    Long createReleaseDate(
+            @NotNull @Valid final ReleaseDate releaseDate,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException;
 
     /**
-     * Save other movie titles.
+     * Update the release date of the movie.
      *
-     * @param otherTitles List of other titles
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param releaseDate The ReleaseDate object to update
+     * @param releaseDateId The ID of the release date
+     * @param movie A movie object to check the existence of the same release date
+     * @throws ResourceConflictException if the element exists
      */
-    void saveOtherTitles(
-            @NotEmpty final Set<OtherTitle> otherTitles,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException;
+    void updateReleaseDate(
+            @NotNull @Valid final ReleaseDate releaseDate,
+            @Min(1) final Long releaseDateId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
 
     /**
-     * Save movie box offices.
+     * Save the storyline for the movie.
      *
-     * @param boxOffices List of box offices
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param storyline The Storyline object to create and save
+     * @param movie The object of the movie to which the storyline will be added and check the uniqueness
+     * @param user The user object to be set in the element
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
      */
-    void saveBoxOffices(
-            @NotEmpty final Set<BoxOffice> boxOffices,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException;
+    Long createStoryline(
+            @NotNull @Valid final Storyline storyline,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException;
 
     /**
-     * Save movie sites.
+     * Update the storyline of the movie.
      *
-     * @param sites List of sites
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param storyline The Storyline object to update
+     * @param storylineId The ID of the storyline
+     * @param movie A movie object to check the existence of the same storyline
+     * @throws ResourceConflictException if the element exists
      */
-    void saveSites(
-            @NotEmpty final Set<Site> sites,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException;
+    void updateStoryline(
+            @NotNull @Valid final Storyline storyline,
+            @Min(1) final Long storylineId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
 
     /**
-     * Save movie release dates.
+     * Save the box office for the movie.
      *
-     * @param releaseDates List of release dates
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param boxOffice The BoxOffice object to create and save
+     * @param movie The object of the movie to which the box office will be added and check the uniqueness
+     * @param user The user object to be set in the element
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
      */
-    void saveReleaseDates(
-            @NotEmpty final Set<ReleaseDate> releaseDates,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException;
+    Long createBoxOffice(
+            @NotNull @Valid final BoxOffice boxOffice,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException;
 
     /**
-     * Save movie storyline.
+     * Update the box office of the movie.
      *
-     * @param storyline The movie storyline
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param boxOffice The BoxOffice object to update
+     * @param boxOfficeId The ID of the box office
+     * @param movie A movie object to check the existence of the same box office
+     * @throws ResourceConflictException if the element exists
      */
-    void saveStoryline(
-            @NotBlank final String storyline,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException;
+    void updateBoxOffice(
+            @NotNull @Valid final BoxOffice boxOffice,
+            @Min(1) final Long boxOfficeId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
 
     /**
-     * Save movie countries.
+     * Save the site for the movie.
      *
-     * @param countries List of countries
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param site The Site object to create and save
+     * @param movie The object of the movie to which the site will be added and check the uniqueness
+     * @param user The user object to be set in the element
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
      */
-    void saveCountries(
-            @NotEmpty final Set<CountryType> countries,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException;
+    Long createSite(
+            @NotNull @Valid final Site site,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException;
 
     /**
-     * Save movie languages.
+     * Update the site of the movie.
      *
-     * @param languages List of languages
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param site The Site object to update
+     * @param siteId The ID of the site
+     * @param movie A movie object to check the existence of the same site
+     * @throws ResourceConflictException if the element exists
      */
-    void saveLanguages(
-            @NotEmpty final Set<LanguageType> languages,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException;
+    void updateSite(
+            @NotNull @Valid final Site site,
+            @Min(1) final Long siteId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
 
     /**
-     * Save movie genres.
+     * Save the country for the movie.
      *
-     * @param genres List of genres
-     * @param movieId The movie ID
-     * @param userId The user ID
-     * @throws ResourceNotFoundException if no movie found or no user found
+     * @param country The Country object to create and save
+     * @param movie The object of the movie to which the country will be added and check the uniqueness
+     * @param user The user object to be set in the element
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
      */
-    void saveGenres(
-            @NotEmpty final Set<GenreType> genres,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException;
+    Long createCountry(
+            @NotNull @Valid final Country country,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException;
+
+    /**
+     * Update the country of the movie.
+     *
+     * @param country The Country object to update
+     * @param countryId The ID of the country
+     * @param movie A movie object to check the existence of the same country
+     * @throws ResourceConflictException if the element exists
+     */
+    void updateCountry(
+            @NotNull @Valid final Country country,
+            @Min(1) final Long countryId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
+
+    /**
+     * Save the language for the movie.
+     *
+     * @param language The Language object to create and save
+     * @param movie The object of the movie to which the language will be added and check the uniqueness
+     * @param user The user object to be set in the element
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
+     */
+    Long createLanguage(
+            @NotNull @Valid final Language language,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException;
+
+    /**
+     * Update the language of the movie.
+     *
+     * @param language The Language object to update
+     * @param languageId The ID of the language
+     * @param movie A movie object to check the existence of the same language
+     * @throws ResourceConflictException if the element exists
+     */
+    void updateLanguage(
+            @NotNull @Valid final Language language,
+            @Min(1) final Long languageId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
+
+    /**
+     * Save the genre for the movie.
+     *
+     * @param genre The Genre object to create and save
+     * @param movie The object of the movie to which the genre will be added and check the uniqueness
+     * @param user The user object to be set in the element
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
+     */
+    Long createGenre(
+            @NotNull @Valid final Genre genre,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException;
+
+    /**
+     * Update the genre of the movie.
+     *
+     * @param genre The Genre object to update
+     * @param genreId The ID of the genre
+     * @param movie A movie object to check the existence of the same genre
+     * @throws ResourceConflictException if the element exists
+     */
+    void updateGenre(
+            @NotNull @Valid final Genre genre,
+            @Min(1) final Long genreId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
+
+    /**
+     * Save the review for the movie.
+     *
+     * @param review The Review object to create and save
+     * @param movie The object of the movie to which the review will be added and check the uniqueness
+     * @param user The user object to be set in the element
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
+     */
+    Long createReview(
+            @NotNull @Valid final Review review,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException;
+
+    /**
+     * Update the review of the movie.
+     *
+     * @param review The Review object to update
+     * @param reviewId The ID of the review
+     * @param movie A movie object to check the existence of the same review
+     * @throws ResourceConflictException if the element exists
+     */
+    void updateReview(
+            @NotNull @Valid final Review review,
+            @Min(1) final Long reviewId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
 
     /**
      * Save the rating for the movie.

@@ -19,7 +19,7 @@ import java.security.Principal;
 @PreAuthorize("permitAll()")
 @RequestMapping(value = "/api/v1.0/users/check")
 @Slf4j
-@Api(value = "Check UserEntity Data API", description = "Provides a list of methods for checking user data")
+@Api(value = "Check User Data API", description = "Provides a list of methods for checking user data")
 public class CheckUserDataRestController {
 
     private final UserSearchService userSearchService;

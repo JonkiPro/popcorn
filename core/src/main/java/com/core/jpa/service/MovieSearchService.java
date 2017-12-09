@@ -1,20 +1,24 @@
 package com.core.jpa.service;
 
 import com.common.dto.Movie;
-import com.common.dto.User;
-import com.common.dto.movie.CountryType;
-import com.common.dto.movie.GenreType;
-import com.common.dto.movie.LanguageType;
-import com.common.dto.movie.MovieType;
+import com.common.dto.movie.*;
+import com.common.dto.movie.response.RateResponse;
+import com.common.dto.movie.type.CountryType;
+import com.common.dto.movie.type.GenreType;
+import com.common.dto.movie.type.LanguageType;
+import com.common.dto.movie.type.MovieType;
+import com.common.dto.search.MovieSearchResult;
 import com.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for searching movies.
@@ -32,17 +36,21 @@ public interface MovieSearchService {
      * @param countries  List of countries
      * @param languages  List of languages
      * @param genres  List of genres
+     * @param minRating  Minimal rating
+     * @param maxRating  Maximum rating
      * @param page  The page to get
      * @return All the movies matching the criteria
      */
-    Page<Movie> getAllMovies(
-            final String title,
-            final MovieType type,
-            final Date fromDate,
-            final Date toDate,
-            final List<CountryType> countries,
-            final List<LanguageType> languages,
-            final List<GenreType> genres,
+    Page<MovieSearchResult> getAllMovies(
+            @Nullable final String title,
+            @Nullable final MovieType type,
+            @Nullable final Date fromDate,
+            @Nullable final Date toDate,
+            @Nullable final List<CountryType> countries,
+            @Nullable final List<LanguageType> languages,
+            @Nullable final List<GenreType> genres,
+            @Nullable final Integer minRating,
+            @Nullable final Integer maxRating,
             @NotNull final Pageable page
     );
 
@@ -54,6 +62,83 @@ public interface MovieSearchService {
      * @throws ResourceNotFoundException if no movie found
      */
     Movie getMovie(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get user ratings for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return User ratings
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<RateResponse> getRatings(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get titles for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie titles
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<OtherTitle> getTitles(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get storylines for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie storylines
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<Storyline> getStorylines(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get box offices for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie titles
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<BoxOffice> getBoxOffices(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get release dates for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie release dates
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<ReleaseDate> getReleaseDates(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get sites for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie sites
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<Site> getSites(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get reviews for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie reviews
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<Review> getReviews(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 }

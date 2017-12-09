@@ -3,11 +3,11 @@ package com.common.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.Date;
 
-@Data
+@Getter
 @Builder
 @ApiModel(description = "Message data sent")
 public class MessageSent {

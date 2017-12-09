@@ -2,9 +2,11 @@ package com.core.jpa.entity;
 
 import com.common.dto.User;
 import com.common.dto.SecurityRole;
+import com.core.jpa.entity.movie.MovieRateEntity;
 import com.core.movie.UserMoviePermission;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,44 +18,61 @@ import java.util.Set;
 /**
  * Representation of the user.
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
-@Data
-@EqualsAndHashCode(callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
 public class UserEntity extends BaseEntity {
 
     private static final long serialVersionUID = -1588795025690250131L;
 
     @Id
-    @Column(updatable = false)
-    @GeneratedValue
+    @Basic(optional = false)
+    @Column(unique = true, nullable = false, updatable = false)
+    @GenericGenerator(
+            name = "userSequenceGenerator", strategy = "enhanced-sequence",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(name = "optimizer", value = "pooled-lo"),
+                    @org.hibernate.annotations.Parameter(name = "initial_value", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "increment_size", value = "5")
+            }
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSequenceGenerator")
     private Long id;
 
+    @Basic(optional = false)
     @Column(length = 36, unique = true, nullable = false)
     private String username;
 
+    @Basic(optional = false)
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Basic(optional = false)
     @Column(nullable = false)
     private String password;
 
+    @Basic
     @Column(name = "activation_token")
     private String activationToken;
 
+    @Basic
     @Column(name = "email_change_token")
     private String emailChangeToken;
 
+    @Basic
     @Column(name = "new_email")
     private String newEmail;
 
+    @Basic(optional = false)
+    @Column(nullable = false)
     private boolean enabled;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name="users_authorities",
-            joinColumns=@JoinColumn(name="user_id")
+            name = "users_authorities",
+            joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false)
     )
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -61,20 +80,27 @@ public class UserEntity extends BaseEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name="users_movie_permissions",
-            joinColumns=@JoinColumn(name="user_id")
+            name = "users_movie_permissions",
+            joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false)
     )
     @Enumerated(EnumType.STRING)
     private Set<UserMoviePermission> permissions;
 
-    @CreatedDate
+    @OneToMany(mappedBy = "user")
+    private Set<MovieRateEntity> ratings;
+
+    @OneToMany(mappedBy = "user")
+    private Set<ContributionEntity> contributions;
+
+    @Basic(optional = false)
     @Column(name = "registration_date", updatable = false, nullable = false)
+    @CreatedDate
     private Date registrationDate;
 
-    @LastModifiedDate
+    @Basic
     @Column(name = "modified_date", nullable = false)
+    @LastModifiedDate
     private Date modifiedDate;
-
 
 
     /**

@@ -1,11 +1,11 @@
 package com.core.jpa.entity;
 
-import com.core.movie.EditStatus;
-import com.common.dto.movie.MovieType;
+import com.core.movie.DataStatus;
+import com.common.dto.movie.type.MovieType;
 import com.core.jpa.entity.movie.*;
 
 import javax.annotation.Generated;
-import javax.persistence.metamodel.SetAttribute;
+import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
@@ -18,18 +18,18 @@ public abstract class MovieEntity_ {
     public static volatile SingularAttribute<MovieEntity, Long> id;
     public static volatile SingularAttribute<MovieEntity, String> title;
     public static volatile SingularAttribute<MovieEntity, MovieType> type;
-    public static volatile SetAttribute<MovieEntity, String> descriptions;
-    public static volatile SetAttribute<MovieEntity, MovieOtherTitle> otherTitles;
-    public static volatile SetAttribute<MovieEntity, MovieReview> reviews;
-    public static volatile SetAttribute<MovieEntity, MovieStoryline> storylines;
-    public static volatile SetAttribute<MovieEntity, MovieBoxOffice> boxOffices;
-    public static volatile SetAttribute<MovieEntity, MovieReleaseDate> releaseDates;
-    public static volatile SetAttribute<MovieEntity, MovieSite> sites;
-    public static volatile SetAttribute<MovieEntity, MovieCountry> countries;
-    public static volatile SetAttribute<MovieEntity, MovieLanguage> languages;
-    public static volatile SetAttribute<MovieEntity, MovieGenre> genres;
-    public static volatile SetAttribute<MovieEntity, MovieRate> ratings;
+    public static volatile ListAttribute<MovieEntity, MovieOtherTitleEntity> otherTitles;
+    public static volatile ListAttribute<MovieEntity, MovieReleaseDateEntity> releaseDates;
+    public static volatile ListAttribute<MovieEntity, MovieStorylineEntity> storylines;
+    public static volatile ListAttribute<MovieEntity, MovieBoxOfficeEntity> boxOffices;
+    public static volatile ListAttribute<MovieEntity, MovieSiteEntity> sites;
+    public static volatile ListAttribute<MovieEntity, MovieCountryEntity> countries;
+    public static volatile ListAttribute<MovieEntity, MovieLanguageEntity> languages;
+    public static volatile ListAttribute<MovieEntity, MovieGenreEntity> genres;
+    public static volatile ListAttribute<MovieEntity, MovieReviewEntity> reviews;
+    public static volatile ListAttribute<MovieEntity, MovieRateEntity> ratings;
     public static volatile SingularAttribute<MovieEntity, String> budget;
-    public static volatile SingularAttribute<MovieEntity, EditStatus> status;
+    public static volatile SingularAttribute<MovieEntity, DataStatus> status;
     public static volatile SingularAttribute<MovieEntity, Float> rating;
+    public static volatile ListAttribute<MovieEntity, ContributionEntity> contributions;
 }

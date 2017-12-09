@@ -2,7 +2,8 @@ package com.core.jpa.entity;
 
 import com.common.dto.MessageReceived;
 import com.common.dto.MessageSent;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,16 +14,18 @@ import java.util.Date;
 /**
  * Representation of the message.
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "messages")
-@Data
 @EntityListeners(AuditingEntityListener.class)
 public class MessageEntity implements Serializable {
 
     private static final long serialVersionUID = 6761068804530627981L;
 
     @Id
-    @Column(updatable = false)
+    @Basic(optional = false)
+    @Column(unique = true, nullable = false, updatable = false)
     @GeneratedValue
     private Long id;
 
@@ -34,22 +37,28 @@ public class MessageEntity implements Serializable {
     @JoinColumn(nullable = false)
     private UserEntity recipient;
 
+    @Basic(optional = false)
     @Column(nullable = false)
     private String subject;
 
+    @Basic(optional = false)
     @Column(length = 4000, nullable = false)
     private String text;
 
-    @CreatedDate
+    @Basic(optional = false)
     @Column(updatable = false, nullable = false)
+    @CreatedDate
     private Date date;
 
+    @Basic
     @Column(name = "date_of_read")
     private Date dateOfRead;
 
+    @Basic(optional = false)
     @Column(name = "visible_for_sender", nullable = false)
     private boolean isVisibleForSender;
 
+    @Basic(optional = false)
     @Column(name = "visible_for_recipient", nullable = false)
     private boolean isVisibleForRecipient;
 

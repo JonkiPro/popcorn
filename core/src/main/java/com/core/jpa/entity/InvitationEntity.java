@@ -1,7 +1,8 @@
 package com.core.jpa.entity;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -12,30 +13,33 @@ import java.util.Date;
 /**
  * Representation of the invitation.
  */
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "invitations")
-@Data
 @EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor
 public class InvitationEntity implements Serializable {
 
     private static final long serialVersionUID = 563181989395575248L;
 
     @Id
-    @Column(updatable = false)
+    @Basic(optional = false)
+    @Column(unique = true, nullable = false, updatable = false)
     @GeneratedValue
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "from_user_id", nullable = false)
     private UserEntity fromUser;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "to_user_id", nullable = false)
     private UserEntity toUser;
 
-    @CreatedDate
+    @Basic(optional = false)
     @Column(updatable = false, nullable = false)
+    @CreatedDate
     private Date date;
 
     public InvitationEntity(final UserEntity fromUser, final UserEntity toUser) {

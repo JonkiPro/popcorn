@@ -1,26 +1,4 @@
-buildscript {
-	ext {
-		springBootVersion = '1.5.7.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	}
-}
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
-
 group = 'com.common'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
-
-repositories {
-	mavenCentral()
-}
 
 
 dependencies {
@@ -30,6 +8,7 @@ dependencies {
 
 	compile("com.fasterxml.jackson.core:jackson-databind")
 	compile("org.hibernate:hibernate-validator")
+	compile group: 'com.google.guava', name: 'guava', version: '23.5-jre'
 	compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
 

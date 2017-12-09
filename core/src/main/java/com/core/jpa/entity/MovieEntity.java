@@ -1,91 +1,112 @@
 package com.core.jpa.entity;
 
 import com.common.dto.Movie;
-import com.core.movie.EditStatus;
-import com.common.dto.movie.MovieType;
+import com.common.dto.search.MovieSearchResult;
+import com.core.movie.DataStatus;
+import com.common.dto.movie.type.MovieType;
 import com.core.jpa.entity.movie.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representation of the movie.
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "movies")
-@Data
 public class MovieEntity implements Serializable {
 
     private static final long serialVersionUID = -2444745076534077956L;
 
     @Id
-    @Column(unique = true, updatable = false)
-    @GeneratedValue
+    @Basic(optional = false)
+    @Column(unique = true, nullable = false, updatable = false)
+    @GenericGenerator(
+            name = "movieSequenceGenerator", strategy = "enhanced-sequence",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(name = "optimizer", value = "pooled-lo"),
+                    @org.hibernate.annotations.Parameter(name = "initial_value", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "increment_size", value = "5")
+            }
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "movieSequenceGenerator")
     private Long id;
 
+    @Basic(optional = false)
+    @Column(nullable = false)
     private String title;
 
+    @Basic
     @Enumerated(EnumType.STRING)
     private MovieType type;
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieDescription> descriptions;
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OrderBy("id ASC")
+    private List<MovieOtherTitleEntity> otherTitles;
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<MovieReleaseDateEntity> releaseDates;
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<MovieStorylineEntity> storylines;
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<MovieBoxOfficeEntity> boxOffices;
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<MovieSiteEntity> sites;
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<MovieCountryEntity> countries;
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<MovieLanguageEntity> languages;
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<MovieGenreEntity> genres;
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<MovieReviewEntity> reviews;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieOtherTitle> otherTitles;
+    private List<MovieRateEntity> ratings;
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieReview> reviews;
-
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieStoryline> storylines;
-
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieBoxOffice> boxOffices;
-
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieReleaseDate> releaseDates;
-
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieSite> sites;
-
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieCountry> countries;
-
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieLanguage> languages;
-
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieGenre> genres;
-
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<MovieRate> ratings;
-
+    @Basic
     private String budget;
 
+    @Basic(optional = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private EditStatus status;
+    private DataStatus status;
 
+    @Basic
     private Float rating;
+
+    @OneToMany(mappedBy = "movie")
+    @OrderBy("creationDate ASC")
+    private List<ContributionEntity> contributions;
 
     /**
      * Constructor - init all sets.
      */
     public MovieEntity() {
-        this.descriptions = new HashSet<>();
-        this.otherTitles = new HashSet<>();
-        this.reviews = new HashSet<>();
-        this.storylines = new HashSet<>();
-        this.boxOffices = new HashSet<>();
-        this.releaseDates = new HashSet<>();
-        this.sites = new HashSet<>();
-        this.countries = new HashSet<>();
-        this.languages = new HashSet<>();
-        this.genres = new HashSet<>();
-        this.ratings = new HashSet<>();
+        this.otherTitles = new ArrayList<>();
+        this.reviews = new ArrayList<>();
+        this.storylines = new ArrayList<>();
+        this.boxOffices = new ArrayList<>();
+        this.releaseDates = new ArrayList<>();
+        this.sites = new ArrayList<>();
+        this.countries = new ArrayList<>();
+        this.languages = new ArrayList<>();
+        this.genres = new ArrayList<>();
+        this.ratings = new ArrayList<>();
     }
 
     /**
@@ -94,7 +115,7 @@ public class MovieEntity implements Serializable {
     @PrePersist
     protected void onCreateMovieEntity() {
         if(this.status == null) {
-            status = EditStatus.WAITING;
+            status = DataStatus.WAITING;
         }
     }
 
@@ -110,6 +131,20 @@ public class MovieEntity implements Serializable {
                 .id(this.id)
                 .title(this.title)
                 .type(this.type)
+                .build();
+    }
+
+    /**
+     * Get a DTO representing this movie.
+     *
+     * @return The read-only DTO.
+     */
+    public MovieSearchResult getSearchResultDTO() {
+        return MovieSearchResult.builder()
+                .id(this.id)
+                .title(this.title)
+                .type(this.type)
+                .rating(this.rating)
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 package com.core.jpa.repository;
 
-import com.core.movie.EditStatus;
+import com.core.movie.DataStatus;
 import com.core.jpa.entity.MovieEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -12,7 +12,12 @@ import java.util.Optional;
  */
 public interface MovieRepository extends JpaRepository<MovieEntity, Long>, JpaSpecificationExecutor {
 
-    Optional<MovieEntity> findById(Long id);
-
-    Optional<MovieEntity> findByIdAndStatus(Long id, EditStatus editStatus);
+    /**
+     * Find movie by ID and status.
+     *
+     * @param id The movie ID
+     * @param dataStatus The status
+     * @return The movie
+     */
+    Optional<MovieEntity> findByIdAndStatus(Long id, DataStatus dataStatus);
 }

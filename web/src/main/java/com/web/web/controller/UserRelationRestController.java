@@ -17,7 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping(value = "/api/v1.0/relations")
 @Slf4j
-@Api(value = "UserEntity Relation API", description = "Provides a list of methods that manage user relationships")
+@Api(value = "User Relation API", description = "Provides a list of methods that manage user relationships")
 public class UserRelationRestController {
 
     private final UserSearchService userSearchService;

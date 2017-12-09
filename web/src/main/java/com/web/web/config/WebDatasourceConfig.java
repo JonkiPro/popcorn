@@ -1,11 +1,14 @@
 package com.web.web.config;
 
+import com.web.web.config.properties.EclipseLinkProperties;
+import com.web.web.config.properties.EntityManagerProperties;
 import org.eclipse.persistence.internal.databaseaccess.DatabasePlatform;
 import org.eclipse.persistence.platform.database.MySQLPlatform;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -29,10 +32,13 @@ import java.util.Map;
 @Configuration
 @EnableJpaRepositories(basePackages = "com.core.jpa.repository")
 @EntityScan(basePackages = "com.core.jpa.entity")
+@EnableConfigurationProperties(value = {EclipseLinkProperties.class, EntityManagerProperties.class})
 public class WebDatasourceConfig {
 
-    @Value("${eclipselink.persistenceUnitName}")
-    private String persistenceUnitName;
+    @Autowired
+    private EclipseLinkProperties eclipseLinkProperties;
+    @Autowired
+    private EntityManagerProperties entityManagerProperties;
 
     /**
      * Get data source.
@@ -54,14 +60,14 @@ public class WebDatasourceConfig {
         final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(getDatasource());
         em.setJpaDialect(jpaDialect());
-        em.setPackagesToScan("com.core.jpa.entity");
-        em.setPersistenceUnitName(persistenceUnitName);
+        em.setPackagesToScan(entityManagerProperties.getPackagesToScan());
+        em.setPersistenceUnitName(eclipseLinkProperties.getPersistenceUnitName());
         final DatabasePlatform dp = new MySQLPlatform();
         em.setJpaVendorAdapter(getEclipseLinkJpaVendorAdapter());
 
         //following code will be used for static weaving. Uncomment when creating war.
 		final Map<String, String> propMap = new HashMap<String, String>();
-		propMap.put("eclipselink.weaving", "static");
+		propMap.put("eclipselink.weaving", eclipseLinkProperties.getWeaving());
 		em.setJpaPropertyMap(propMap);
 
 //        em.setLoadTimeWeaver(loadTimeWeaver()); //comment this when using static weaving. Mostly in development environment inside eclipse
@@ -75,9 +81,9 @@ public class WebDatasourceConfig {
     @Bean
     public EclipseLinkJpaVendorAdapter getEclipseLinkJpaVendorAdapter() {
         final EclipseLinkJpaVendorAdapter vendorAdapter = new EclipseLinkJpaVendorAdapter();
-        vendorAdapter.setDatabasePlatform("org.eclipse.persistence.platform.database.PostgreSQLPlatform");
-        vendorAdapter.setGenerateDdl(true);
-        vendorAdapter.setShowSql(true);
+        vendorAdapter.setDatabasePlatform(eclipseLinkProperties.getDatabasePlatform());
+        vendorAdapter.setGenerateDdl(eclipseLinkProperties.isGenerateDll());
+        vendorAdapter.setShowSql(eclipseLinkProperties.isShowSql());
         return vendorAdapter;
     }
 

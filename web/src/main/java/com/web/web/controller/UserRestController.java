@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @PreAuthorize("permitAll()")
 @RequestMapping(value = "/api/v1.0/users")
 @Slf4j
-@Api(value = "UserEntity API", description = "Provides a list of methods that retrieve users and their data")
+@Api(value = "User API", description = "Provides a list of methods that retrieve users and their data")
 public class UserRestController {
 
     private final UserSearchService userSearchService;

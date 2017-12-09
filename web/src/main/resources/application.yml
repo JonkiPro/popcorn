@@ -7,7 +7,16 @@ spring.datasource:
   schema: classpath:/db/init/schema.sql
 
 #EclipseLink
-eclipselink.persistenceUnitName: unit
+eclipseLink:
+  persistence-unit-name: unit
+  database-platform: org.eclipse.persistence.platform.database.PostgreSQLPlatform
+  generate-dll: true
+  show-sql: true
+  weaving: static
+
+#EntityManagerFactory
+entityManager:
+  packages-to-scan: com.core.jpa.entity
 
 #settings mail
 spring.mail:

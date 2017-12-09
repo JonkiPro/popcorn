@@ -1,6 +1,6 @@
 package com.core.jpa.entity;
 
-import lombok.Data;
+import lombok.Getter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,12 +9,13 @@ import java.util.UUID;
 /**
  * Abstract class to support basic column UUID.
  */
+@Getter
 @MappedSuperclass
-@Data
 public class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 4076477009276822012L;
 
+    @Basic(optional = false)
     @Column(updatable = false, nullable = false, unique = true)
     private String uuid;
 

@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping(value = "/api/v1.0/messages")
 @Slf4j
-@Api(value = "MessageEntity API", description = "Provides a list of methods that manage messages")
+@Api(value = "Message API", description = "Provides a list of methods that manage messages")
 public class MessageRestController {
 
     private final ResourceBundle bundle = ResourceBundle.getBundle(BundleProperties.VALIDATION_MESSAGES.getSource(), LocaleContextHolder.getLocale());

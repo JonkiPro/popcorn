@@ -1,26 +1,22 @@
 package com.core.jpa.service.impl;
 
 import com.common.dto.movie.*;
+import com.common.dto.movie.request.*;
 import com.common.dto.request.MovieDTO;
-import com.common.dto.request.movie.*;
 import com.common.exception.ResourceConflictException;
 import com.common.exception.ResourceForbiddenException;
 import com.common.exception.ResourceNotFoundException;
-import com.core.jpa.entity.ContributionEntity;
 import com.core.jpa.entity.MovieEntity;
 import com.core.jpa.entity.UserEntity;
 import com.core.jpa.entity.movie.*;
 import com.core.jpa.repository.*;
 import com.core.jpa.service.MoviePersistenceService;
-import com.core.movie.EditStatus;
-import com.core.movie.MovieField;
+import com.core.movie.DataStatus;
 import com.core.movie.UserMoviePermission;
+import com.core.movie.VerificationStatus;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +29,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * JPA implementation of the Movie Persistence Service.
@@ -41,7 +38,6 @@ import java.util.*;
 @Slf4j
 @Transactional(
         rollbackFor = {
-                ResourceForbiddenException.class,
                 ResourceNotFoundException.class,
                 ResourceConflictException.class,
                 ConstraintViolationException.class
@@ -51,8 +47,6 @@ import java.util.*;
 public class MoviePersistenceServiceImpl implements MoviePersistenceService {
 
     private final MovieRepository movieRepository;
-    private final MovieInfoRepository movieInfoRepository;
-    private final ContributionRepository contributionRepository;
     private final UserRepository userRepository;
 
     @PersistenceContext
@@ -62,20 +56,14 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * Constructor.
      *
      * @param movieRepository The movie repository to use
-     * @param movieInfoRepository The movie info repository to use
-     * @param contributionRepository The contribution repository to use
      * @param userRepository The user repository to use
      */
     @Autowired
     public MoviePersistenceServiceImpl(
             @NotNull final MovieRepository movieRepository,
-            @NotNull final MovieInfoRepository movieInfoRepository,
-            @NotNull final ContributionRepository contributionRepository,
             @NotNull final UserRepository userRepository
     ) {
         this.movieRepository = movieRepository;
-        this.movieInfoRepository = movieInfoRepository;
-        this.contributionRepository = contributionRepository;
         this.userRepository = userRepository;
     }
 
@@ -95,327 +83,458 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
 
         movie.setTitle(movieDTO.getTitle());
         movie.setType(movieDTO.getType());
-        movieDTO.getBudget().ifPresent(movie::setBudget);
 
         this.movieRepository.save(movie);
-
-        this.createNewMovieContributions(movieDTO, movie, user);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void acceptMovie(
+    public void updateMovieStatus(
             @Min(1) final Long movieId,
-            @Min(1) final Long userId
+            @Min(1) final Long userId,
+            @NotNull final VerificationStatus status
     ) throws ResourceForbiddenException, ResourceNotFoundException {
-        log.info("Called with movieId {}, userId {}", movieId, userId);
+        log.info("Called with movieId {}, userId {}, status {}", movieId, userId, status);
 
         final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId, EditStatus.WAITING);
+        final MovieEntity movie = this.findMovie(movieId, DataStatus.WAITING);
 
         if(!user.getPermissions().contains(UserMoviePermission.ALL)
                 && !user.getPermissions().contains(UserMoviePermission.NEW_MOVIE)) {
             throw new ResourceForbiddenException("No permissions");
         }
 
-        movie.setStatus(EditStatus.ACCEPTED);
+        movie.setStatus(status.getDataStatus());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void acceptContribution(
-            @Min(1) final Long contributionId,
-            @Min(1) final Long userId,
-            final String comment
-    ) throws ResourceForbiddenException, ResourceNotFoundException {
-        log.info("Called with contributionId {}, userId {}", contributionId, userId);
+    public Long createOtherTitle(
+            @NotNull @Valid final OtherTitle otherTitle,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException {
+        log.info("Called with otherTitle {}, movie {}, user {}", otherTitle, movie, user);
 
-        final UserEntity user = this.findUser(userId);
-        final ContributionEntity contribution = this.findContribution(contributionId);
+        this.existsOtherTile(movie.getOtherTitles()
+                .stream()
+                .filter(ot -> ot.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), otherTitle);
 
-        if(!CollectionUtils.containsAny(user.getPermissions(), contribution.getField().getNecessaryPermissions())) {
-            throw new ResourceForbiddenException("No permissions");
-        }
+        final MovieOtherTitleEntity movieOtherTitle = new MovieOtherTitleEntity(otherTitle.getTitle(), otherTitle.getCountry());
+        movieOtherTitle.setMovie(movie);
+        movieOtherTitle.setUser(user);
 
-        contribution.setComment(comment);
-        contribution.setVerificationDate(new Date());
-        contribution.setVerificationUser(user);
-        contribution.setStatus(EditStatus.ACCEPTED);
+        movie.getOtherTitles().add(movieOtherTitle);
 
-        contribution.getIds().forEach(id -> {
-            MovieInfo movieInfo = this.movieInfoRepository.findOne(id);
-            movieInfo.setStatus(EditStatus.ACCEPTED);
-        });
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getOtherTitles()).getId();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void rejectMovie(
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceForbiddenException, ResourceNotFoundException {
-        log.info("Called with movieId {}, userId {}", movieId, userId);
+    public void updateOtherTitle(
+            @NotNull @Valid final OtherTitle otherTitle,
+            @Min(1) final Long otherTitleId,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException {
+        log.info("Called with otherTitle {}, otherTitleId {}, movie {}", otherTitle, otherTitleId, movie);
 
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId, EditStatus.WAITING);
+        this.existsOtherTile(movie.getOtherTitles()
+                .stream()
+                .filter(ot -> ot.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), otherTitle);
 
-        if(!user.getPermissions().contains(UserMoviePermission.ALL)
-                || !user.getPermissions().contains(UserMoviePermission.NEW_MOVIE)) {
-            throw new ResourceForbiddenException("No permissions");
-        }
-
-        movie.setStatus(EditStatus.REJECTED);
+        final MovieOtherTitleEntity movieOtherTitle = this.entityManager.find(MovieOtherTitleEntity.class, otherTitleId);
+        movieOtherTitle.setTitle(otherTitle.getTitle());
+        movieOtherTitle.setCountry(otherTitle.getCountry());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void rejectContribution(
-            @Min(1) final Long contributionId,
-            @Min(1) final Long userId,
-            final String comment
-    ) throws ResourceForbiddenException, ResourceNotFoundException {
-        log.info("Called with contributionId {}, userId {}", contributionId, userId);
+    public Long createReleaseDate(
+            @NotNull @Valid final ReleaseDate releaseDate,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException {
+        log.info("Called with releaseDate {}, movie {}, user {}", releaseDate, movie, user);
 
-        final UserEntity user = this.findUser(userId);
-        final ContributionEntity contribution = this.findContribution(contributionId);
+        this.existsReleaseDate(movie.getReleaseDates()
+                .stream()
+                .filter(rd -> rd.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), releaseDate);
 
-        if(!CollectionUtils.containsAny(user.getPermissions(), contribution.getField().getNecessaryPermissions())) {
-            throw new ResourceForbiddenException("No permissions");
-        }
+        final MovieReleaseDateEntity movieReleaseDate = new MovieReleaseDateEntity(releaseDate.getDate(), releaseDate.getCountry());
+        movieReleaseDate.setMovie(movie);
+        movieReleaseDate.setUser(user);
 
-        contribution.setComment(comment);
-        contribution.setVerificationDate(new Date());
-        contribution.setVerificationUser(user);
-        contribution.setStatus(EditStatus.REJECTED);
+        movie.getReleaseDates().add(movieReleaseDate);
 
-        contribution.getIds().forEach(id -> {
-            MovieInfo movieInfo = this.movieInfoRepository.findOne(id);
-            movieInfo.setStatus(EditStatus.REJECTED);
-        });
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getReleaseDates()).getId();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void saveDescription(
-            @NotBlank final String description,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException {
-        log.info("Called with description {}, movieId {}, userId {}", description, movieId, userId);
+    @Override
+    public void updateReleaseDate(
+            @NotNull @Valid final ReleaseDate releaseDate,
+            @Min(1) final Long releaseDateId,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException {
+        log.info("Called with releaseDate {}, releaseDateId {}, movie {}", releaseDate, releaseDateId, movie);
 
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId);
+        this.existsReleaseDate(movie.getReleaseDates()
+                .stream()
+                .filter(rd -> rd.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), releaseDate);
 
-        final MovieDescription movieDescription = new MovieDescription(description);
-        movieDescription.setMovie(movie);
-        movieDescription.setUser(user);
-
-        this.createContribution(Sets.newHashSet(movieDescription), movie, user, MovieField.DESCRIPTION);
+        final MovieReleaseDateEntity movieReleaseDate = this.entityManager.find(MovieReleaseDateEntity.class, releaseDateId);
+        movieReleaseDate.setDate(releaseDate.getDate());
+        movieReleaseDate.setCountry(releaseDate.getCountry());
     }
 
     /**
      * {@inheritDoc}
      */
-    public void saveOtherTitles(
-            @NotEmpty final Set<OtherTitle> otherTitles,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException {
-        log.info("Called with otherTitles {}, movieId {}, userId {}", otherTitles, movieId, userId);
+    @Override
+    public Long createStoryline(
+            @NotNull @Valid final Storyline storyline,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException {
+        log.info("Called with storyline {}, movie {}, user {}", storyline, movie, user);
 
-        final Set<MovieOtherTitle> movieOtherTitles = new HashSet<>();
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId);
+        this.existsStoryline(movie.getStorylines()
+                .stream()
+                .filter(s -> s.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), storyline);
 
-        otherTitles.forEach(otherTitle -> {
-            final MovieOtherTitle movieOtherTitle = new MovieOtherTitle(otherTitle.getTitle(), otherTitle.getCountry());
-            movieOtherTitle.setMovie(movie);
-            movieOtherTitle.setUser(user);
-
-            movieOtherTitles.add(movieOtherTitle);
-        });
-
-        this.createContribution(movieOtherTitles, movie, user, MovieField.OTHER_TITLE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void saveBoxOffices(
-            @NotEmpty final Set<BoxOffice> boxOffices,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException {
-        log.info("Called with boxOffices {}, movieId {}, userId {}", boxOffices, movieId, userId);
-
-        final Set<MovieBoxOffice> movieBoxOffices = new HashSet<>();
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId);
-
-        boxOffices.forEach(boxOffice -> {
-            final MovieBoxOffice movieBoxOffice = new MovieBoxOffice(boxOffice.getBoxOffice(), boxOffice.getCountry());
-            movieBoxOffice.setMovie(movie);
-            movieBoxOffice.setUser(user);
-
-            movieBoxOffices.add(movieBoxOffice);
-        });
-
-        this.createContribution(movieBoxOffices, movie, user, MovieField.BOX_OFFICE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void saveSites(
-            @NotEmpty final Set<Site> sites,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException {
-        log.info("Called with sites {}, movieId {}, userId {}", sites, movieId, userId);
-
-        final Set<MovieSite> movieSites = new HashSet<>();
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId);
-
-        sites.forEach(site -> {
-            final MovieSite movieSite = new MovieSite(site.getSite(), site.getOfficial());
-            movieSite.setMovie(movie);
-            movieSite.setUser(user);
-
-            movieSites.add(movieSite);
-        });
-
-        this.createContribution(movieSites, movie, user, MovieField.SITE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void saveReleaseDates(
-            @NotEmpty final Set<ReleaseDate> releaseDates,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException {
-        log.info("Called with releaseDates {}, movieId {}, userId {}", releaseDates, movieId, userId);
-
-        final Set<MovieReleaseDate> movieReleaseDates = new HashSet<>();
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId);
-
-        releaseDates.forEach(releaseDate -> {
-            final MovieReleaseDate movieReleaseDate = new MovieReleaseDate(releaseDate.getReleaseDate(),
-                    releaseDate.getCountry());
-            movieReleaseDate.setMovie(movie);
-            movieReleaseDate.setUser(user);
-
-            movieReleaseDates.add(movieReleaseDate);
-        });
-
-        this.createContribution(movieReleaseDates, movie, user, MovieField.RELEASE_DATE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void saveStoryline(
-            @NotBlank final String storyline,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException {
-        log.info("Called with storyline {}, movieId {}, userId {}", storyline, movieId, userId);
-
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId);
-
-        final MovieStoryline movieStoryline = new MovieStoryline(storyline);
+        final MovieStorylineEntity movieStoryline = new MovieStorylineEntity(storyline.getStoryline());
         movieStoryline.setMovie(movie);
         movieStoryline.setUser(user);
 
-        this.createContribution(Sets.newHashSet(movieStoryline), movie, user, MovieField.STORYLINE);
+        movie.getStorylines().add(movieStoryline);
+
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getStorylines()).getId();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void saveCountries(
-            @NotEmpty final Set<CountryType> countries,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException {
-        log.info("Called with countries {}, movieId {}, userId {}", countries, movieId, userId);
+    @Override
+    public void updateStoryline(
+            @NotNull @Valid final Storyline storyline,
+            @Min(1) final Long storylineId,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException {
+        log.info("Called with storyline {}, storylineId {}, movie {}", storyline, storylineId, movie);
 
-        final Set<MovieCountry> movieCountries = new HashSet<>();
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId);
+        this.existsStoryline(movie.getStorylines()
+                .stream()
+                .filter(s -> s.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), storyline);
 
-        countries.forEach(country -> {
-            final MovieCountry movieCountry = new MovieCountry(country);
-            movieCountry.setMovie(movie);
-            movieCountry.setUser(user);
-
-            movieCountries.add(movieCountry);
-        });
-
-        this.createContribution(movieCountries, movie, user, MovieField.COUNTRY);
+        final MovieStorylineEntity movieStoryline = this.entityManager.find(MovieStorylineEntity.class, storylineId);
+        movieStoryline.setStoryline(storyline.getStoryline());
     }
 
     /**
      * {@inheritDoc}
      */
-    public void saveLanguages(
-            @NotEmpty final Set<LanguageType> languages,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException {
-        log.info("Called with languages {}, movieId {}, userId {}", languages, movieId, userId);
+    @Override
+    public Long createBoxOffice(
+            @NotNull @Valid final BoxOffice boxOffice,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException {
+        log.info("Called with boxOffice {}, movie {}, user {}", boxOffice, movie, user);
 
-        final Set<MovieLanguage> movieLanguages = new HashSet<>();
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId);
+        this.existsBoxOffice(movie.getBoxOffices()
+                .stream()
+                .filter(bo -> bo.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), boxOffice);
 
-        languages.forEach(language -> {
-            final MovieLanguage movieLanguage = new MovieLanguage(language);
-            movieLanguage.setMovie(movie);
-            movieLanguage.setUser(user);
+        final MovieBoxOfficeEntity movieBoxOffice = new MovieBoxOfficeEntity(boxOffice.getBoxOffice(), boxOffice.getCountry());
+        movieBoxOffice.setMovie(movie);
+        movieBoxOffice.setUser(user);
 
-            movieLanguages.add(movieLanguage);
-        });
+        movie.getBoxOffices().add(movieBoxOffice);
 
-        this.createContribution(movieLanguages, movie, user, MovieField.LANGUAGE);
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getBoxOffices()).getId();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void saveGenres(
-            @NotEmpty final Set<GenreType> genres,
-            @Min(1) final Long movieId,
-            @Min(1) final Long userId
-    ) throws ResourceNotFoundException {
-        log.info("Called with genres {}, movieId {}, userId {}", genres, movieId, userId);
+    @Override
+    public void updateBoxOffice(
+            @NotNull @Valid final BoxOffice boxOffice,
+            @Min(1) final Long boxOfficeId,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException {
+        log.info("Called with boxOffice {}, boxOfficeId {}, movie {}", boxOffice, boxOfficeId, movie);
 
-        final Set<MovieGenre> movieGenres = new HashSet<>();
-        final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId);
+        this.existsBoxOffice(movie.getBoxOffices()
+                .stream()
+                .filter(bo -> bo.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), boxOffice);
 
-        genres.forEach(genre -> {
-            final MovieGenre movieGenre = new MovieGenre(genre);
-            movieGenre.setMovie(movie);
-            movieGenre.setUser(user);
+        final MovieBoxOfficeEntity movieBoxOffice = this.entityManager.find(MovieBoxOfficeEntity.class, boxOfficeId);
+        movieBoxOffice.setBoxOffice(boxOffice.getBoxOffice());
+        movieBoxOffice.setCountry(boxOffice.getCountry());
+    }
 
-            movieGenres.add(movieGenre);
-        });
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createSite(
+            @NotNull @Valid final Site site,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException {
+        log.info("Called with site {}, movie {}, user {}", site, movie, user);
 
-        this.createContribution(movieGenres, movie, user, MovieField.GENRE);
+        this.existsSite(movie.getSites()
+                .stream()
+                .filter(s -> s.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), site);
+
+        final MovieSiteEntity movieSite = new MovieSiteEntity(site.getSite(), site.getOfficial());
+        movieSite.setMovie(movie);
+        movieSite.setUser(user);
+
+        movie.getSites().add(movieSite);
+
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getSites()).getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateSite(
+            @NotNull @Valid final Site site,
+            @Min(1) final Long siteId,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException {
+        log.info("Called with site {}, siteId {}, movie {}", site, siteId, movie);
+
+        this.existsSite(movie.getSites()
+                .stream()
+                .filter(s -> s.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), site);
+
+        final MovieSiteEntity movieSite = this.entityManager.find(MovieSiteEntity.class, siteId);
+        movieSite.setSite(site.getSite());
+        movieSite.setOfficial(site.getOfficial());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createCountry(
+            @NotNull @Valid final Country country,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException {
+        log.info("Called with country {}, movie {}, user {}", country, movie, user);
+
+        this.existsCountry(movie.getCountries()
+                .stream()
+                .filter(c -> c.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), country);
+
+        final MovieCountryEntity movieCountry = new MovieCountryEntity(country.getCountry());
+        movieCountry.setMovie(movie);
+        movieCountry.setUser(user);
+
+        movie.getCountries().add(movieCountry);
+
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getCountries()).getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateCountry(
+            @NotNull @Valid final Country country,
+            @Min(1) final Long countryId,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException {
+        log.info("Called with country {}, countryId {}, movie {}", country, countryId, movie);
+
+        this.existsCountry(movie.getCountries()
+                .stream()
+                .filter(c -> c.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), country);
+
+        final MovieCountryEntity movieCountry = this.entityManager.find(MovieCountryEntity.class, countryId);
+        movieCountry.setCountry(country.getCountry());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createLanguage(
+            @NotNull @Valid final Language language,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException {
+        log.info("Called with language {}, movie {}, user {}", language, movie, user);
+
+        this.existsLanguage(movie.getLanguages()
+                .stream()
+                .filter(l -> l.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), language);
+
+        final MovieLanguageEntity movieLanguage = new MovieLanguageEntity(language.getLanguage());
+        movieLanguage.setMovie(movie);
+        movieLanguage.setUser(user);
+
+        movie.getLanguages().add(movieLanguage);
+
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getLanguages()).getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateLanguage(
+            @NotNull @Valid final Language language,
+            @Min(1) final Long languageId,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException {
+        log.info("Called with language {}, languageId {}, movie {}", language, languageId, movie);
+
+        this.existsLanguage(movie.getLanguages()
+                .stream()
+                .filter(l -> l.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), language);
+
+        final MovieLanguageEntity movieLanguage = this.entityManager.find(MovieLanguageEntity.class, languageId);
+        movieLanguage.setLanguage(language.getLanguage());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createGenre(
+            @NotNull @Valid final Genre genre,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException {
+        log.info("Called with genre {}, movie {}, user {}", genre, movie, user);
+
+        this.existsGenre(movie.getGenres()
+                .stream()
+                .filter(g -> g.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), genre);
+
+        final MovieGenreEntity movieGenre = new MovieGenreEntity(genre.getGenre());
+        movieGenre.setMovie(movie);
+        movieGenre.setUser(user);
+
+        movie.getGenres().add(movieGenre);
+
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getGenres()).getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateGenre(
+            @NotNull @Valid final Genre genre,
+            @Min(1) final Long genreId,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException {
+        log.info("Called with genre {}, genreId {}, movie {}", genre, genreId, movie);
+
+        this.existsGenre(movie.getGenres()
+                .stream()
+                .filter(g -> g.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), genre);
+
+        final MovieGenreEntity movieGenre = this.entityManager.find(MovieGenreEntity.class, genreId);
+        movieGenre.setGenre(genre.getGenre());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createReview(
+            @NotNull @Valid final Review review,
+            @NotNull final MovieEntity movie,
+            @NotNull final UserEntity user
+    ) throws ResourceConflictException {
+        log.info("Called with review {}, movie {}, user {}", review, movie, user);
+
+        this.existsReview(movie.getReviews()
+                .stream()
+                .filter(r -> r.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), review);
+
+        final MovieReviewEntity movieReview = new MovieReviewEntity(review.getTitle(), review.getReview());
+        movieReview.setMovie(movie);
+        movieReview.setUser(user);
+
+        movie.getReviews().add(movieReview);
+
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getReviews()).getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateReview(
+            @NotNull @Valid final Review review,
+            @Min(1) final Long reviewId,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException {
+        log.info("Called with review {}, reviewId {}, movie {}", review, reviewId, movie);
+
+        this.existsReview(movie.getReviews()
+                .stream()
+                .filter(r -> r.getStatus() == DataStatus.ACCEPTED)
+                .collect(Collectors.toList()), review);
+
+        final MovieReviewEntity movieReview = this.entityManager.find(MovieReviewEntity.class, reviewId);
+        movieReview.setTitle(review.getTitle());
+        movieReview.setReview(review.getReview());
     }
 
     /**
@@ -430,20 +549,21 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
         log.info("Called with rate {}, movieId {}, userId {}", rate, movieId, userId);
 
         final UserEntity user = this.findUser(userId);
-        final MovieEntity movie = this.findMovie(movieId, EditStatus.ACCEPTED);
+        final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
 
-        final Set<MovieReleaseDate> releaseDates = movie.getReleaseDates();
+        final List<MovieReleaseDateEntity> releaseDates = movie.getReleaseDates();
 
-        Lists.newArrayList(releaseDates).sort(Comparator.comparing(MovieReleaseDate::getDate));
+        Lists.newArrayList(releaseDates).sort(Comparator.comparing(MovieReleaseDateEntity::getDate));
 
-        if(new Date().before(releaseDates.iterator().next().getDate())) {
+        if(!releaseDates.isEmpty()
+                && new Date().before(releaseDates.iterator().next().getDate())) {
             throw new ResourceConflictException("The movie with id " + movieId + " had no premiere");
         }
 
         boolean rated = false;
 
-        final Set<MovieRate> ratings = movie.getRatings();
-        for(final MovieRate mRate : ratings) {
+        final List<MovieRateEntity> ratings = movie.getRatings();
+        for(final MovieRateEntity mRate : ratings) {
             if(mRate.getUser().getId().equals(userId)) {
                 mRate.setRate(rate.getRate());
 
@@ -456,7 +576,7 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
         }
 
         if(!rated) {
-            final MovieRate movieRate = new MovieRate();
+            final MovieRateEntity movieRate = new MovieRateEntity();
             movieRate.setRate(rate.getRate());
             movieRate.setMovie(movie);
             movieRate.setUser(user);
@@ -468,87 +588,13 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
     }
 
     /**
-     * Create a contributions for the new movie.
-     *
-     * @param movieDTO MovieDTO object
-     * @param movie MovieEntity object
-     * @param user UserEntity object
-     */
-    private void createNewMovieContributions(
-            final MovieDTO movieDTO,
-            final MovieEntity movie,
-            final UserEntity user
-    ) {
-        movieDTO.getDescription().ifPresent(description -> this.saveDescription(description, movie.getId(), user.getId()));
-        if(movieDTO.getOtherTitles() != null
-                && !movieDTO.getOtherTitles().isEmpty()) {
-            this.saveOtherTitles(movieDTO.getOtherTitles(), movie.getId(), user.getId());
-        }
-        if(movieDTO.getBoxOffices() != null
-                && !movieDTO.getBoxOffices().isEmpty()) {
-            this.saveBoxOffices(movieDTO.getBoxOffices(), movie.getId(), user.getId());
-        }
-        if(movieDTO.getSites() != null
-                && !movieDTO.getSites().isEmpty()) {
-            this.saveSites(movieDTO.getSites(), movie.getId(), user.getId());
-        }
-        if(movieDTO.getReleaseDates() != null
-                && !movieDTO.getReleaseDates().isEmpty()) {
-            this.saveReleaseDates(movieDTO.getReleaseDates(), movie.getId(), user.getId());
-        }
-        movieDTO.getStoryline().ifPresent(storyline -> this.saveStoryline(storyline, movie.getId(), user.getId()));
-        if(movieDTO.getCountries() != null
-                && !movieDTO.getCountries().isEmpty()) {
-            this.saveCountries(movieDTO.getCountries(), movie.getId(), user.getId());
-        }
-        if(movieDTO.getLanguages() != null
-                && !movieDTO.getLanguages().isEmpty()) {
-            this.saveLanguages(movieDTO.getLanguages(), movie.getId(), user.getId());
-        }
-        if(movieDTO.getGenres() != null
-                && !movieDTO.getGenres().isEmpty()) {
-            this.saveGenres(movieDTO.getGenres(), movie.getId(), user.getId());
-        }
-    }
-
-    /**
-     * Create a contribution.
-     *
-     * @param setElements Set of elements to be included in the contribution
-     * @param movie The movie
-     * @param user The user
-     * @param field The movie field for which the contribution will be made
-     * @param <T> An object of the type inheriting from MovieInfo
-     */
-    private <T extends MovieInfo> void createContribution(
-            final Set<T> setElements,
-            final MovieEntity movie,
-            final UserEntity user,
-            final MovieField field
-    ) {
-        final Set<Long> ids = new HashSet<>();
-
-        setElements.forEach(element -> {
-            this.entityManager.persist(element);
-            ids.add(element.getId());
-        });
-
-        final ContributionEntity contribution = new ContributionEntity();
-        contribution.setMovie(movie);
-        contribution.setUser(user);
-        contribution.setIds(ids);
-        contribution.setField(field);
-
-        this.entityManager.persist(contribution);
-    }
-
-    /**
      * Helper method to find the user entity.
      *
      * @param id The user ID
      * @return The user
+     * @throws ResourceNotFoundException if no user found
      */
-    private UserEntity findUser(final Long id) {
+    private UserEntity findUser(final Long id) throws ResourceNotFoundException {
         return this.userRepository
                 .findByIdAndEnabledTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found with id " + id));
@@ -558,38 +604,16 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * Helper method to find the movie entity.
      *
      * @param id The movie ID
-     * @return The movie
-     */
-    private MovieEntity findMovie(final Long id) {
-        return this.movieRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No movie found with id " + id));
-    }
-
-    /**
-     * Helper method to find the movie entity.
-     *
-     * @param id The movie ID
      * @param status The movie status
      * @return The movie
+     * @throws ResourceNotFoundException if no movie found
      */
-    private MovieEntity findMovie(final Long id, final EditStatus status) {
+    private MovieEntity findMovie(final Long id, final DataStatus status) throws ResourceNotFoundException {
         return this.movieRepository
                 .findByIdAndStatus(id, status)
                 .orElseThrow(() -> new ResourceNotFoundException("No movie found with id " + id));
     }
 
-    /**
-     * Helper method to find the contribution entity.
-     *
-     * @param id The contribution ID
-     * @return The contribution
-     */
-    private ContributionEntity findContribution(final Long id) {
-        return this.contributionRepository
-                .findByIdAndStatus(id, EditStatus.WAITING)
-                .orElseThrow(() -> new ResourceNotFoundException("No contribution found with id " + id));
-    }
 
     /**
      * Calculates the average rating for a movie.
@@ -597,15 +621,187 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * @param movieRates Rating list
      * @return Average rating
      */
-    private Float calculationRating(final Set<MovieRate> movieRates) {
+    private Float calculationRating(final List<MovieRateEntity> movieRates) {
         Float averageRating = 0F;
 
-        for(final MovieRate movieRate : movieRates) {
+        for(final MovieRateEntity movieRate : movieRates) {
             averageRating += movieRate.getRate();
         }
 
         averageRating = averageRating / movieRates.size();
 
         return averageRating;
+    }
+
+    /**
+     * Helper method for checking the uniqueness of the title.
+     *
+     * @param otherTitles List of titles
+     * @param otherTitle The OtherTitle object to be checked
+     * @throws ResourceConflictException if the element exists
+     */
+    private void existsOtherTile(final List<MovieOtherTitleEntity> otherTitles, final OtherTitle otherTitle)
+            throws  ResourceConflictException {
+        otherTitles.forEach(ot -> {
+            if(ot.getTitle().equalsIgnoreCase(otherTitle.getTitle())
+                    && ot.getCountry() == otherTitle.getCountry()) {
+                throw new ResourceConflictException(
+                        "The element with the title " + otherTitle.getTitle() +
+                                " and the country of the " + otherTitle.getCountry() +
+                                " exists");
+            }
+        });
+    }
+
+    /**
+     * Helper method for checking the uniqueness of the release date.
+     *
+     * @param releaseDates List of release dates
+     * @param releaseDate The ReleaseDate to be checked
+     * @throws ResourceConflictException if the element exists
+     */
+    private void existsReleaseDate(final List<MovieReleaseDateEntity> releaseDates, final ReleaseDate releaseDate)
+            throws  ResourceConflictException {
+        releaseDates.forEach(rd -> {
+            if(rd.getDate().compareTo(releaseDate.getDate()) == 0
+                    && rd.getCountry() == releaseDate.getCountry()) {
+                throw new ResourceConflictException(
+                        "The element with the date " + releaseDate.getDate() +
+                                " and the country of the " + releaseDate.getCountry() +
+                                " exists");
+            }
+        });
+    }
+
+    /**
+     * Helper method for checking the uniqueness of the storyline.
+     *
+     * @param storylines List of storylines
+     * @param storyline The Storyline object to be checked
+     * @throws ResourceConflictException if the element exists
+     */
+    private void existsStoryline(final List<MovieStorylineEntity> storylines, final Storyline storyline)
+            throws  ResourceConflictException {
+        storylines.forEach(s -> {
+            if(s.getStoryline().equals(storyline.getStoryline())) {
+                throw new ResourceConflictException(
+                        "The element with the storyline " + storyline.getStoryline() +
+                                " exists");
+            }
+        });
+    }
+
+    /**
+     * Helper method for checking the uniqueness of the box office.
+     *
+     * @param boxOffices List of box offices
+     * @param boxOffice The BoxOffice object to be checked
+     * @throws ResourceConflictException if the element exists
+     */
+    private void existsBoxOffice(final List<MovieBoxOfficeEntity> boxOffices, final BoxOffice boxOffice)
+            throws  ResourceConflictException {
+        boxOffices.forEach(bo -> {
+            if(bo.getBoxOffice().equals(boxOffice.getBoxOffice())
+                    && bo.getCountry() == boxOffice.getCountry()) {
+                throw new ResourceConflictException(
+                        "The element with the box office " + boxOffice.getBoxOffice() +
+                                " and the country of the " + boxOffice.getCountry() +
+                                " exists");
+            }
+        });
+    }
+
+    /**
+     * Helper method for checking the uniqueness of the site.
+     *
+     * @param sites List of sites
+     * @param site The Site object to be checked
+     * @throws ResourceConflictException if the element exists
+     */
+    private void existsSite(final List<MovieSiteEntity> sites, final Site site)
+            throws  ResourceConflictException {
+        sites.forEach(s -> {
+            if(s.getSite().equals(site.getSite())
+                    && s.getOfficial() == site.getOfficial()) {
+                throw new ResourceConflictException(
+                        "The element with the site " + site.getSite() +
+                                " and the status of the " + site.getOfficial() +
+                                " exists");
+            }
+        });
+    }
+
+    /**
+     * Helper method for checking the uniqueness of the country.
+     *
+     * @param countries List of countries
+     * @param country The Country object to be checked
+     * @throws ResourceConflictException if the element exists
+     */
+    private void existsCountry(final List<MovieCountryEntity> countries, final Country country)
+            throws  ResourceConflictException {
+        countries.forEach(c -> {
+            if(c.getCountry() == country.getCountry()) {
+                throw new ResourceConflictException(
+                        "The element with the country " + country.getCountry() +
+                                " exists");
+            }
+        });
+    }
+
+    /**
+     * Helper method for checking the uniqueness of the language.
+     *
+     * @param languages List of languages
+     * @param language The Language object to be checked
+     * @throws ResourceConflictException if the element exists
+     */
+    private void existsLanguage(final List<MovieLanguageEntity> languages, final Language language)
+            throws  ResourceConflictException {
+        languages.forEach(l -> {
+            if(l.getLanguage() == language.getLanguage()) {
+                throw new ResourceConflictException(
+                        "The element with the language " + language.getLanguage() +
+                                " exists");
+            }
+        });
+    }
+
+    /***
+     * Helper method for checking the uniqueness of the genre.
+     *
+     * @param genres List of genres
+     * @param genre The Genre object to be checked
+     * @throws ResourceConflictException if the element exists
+     */
+    private void existsGenre(final List<MovieGenreEntity> genres, final Genre genre)
+            throws  ResourceConflictException {
+        genres.forEach(g -> {
+            if(g.getGenre() == genre.getGenre()) {
+                throw new ResourceConflictException(
+                        "The element with the genre " + genre.getGenre() +
+                                " exists");
+            }
+        });
+    }
+
+    /**
+     * Helper method for checking the uniqueness of the review.
+     *
+     * @param reviews List of reviews
+     * @param review The Review object to be checked
+     * @throws ResourceConflictException if the element exists
+     */
+    private void existsReview(final List<MovieReviewEntity> reviews, final Review review)
+            throws  ResourceConflictException {
+        reviews.forEach(r -> {
+            if(r.getTitle().equals(review.getTitle())
+                    && r.getReview().equals(review.getReview())) {
+                throw new ResourceConflictException(
+                        "The element with the title " + review.getTitle() +
+                                " and the review of the " + review.getReview() +
+                                " exists");
+            }
+        });
     }
 }

@@ -26,12 +26,6 @@ public enum MovieField {
             return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.OTHER_TITLE);
         }
     },
-    DESCRIPTION(Values.DESCRIPTION) {
-        @Override
-        public Set<UserMoviePermission> getNecessaryPermissions() {
-            return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.DESCRIPTION);
-        }
-    },
     REVIEW(Values.REVIEW) {
         @Override
         public Set<UserMoviePermission> getNecessaryPermissions() {
@@ -109,7 +103,6 @@ public enum MovieField {
         public static final String TYPE = "TYPE";
         public static final String OTHER_TITLE = "OTHER_TITLE";
         public static final String REVIEW = "REVIEW";
-        public static final String DESCRIPTION = "DESCRIPTION";
         public static final String BUDGET = "BUDGET";
         public static final String BOX_OFFICE = "BOX_OFFICE";
         public static final String SITE = "SITE";
