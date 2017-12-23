@@ -1,5 +1,5 @@
 /**
- * Interfaces for core services(no JPA).
+ * Interfaces for core services.
  */
 
 package com.core.service;

@@ -1,7 +1,7 @@
 package com.web.web.security.service.impl;
 
 import com.common.dto.User;
-import com.core.jpa.service.UserSearchService;
+import com.core.service.UserSearchService;
 import com.web.web.security.service.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,9 +27,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     /**
-     * Get the user.
-     *
-     * @return The user
+     * {@inheritDoc}
      */
     @Override
     public User getUser() {
@@ -37,19 +35,15 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     /**
-     * Get the user ID.
-     *
-     * @return The user ID
+     * {@inheritDoc}
      */
     @Override
-    public Long getUserId() {
+    public String getUserId() {
         return userSearchService.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
     }
 
     /**
-     * Get the user's name.
-     *
-     * @return The user's name
+     * {@inheritDoc}
      */
     @Override
     public String getUsername() {

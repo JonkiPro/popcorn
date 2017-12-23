@@ -4,8 +4,8 @@ import com.common.dto.error.ValidationErrorDTO;
 import com.common.dto.request.ChangeEmailDTO;
 import com.common.dto.request.ChangePasswordDTO;
 import com.common.exception.FormBadRequestException;
-import com.core.jpa.service.UserPersistenceService;
-import com.core.jpa.service.UserSearchService;
+import com.core.service.UserPersistenceService;
+import com.core.service.UserSearchService;
 import com.core.properties.BundleProperties;
 import com.core.utils.EncryptUtils;
 import com.web.web.security.service.AuthorizationService;
@@ -60,7 +60,8 @@ public class SettingsRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void changeEmail(
-            @ApiParam(value = "Form of e-mail change", required = true) @RequestBody @Valid final ChangeEmailDTO changeEmailDTO
+            @ApiParam(value = "Form of e-mail change", required = true)
+            @RequestBody @Valid final ChangeEmailDTO changeEmailDTO
     ) {
         log.info("Called with {}", changeEmailDTO);
 
@@ -78,7 +79,8 @@ public class SettingsRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void changePassword(
-            @ApiParam(value = "Form of password change", required = true) @RequestBody @Valid final ChangePasswordDTO changePasswordDTO
+            @ApiParam(value = "Form of password change", required = true)
+            @RequestBody @Valid final ChangePasswordDTO changePasswordDTO
     ) {
         log.info("Called with {}", changePasswordDTO);
 
@@ -94,7 +96,8 @@ public class SettingsRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void emailChangeToken(
-            @ApiParam(value = "E-mail change token", required = true) @PathVariable final String token
+            @ApiParam(value = "E-mail change token", required = true)
+            @PathVariable("token") final String token
     ) {
         log.info("Called with token {}", token);
 
@@ -111,7 +114,7 @@ public class SettingsRestController {
     private void validChangeEmailDTO(final ChangeEmailDTO changeEmailDTO) {
         final ValidationErrorDTO validationErrorDTO = new ValidationErrorDTO();
 
-        if(this.userSearchService.getUserExistsByEmail(changeEmailDTO.getEmail())) {
+        if(this.userSearchService.existsUserByEmail(changeEmailDTO.getEmail())) {
             validationErrorDTO.addFieldError("email", bundle.getString("validation.existsEmail"));
         }
         final String userPassword = this.userSearchService.getUserPassword(this.authorizationService.getUsername());

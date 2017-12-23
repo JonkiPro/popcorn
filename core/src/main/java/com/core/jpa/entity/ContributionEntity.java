@@ -1,9 +1,9 @@
 package com.core.jpa.entity;
 
-import com.common.dto.Contribution;
-import com.common.dto.search.ContributionSearchResult;
-import com.core.movie.DataStatus;
-import com.core.movie.MovieField;
+import com.common.dto.DataStatus;
+import com.common.dto.MovieField;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -19,6 +19,7 @@ import java.util.*;
  */
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "contributions")
 @EntityListeners(AuditingEntityListener.class)
@@ -41,63 +42,72 @@ public class ContributionEntity implements Serializable {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "movie_id", nullable = false)
     private MovieEntity movie;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "contributions_ids_to_add",
-            joinColumns = @JoinColumn(name = "contribution_id", nullable = false, updatable = false)
+            joinColumns = {
+                    @JoinColumn(name = "contribution_id", nullable = false, updatable = false)
+            }
     )
-    @Column(name = "element_id_to_add")
-    private List<Long> idsToAdd;
+    @Column(name = "element_id_to_add", nullable = false, updatable = false)
+    private Set<Long> idsToAdd = new HashSet<>();
 
-    @ElementCollection(fetch=FetchType.EAGER)
+    @ElementCollection(fetch=FetchType.LAZY)
     @CollectionTable(
             name = "contributions_ids_to_update",
-            joinColumns = @JoinColumn(name = "contribution_id", nullable = false, updatable = false)
+            joinColumns = {
+                    @JoinColumn(name = "contribution_id", nullable = false, updatable = false)
+            }
     )
-    @MapKeyColumn(name="new_element_id")
-    @Column(name = "old_element_id")
-    private Map<Long, Long> idsToUpdate;
+    @MapKeyColumn(name = "new_element_id", nullable = false)
+    @Column(name = "old_element_id", nullable = false, updatable = false)
+    private Map<Long, Long> idsToUpdate = new HashMap<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "contributions_ids_to_delete",
-            joinColumns = @JoinColumn(name = "contribution_id", nullable = false, updatable = false)
+            joinColumns = {
+                    @JoinColumn(name = "contribution_id", nullable = false, updatable = false)
+            }
     )
-    @Column(name = "element_id_to_delete")
-    private List<Long> idsToDelete;
+    @Column(name = "element_id_to_delete", nullable = false, updatable = false)
+    private Set<Long> idsToDelete = new HashSet<>();
 
     @Basic(optional = false)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private DataStatus status;
 
     @Basic(optional = false)
-    @Column(nullable = false)
+    @Column(name = "field", nullable = false)
     @Enumerated(EnumType.STRING)
     private MovieField field;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "contributions_sources",
-            joinColumns = @JoinColumn(name = "contribution_id", nullable = false, updatable = false)
+            joinColumns = {
+                    @JoinColumn(name = "contribution_id", nullable = false, updatable = false)
+            }
     )
-    private Set<String> sources;
+    @Column(nullable = false, updatable = false)
+    private Set<String> sources = new HashSet<>();
 
     @Basic
     @Column(name = "user_comment")
     private String userComment;
 
     @Basic(optional = false)
-    @Column(name = "creation_date", updatable = false, nullable = false)
+    @Column(name = "created", updatable = false, nullable = false)
     @CreatedDate
-    private Date creationDate;
+    private Date created;
 
     @Basic
     @Column(name = "verification_date")
@@ -111,14 +121,16 @@ public class ContributionEntity implements Serializable {
     @Column(name = "verification_comment")
     private String verificationComment;
 
+    @Version
+    @Column(name = "entity_version", nullable = false)
+    @Getter(AccessLevel.NONE)
+    private Integer entityVersion;
+
     /**
-     * Constructor - init all lists, sets, maps.
+     * Default constructor.
      */
     public ContributionEntity() {
-        this.idsToAdd = new ArrayList<>();
-        this.idsToUpdate = new HashMap<>();
-        this.idsToDelete = new ArrayList<>();
-        this.sources = new HashSet<>();
+        super();
     }
 
     /**
@@ -131,43 +143,39 @@ public class ContributionEntity implements Serializable {
         }
     }
 
-
     /**
-     * Get a DTO representing this contribution.
+     * Get the user's comment.
      *
-     * @return The read-only DTO.
+     * @return The user's comment
      */
-    public Contribution getDTO() {
-        return Contribution.builder()
-                .id(this.id)
-                .elementsToAdd(new HashMap<>())
-                .elementsToUpdate(new HashMap<>())
-                .elementsToDelete(new HashMap<>())
-                .elementsUpdated(new HashMap<>())
-                .movieId(this.movie.getId())
-                .movieTitle(this.movie.getTitle())
-                .username(user != null ? this.user.getUsername() : null)
-                .status(this.status.toString())
-                .field(this.field.toString())
-                .sources(this.sources)
-                .userComment(userComment != null ? userComment : "")
-                .creationDate(this.creationDate)
-                .verificationDate(verificationDate)
-                .verificationUsername(this.verificationUser != null ? verificationUser.getUsername() : null)
-                .verificationComment(this.verificationComment != null ? verificationComment : "")
-                .build();
+    public Optional<String> getUserComment() {
+        return Optional.ofNullable(userComment);
     }
 
     /**
-     * Get a DTO representing this contribution.
+     * Get the verification date.
      *
-     * @return The read-only DTO.
+     * @return The verification date
      */
-    public ContributionSearchResult getSearchResultDTO() {
-        return ContributionSearchResult.builder()
-                .id(this.id)
-                .field(this.field.toString())
-                .date(this.creationDate)
-                .build();
+    public Optional<Date> getVerificationDate() {
+        return Optional.ofNullable(verificationDate);
+    }
+
+    /**
+     * Get the verification user.
+     *
+     * @return The verification user
+     */
+    public Optional<UserEntity> getVerificationUser() {
+        return Optional.ofNullable(verificationUser);
+    }
+
+    /**
+     * Get the verification comment.
+     *
+     * @return The verification comment
+     */
+    public Optional<String> getVerificationComment() {
+        return Optional.ofNullable(verificationComment);
     }
 }

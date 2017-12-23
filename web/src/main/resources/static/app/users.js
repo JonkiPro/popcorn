@@ -3,13 +3,13 @@ var app = angular.module('app', []);
 app.controller('UsersController', function ($scope, $http) {
 
     $scope.page = angular.element('#page').val();
-    $scope.pageSize = angular.element('#page-size').val();
+    $scope.size = angular.element('#size').val();
 
     $scope.btnPrev = false;
 
     if(angular.element('#search-value').val() === '') {
         angular.element('#search-value').val('');
-        $scope.pageSize = 1;
+        $scope.size = 1;
         $scope.page = 1;
     }
 
@@ -25,32 +25,17 @@ app.controller('UsersController', function ($scope, $http) {
             method: "GET",
             params: {
                 q: angular.element('#search-value').val(),
-                pageSize: parseInt($scope.pageSize),
-                page: parseInt($scope.page)
+                size: parseInt($scope.size),
+                page: (parseInt($scope.page)-1)
             }
         })
             .then(function (response) {
-                $scope.users = response.data;
-            });
-
-        $http({
-            url: '/api/v1.0/users/number',
-            method: "GET",
-            params: {
-                username: angular.element('#search-value').val()
-            }
-        })
-            .then(function (response) {
-                $scope.numberOfUsers = response.data;
+                $scope.users = (response.data._embedded || []).userSearchResults;
+                $scope.numberOfUsers = response.data.page.totalElements;
+                $scope.numberOfPages = response.data.page.totalPages;
+                $scope.page = response.data.page.number+1;
 
                 if(parseInt($scope.numberOfUsers) > 0) {
-                    $scope.numberOfPages = window.Math.ceil((parseInt($scope.numberOfUsers)) / parseInt($scope.pageSize));
-
-                    if (parseInt($scope.page) > parseInt($scope.numberOfPages)) {
-                        $scope.page = $scope.numberOfPages;
-                        getUser();
-                    }
-
                     if (isLastPage()) {
                         $scope.btnNext = false;
                     } else {
@@ -64,8 +49,6 @@ app.controller('UsersController', function ($scope, $http) {
 
                     $scope.noResults = '';
                 } else {
-                    $scope.numberOfUsers = 0;
-                    $scope.numberOfPages = 0;
                     $scope.noResults = 'No results found!';
                     $scope.btnPrev = false;
                     $scope.btnNext = false;
@@ -73,25 +56,12 @@ app.controller('UsersController', function ($scope, $http) {
             });
     }
 
-    function getUser() {
-        return $http({
-            url: '/api/v1.0/users',
-            method: "GET",
-            params: {
-                q: angular.element('#search-value').val(),
-                pageSize: parseInt($scope.pageSize),
-                page: parseInt($scope.page)
-            }
-        })
-            .then(function (response) {
-                $scope.users = response.data;
-            });
-    }
-
     $scope.getAllByUsernameByPageSize = function () {
-        if (parseInt($scope.pageSize) < 1 || !$scope.pageSize) {
-            $scope.pageSize = 1;
+        if (parseInt($scope.size) < 1 || !$scope.size) {
+            $scope.size = 1;
         }
+        $scope.page = 1;
+
         getAllByUsername();
     };
 

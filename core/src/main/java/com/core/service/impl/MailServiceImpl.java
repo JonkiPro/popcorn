@@ -50,10 +50,7 @@ public class MailServiceImpl implements MailService{
     }
 
     /**
-     * Create an email with the activation token.
-     *
-     * @param email E-mail address of the recipient
-     * @param token Activation token
+     * {@inheritDoc}
      */
     @Async
     @Override
@@ -84,10 +81,7 @@ public class MailServiceImpl implements MailService{
     }
 
     /**
-     * Create an email with the e-mail change token.
-     *
-     * @param email E-mail address of the recipient
-     * @param token E-mail change token
+     * {@inheritDoc}
      */
     @Async
     @Override
@@ -118,10 +112,7 @@ public class MailServiceImpl implements MailService{
     }
 
     /**
-     * Create an e-mail with a new password.
-     *
-     * @param email E-mail address of the recipient
-     * @param newPassword A new password
+     * {@inheritDoc}
      */
     @Async
     @Override
@@ -149,10 +140,7 @@ public class MailServiceImpl implements MailService{
     }
 
     /**
-     * Create an e-mail with username.
-     *
-     * @param email E-mail address of the recipient
-     * @param username The user's name
+     * {@inheritDoc}
      */
     @Async
     @Override

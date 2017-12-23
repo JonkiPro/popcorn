@@ -1,9 +1,9 @@
 package com.core.jpa.repository;
 
 import com.core.jpa.entity.UserEntity;
-import com.core.movie.DataStatus;
+import com.common.dto.DataStatus;
 import com.core.jpa.entity.ContributionEntity;
-import com.core.movie.MovieField;
+import com.common.dto.MovieField;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -21,7 +21,7 @@ public interface ContributionRepository extends JpaRepository<ContributionEntity
      * @param field The movie field
      * @return The contribution
      */
-    Optional<ContributionEntity> findByIdAndField(Long id, MovieField field);
+    Optional<ContributionEntity> findByIdAndField(final Long id, final MovieField field);
 
     /**
      * Find contribution by ID and status.
@@ -30,7 +30,7 @@ public interface ContributionRepository extends JpaRepository<ContributionEntity
      * @param dataStatus The status
      * @return The contribution
      */
-    Optional<ContributionEntity> findByIdAndStatus(Long id, DataStatus dataStatus);
+    Optional<ContributionEntity> findByIdAndStatus(final Long id, final DataStatus dataStatus);
 
     /**
      * Find contribution by ID and status and user and movie field.
@@ -41,5 +41,5 @@ public interface ContributionRepository extends JpaRepository<ContributionEntity
      * @param field The movie field
      * @return The contribution
      */
-    Optional<ContributionEntity> findByIdAndStatusAndUserAndField(Long id, DataStatus dataStatus, UserEntity user, MovieField field);
+    Optional<ContributionEntity> findByIdAndStatusAndUserAndField(final Long id, final DataStatus dataStatus, final UserEntity user, final MovieField field);
 }

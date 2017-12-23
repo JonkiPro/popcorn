@@ -19,14 +19,14 @@
                     <div class="col-md-12">
                         <div class="input-group" id="adv-search">
                             <input type="hidden" th:value="${page}" id="page"/>
-                            <input type="hidden" th:value="${pageSize}" id="page-size"/>
+                            <input type="hidden" th:value="${pageSize}" id="size"/>
                             <input type="text" th:value="${q}" data-ng-keyup="getAllByUsernameWithInput()" id="search-value"
                                    class="form-control input-search" th:placeholder="#{users.searchUsers}"/>
                         </div>
                     </div>
                 </div>
                 <br/>
-                <label><span th:text="#{users.pageSize}">Page size</span>:</label> <input data-numbers-only="true" data-ng-model="pageSize"
+                <label><span th:text="#{users.pageSize}">Page size</span>:</label> <input data-numbers-only="true" data-ng-model="size"
                                                  data-ng-keyup="getAllByUsernameByPageSize()" class="form-control input-search"
                                                  style="width: 50px; display: inline;"/>
                 <span style="float: right;margin-right: 90px;">

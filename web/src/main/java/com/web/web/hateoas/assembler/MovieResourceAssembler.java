@@ -1,6 +1,7 @@
 package com.web.web.hateoas.assembler;
 
 import com.common.dto.Movie;
+import com.web.web.controller.MovieContributionRestController;
 import com.web.web.controller.MovieRestController;
 import com.web.web.hateoas.resource.MovieResource;
 import org.springframework.hateoas.ResourceAssembler;
@@ -18,16 +19,106 @@ public class MovieResourceAssembler implements ResourceAssembler<Movie, MovieRes
      */
     @Override
     public MovieResource toResource(final Movie movie) {
-        final MovieResource userResource = new MovieResource(movie);
+        final MovieResource movieResource = new MovieResource(movie);
+        final Long id = Long.valueOf(movie.getId());
 
-        userResource.add(
+        movieResource.add(
                 ControllerLinkBuilder.linkTo(
                         ControllerLinkBuilder
                                 .methodOn(MovieRestController.class)
-                                .getMovie(movie.getId())
+                                .getMovie(id)
                 ).withSelfRel()
         );
 
-        return userResource;
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getTitles(id)
+                ).withRel("titles")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getReleaseDates(id)
+                ).withRel("releaseDates")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getStorylines(id)
+                ).withRel("storylines")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getBoxOffices(id)
+                ).withRel("boxOffices")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getSites(id)
+                ).withRel("sites")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getCountries(id)
+                ).withRel("countries")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getLanguages(id)
+                ).withRel("languages")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getGenres(id)
+                ).withRel("genres")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getReviews(id)
+                ).withRel("reviews")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getRatings(id)
+                ).withRel("ratings")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieContributionRestController.class)
+                                .findContributions(id,
+                                        null, null, null, null, null, null)
+                ).withRel("contributions")
+        );
+
+        return movieResource;
     }
 }

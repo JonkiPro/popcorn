@@ -1,6 +1,6 @@
 package com.core.jpa.entity;
 
-import com.core.movie.DataStatus;
+import com.common.dto.DataStatus;
 import com.common.dto.movie.type.MovieType;
 import com.core.jpa.entity.movie.*;
 

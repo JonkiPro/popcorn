@@ -1,6 +1,6 @@
 package com.web.web.controller;
 
-import com.core.jpa.service.UserSearchService;
+import com.core.service.UserSearchService;
 import com.core.utils.EncryptUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -41,15 +41,17 @@ public class CheckUserDataRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     boolean checkUsername(
-            @ApiParam(value = "The user's name", required = true) @RequestParam final String username,
+            @ApiParam(value = "The user's name", required = true)
+            @RequestParam final String username,
+            @ApiParam(value = "Negation of the returned value")
             @RequestParam(defaultValue = "false", required = false) final boolean negation
     ) {
         log.info("Called with username {}, negation {}", username, negation);
 
         if(!negation) {
-            return userSearchService.getUserExistsByUsername(username);
+            return userSearchService.existsUserByUsername(username);
         } else {
-            return !userSearchService.getUserExistsByUsername(username);
+            return !userSearchService.existsUserByUsername(username);
         }
     }
 
@@ -58,15 +60,17 @@ public class CheckUserDataRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     boolean checkEmail(
-            @ApiParam(value = "The user's e-mail", required = true) @RequestParam final String email,
+            @ApiParam(value = "The user's e-mail", required = true)
+            @RequestParam final String email,
+            @ApiParam(value = "Negation of the returned value")
             @RequestParam(defaultValue = "false", required = false) final boolean negation
     ) {
         log.info("Called with email {}, negation {}", email, negation);
 
         if(!negation) {
-            return userSearchService.getUserExistsByEmail(email);
+            return userSearchService.existsUserByEmail(email);
         } else {
-            return !userSearchService.getUserExistsByEmail(email);
+            return !userSearchService.existsUserByEmail(email);
         }
     }
 
@@ -76,7 +80,9 @@ public class CheckUserDataRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     boolean checkPassword(
-            @ApiParam(value = "The user's password", required = true) @RequestParam final String password,
+            @ApiParam(value = "The user's password", required = true)
+            @RequestParam final String password,
+            @ApiParam(value = "Negation of the returned value")
             @RequestParam(defaultValue = "false", required = false) final boolean negation,
             final Principal principal
     ) {

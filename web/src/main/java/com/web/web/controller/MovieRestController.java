@@ -9,9 +9,9 @@ import com.common.dto.movie.request.*;
 import com.common.dto.movie.response.RateResponse;
 import com.common.dto.request.MovieDTO;
 import com.common.dto.search.MovieSearchResult;
-import com.core.jpa.service.MoviePersistenceService;
-import com.core.jpa.service.MovieSearchService;
-import com.core.movie.VerificationStatus;
+import com.core.service.MoviePersistenceService;
+import com.core.service.MovieSearchService;
+import com.common.dto.VerificationStatus;
 import com.web.web.hateoas.assembler.MovieResourceAssembler;
 import com.web.web.hateoas.assembler.MovieSearchResultResourceAssembler;
 import com.web.web.hateoas.resource.MovieResource;
@@ -85,7 +85,8 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createMovie(
-            @ApiParam(value = "Form of the new movie", required = true) @RequestBody @Valid MovieDTO movieDTO
+            @ApiParam(value = "New movie", required = true)
+            @RequestBody @Valid MovieDTO movieDTO
     ) {
         log.info("Called with movieDTO {}", movieDTO);
 
@@ -106,28 +107,39 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateMovieStatus(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
-            @ApiParam(value = "Status for the movie", required = true) @RequestParam final VerificationStatus status
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "Status for the movie", required = true)
+            @RequestParam("status") final VerificationStatus status
     ) {
         log.info("Called with id {}, status {}", id, status);
 
         this.moviePersistenceService.updateMovieStatus(id, authorizationService.getUserId(), status);
     }
 
-    @ApiOperation(value = "Get movies")
+    @ApiOperation(value = "Find movies")
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public
-    PagedResources<MovieSearchResultResource> getMovies(
-            @RequestParam(required = false) final String title,
-            @RequestParam(required = false) final MovieType type,
-            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy-MM-dd") final Date fromDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy-MM-dd") final Date toDate,
-            @RequestParam(required = false) final List<CountryType> countries,
-            @RequestParam(required = false) final List<LanguageType> languages,
-            @RequestParam(required = false) final List<GenreType> genres,
-            @RequestParam(required = false) @Size(max = 10) final Integer minRating,
-            @RequestParam(required = false) @Size(max = 10) final Integer maxRating,
+    PagedResources<MovieSearchResultResource> findMovies(
+            @ApiParam(value = "The title of the movie")
+            @RequestParam(value = "title", required = false) final String title,
+            @ApiParam(value = "The type of the movie")
+            @RequestParam(value = "type", required = false) final MovieType type,
+            @ApiParam(value = "Release date range \"from\"")
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") final Date fromDate,
+            @ApiParam(value = "Release date range \"to\"")
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") final Date toDate,
+            @ApiParam(value = "List of countries")
+            @RequestParam(value = "country", required = false) final List<CountryType> countries,
+            @ApiParam(value = "List of languages")
+            @RequestParam(value = "language", required = false) final List<LanguageType> languages,
+            @ApiParam(value = "List of genres")
+            @RequestParam(value = "genre", required = false) final List<GenreType> genres,
+            @ApiParam(value = "Min. rating")
+            @RequestParam(value = "minRating", required = false) @Size(max = 10) final Integer minRating,
+            @ApiParam(value = "Max. rating")
+            @RequestParam(value = "maxRating", required = false) @Size(max = 10) final Integer maxRating,
             @PageableDefault(sort = {"title"}, direction = Sort.Direction.DESC) final Pageable page,
             final PagedResourcesAssembler<MovieSearchResult> assembler
     ) {
@@ -142,7 +154,7 @@ public class MovieRestController {
                 .linkTo(
                         ControllerLinkBuilder
                                 .methodOn(MovieRestController.class)
-                                .getMovies(
+                                .findMovies(
                                         title,
                                         type,
                                         fromDate,
@@ -157,7 +169,7 @@ public class MovieRestController {
                                 )
                 ).withSelfRel();
 
-        return assembler.toResource(this.movieSearchService.getAllMovies(
+        return assembler.toResource(this.movieSearchService.findMovies(
                 title, type, fromDate, toDate, countries, languages, genres, minRating, maxRating, page
         ), this.movieSearchResultResourceAssembler, self);
     }
@@ -168,7 +180,8 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     MovieResource getMovie(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -181,11 +194,26 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     Set<OtherTitle> getTitles(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
         return this.movieSearchService.getTitles(id);
+    }
+
+    @ApiOperation(value = "Get movie release dates")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
+    @GetMapping(value = "/{id}/releaseDates")
+    @ResponseStatus(HttpStatus.OK)
+    public
+    Set<ReleaseDate> getReleaseDates(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        return this.movieSearchService.getReleaseDates(id);
     }
 
     @ApiOperation(value = "Get movie storylines")
@@ -194,7 +222,8 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     Set<Storyline> getStorylines(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -207,24 +236,12 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     Set<BoxOffice> getBoxOffices(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
         return this.movieSearchService.getBoxOffices(id);
-    }
-
-    @ApiOperation(value = "Get movie release dates")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
-    @GetMapping(value = "/{id}/releaseDates")
-    @ResponseStatus(HttpStatus.OK)
-    public
-    Set<ReleaseDate> getReleaseDates(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id
-    ) {
-        log.info("Called with id {}", id);
-
-        return this.movieSearchService.getReleaseDates(id);
     }
 
     @ApiOperation(value = "Get movie sites")
@@ -233,11 +250,54 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     Set<Site> getSites(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
         return this.movieSearchService.getSites(id);
+    }
+
+    @ApiOperation(value = "Get movie countries")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
+    @GetMapping(value = "/{id}/countries")
+    @ResponseStatus(HttpStatus.OK)
+    public
+    Set<Country> getCountries(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        return this.movieSearchService.getCountries(id);
+    }
+
+    @ApiOperation(value = "Get movie languages")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
+    @GetMapping(value = "/{id}/languages")
+    @ResponseStatus(HttpStatus.OK)
+    public
+    Set<Language> getLanguages(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        return this.movieSearchService.getLanguages(id);
+    }
+
+    @ApiOperation(value = "Get movie genres")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
+    @GetMapping(value = "/{id}/genres")
+    @ResponseStatus(HttpStatus.OK)
+    public
+    Set<Genre> getGenres(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        return this.movieSearchService.getGenres(id);
     }
 
     @ApiOperation(value = "Get movie reviews")
@@ -246,7 +306,8 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     Set<Review> getReviews(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -263,8 +324,10 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createRating(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
-            @ApiParam(value = "Rating for the movie", required = true) @RequestBody @Valid final Rate rate
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "Rating for the movie", required = true)
+            @RequestBody @Valid final Rate rate
     ) {
         log.info("Called with id {}, rate {}", id, rate);
 
@@ -281,7 +344,8 @@ public class MovieRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     Set<RateResponse> getRatings(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 

@@ -1,6 +1,6 @@
 package com.core.jpa.repository;
 
-import com.core.movie.DataStatus;
+import com.common.dto.DataStatus;
 import com.core.jpa.entity.MovieEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -19,5 +19,5 @@ public interface MovieRepository extends JpaRepository<MovieEntity, Long>, JpaSp
      * @param dataStatus The status
      * @return The movie
      */
-    Optional<MovieEntity> findByIdAndStatus(Long id, DataStatus dataStatus);
+    Optional<MovieEntity> findByIdAndStatus(final Long id, final DataStatus dataStatus);
 }

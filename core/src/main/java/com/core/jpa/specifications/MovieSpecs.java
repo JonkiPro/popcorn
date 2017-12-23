@@ -7,9 +7,8 @@ import com.common.dto.movie.type.MovieType;
 import com.core.jpa.entity.MovieEntity;
 import com.core.jpa.entity.MovieEntity_;
 import com.core.jpa.entity.movie.*;
-import com.core.movie.DataStatus;
+import com.common.dto.DataStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.jpa.domain.Specification;
 
 import javax.annotation.Nullable;
 import javax.persistence.criteria.*;
@@ -23,11 +22,13 @@ import java.util.stream.Stream;
 /**
  * Specifications for JPA queries.
  */
-public class MovieSpecs {
+public final class MovieSpecs {
 
     /**
-     * Generate a specification given the parameters.
+     * Generate a criteria query predicate for a where clause based on the given parameters.
      *
+     * @param root The root to use
+     * @param cb The criteria builder to use
      * @param title Title of the movie
      * @param type Type of the movie
      * @param fromDate Date range "from"
@@ -39,7 +40,9 @@ public class MovieSpecs {
      * @param maxRating Maximum rating
      * @return The specification
      */
-    public static Specification<MovieEntity> getFindPredicate(
+    public static Predicate getFindPredicate(
+            final Root<MovieEntity> root,
+            final CriteriaBuilder cb,
             @Nullable final String title,
             @Nullable final MovieType type,
             @Nullable final Date fromDate,
@@ -50,67 +53,65 @@ public class MovieSpecs {
             @Nullable final Integer minRating,
             @Nullable final Integer maxRating
     ) {
-        return (final Root<MovieEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
-            final List<Predicate> predicates = new ArrayList<>();
+        final List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(cb.equal(root.get(MovieEntity_.status), DataStatus.ACCEPTED));
-            if (StringUtils.isNotBlank(title)) {
-                predicates.add(cb.like(root.get(MovieEntity_.title), "%" + title + "%"));
-            }
-            if (Optional.ofNullable(type).isPresent()) {
-                predicates.add(cb.equal(root.get(MovieEntity_.type), type));
-            }
-            if (fromDate != null) {
-                final Join<MovieEntity, MovieReleaseDateEntity> listReleaseDates = root.join(MovieEntity_.releaseDates);
-                final List<Predicate> orPredicates =
-                        Stream.of(fromDate)
-                                .map(releaseDate -> cb.greaterThanOrEqualTo(listReleaseDates.get(MovieReleaseDateEntity_.date), fromDate))
-                                .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
-            }
-            if (toDate != null) {
-                final Join<MovieEntity, MovieReleaseDateEntity> listReleaseDates = root.join(MovieEntity_.releaseDates);
-                final List<Predicate> orPredicates =
-                        Stream.of(toDate)
-                                .map(releaseDate -> cb.lessThanOrEqualTo(listReleaseDates.get(MovieReleaseDateEntity_.date), toDate))
-                                .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
-            }
-            if (countries != null && !countries.isEmpty()) {
-                final Join<MovieEntity, MovieCountryEntity> listCountries = root.join(MovieEntity_.countries);
-                final List<Predicate> orPredicates =
-                        countries
-                                .stream()
-                                .map(country -> cb.equal(listCountries.get(MovieCountryEntity_.country), country))
-                                .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
-            }
-            if (languages != null && !languages.isEmpty()) {
-                final Join<MovieEntity, MovieLanguageEntity> listLanguages = root.join(MovieEntity_.languages);
-                final List<Predicate> orPredicates =
-                        languages
-                                .stream()
-                                .map(language -> cb.equal(listLanguages.get(MovieLanguageEntity_.language), language))
-                                .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
-            }
-            if (genres != null && !genres.isEmpty()) {
-                final Join<MovieEntity, MovieGenreEntity> listGenres = root.join(MovieEntity_.genres);
-                final List<Predicate> orPredicates =
-                        genres
-                                .stream()
-                                .map(genre -> cb.equal(listGenres.get(MovieGenreEntity_.genre), genre))
-                                .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
-            }
-            if (minRating != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get(MovieEntity_.rating), (float) minRating));
-            }
-            if (maxRating != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get(MovieEntity_.rating), (float) maxRating));
-            }
+        predicates.add(cb.equal(root.get(MovieEntity_.status), DataStatus.ACCEPTED));
+        if (StringUtils.isNotBlank(title)) {
+            predicates.add(cb.like(root.get(MovieEntity_.title), "%" + title + "%"));
+        }
+        if (Optional.ofNullable(type).isPresent()) {
+            predicates.add(cb.equal(root.get(MovieEntity_.type), type));
+        }
+        if (fromDate != null) {
+            final Join<MovieEntity, MovieReleaseDateEntity> listReleaseDates = root.join(MovieEntity_.releaseDates);
+            final List<Predicate> orPredicates =
+                    Stream.of(fromDate)
+                            .map(releaseDate -> cb.greaterThanOrEqualTo(listReleaseDates.get(MovieReleaseDateEntity_.date), fromDate))
+                            .collect(Collectors.toList());
+            predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+        }
+        if (toDate != null) {
+            final Join<MovieEntity, MovieReleaseDateEntity> listReleaseDates = root.join(MovieEntity_.releaseDates);
+            final List<Predicate> orPredicates =
+                    Stream.of(toDate)
+                            .map(releaseDate -> cb.lessThanOrEqualTo(listReleaseDates.get(MovieReleaseDateEntity_.date), toDate))
+                            .collect(Collectors.toList());
+            predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+        }
+        if (countries != null && !countries.isEmpty()) {
+            final Join<MovieEntity, MovieCountryEntity> listCountries = root.join(MovieEntity_.countries);
+            final List<Predicate> orPredicates =
+                    countries
+                            .stream()
+                            .map(country -> cb.equal(listCountries.get(MovieCountryEntity_.country), country))
+                            .collect(Collectors.toList());
+            predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+        }
+        if (languages != null && !languages.isEmpty()) {
+            final Join<MovieEntity, MovieLanguageEntity> listLanguages = root.join(MovieEntity_.languages);
+            final List<Predicate> orPredicates =
+                    languages
+                            .stream()
+                            .map(language -> cb.equal(listLanguages.get(MovieLanguageEntity_.language), language))
+                            .collect(Collectors.toList());
+            predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+        }
+        if (genres != null && !genres.isEmpty()) {
+            final Join<MovieEntity, MovieGenreEntity> listGenres = root.join(MovieEntity_.genres);
+            final List<Predicate> orPredicates =
+                    genres
+                            .stream()
+                            .map(genre -> cb.equal(listGenres.get(MovieGenreEntity_.genre), genre))
+                            .collect(Collectors.toList());
+            predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+        }
+        if (minRating != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get(MovieEntity_.rating), (float) minRating));
+        }
+        if (maxRating != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get(MovieEntity_.rating), (float) maxRating));
+        }
 
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
-        };
+        return cb.and(predicates.toArray(new Predicate[predicates.size()]));
     }
 }

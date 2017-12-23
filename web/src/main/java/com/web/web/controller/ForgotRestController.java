@@ -6,8 +6,8 @@ import com.common.dto.User;
 import com.common.exception.FormBadRequestException;
 import com.common.dto.request.ForgotUsernameDTO;
 import com.common.exception.ResourceNotFoundException;
-import com.core.jpa.service.UserPersistenceService;
-import com.core.jpa.service.UserSearchService;
+import com.core.service.UserPersistenceService;
+import com.core.service.UserSearchService;
 import com.core.properties.BundleProperties;
 import com.core.service.MailService;
 import io.swagger.annotations.*;
@@ -61,7 +61,8 @@ public class ForgotRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void forgotUsername(
-            @ApiParam(value = "Username recovery form", required = true) @RequestBody @Valid final ForgotUsernameDTO forgotUsernameDTO
+            @ApiParam(value = "Username recovery form", required = true)
+            @RequestBody @Valid final ForgotUsernameDTO forgotUsernameDTO
     ) {
         log.info("Called with {}", forgotUsernameDTO);
 
@@ -81,7 +82,8 @@ public class ForgotRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void forgotPassword(
-            @ApiParam(value = "Password recovery form", required = true) @RequestBody @Valid final ForgotPasswordDTO forgotPasswordDTO
+            @ApiParam(value = "Password recovery form", required = true)
+            @RequestBody @Valid final ForgotPasswordDTO forgotPasswordDTO
     ) {
         log.info("Called with {}", forgotPasswordDTO);
 
@@ -98,7 +100,7 @@ public class ForgotRestController {
      * @throws FormBadRequestException if the e-mail doesn't exist
      */
     private void validEmail(final String email) {
-        if(!this.userSearchService.getUserExistsByEmail(email)) {
+        if(!this.userSearchService.existsUserByEmail(email)) {
             final ValidationErrorDTO validationErrorDTO = new ValidationErrorDTO();
             validationErrorDTO.addFieldError("email", this.bundle.getString("validation.noExistsEmail"));
 
@@ -107,14 +109,14 @@ public class ForgotRestController {
     }
 
     /**
-     * Check if the username or e-mail address exists in the database.
+     * Check if the username and e-mail address exists in the database.
      *
      * @param forgotPasswordDTO ForgotPasswordDTO object
      * @throws ResourceNotFoundException if no user found
      */
     private void validForgotPasswordDTO(final ForgotPasswordDTO forgotPasswordDTO) {
-        if(!this.userSearchService.getUserExistsByUsername(forgotPasswordDTO.getUsername())
-                || !this.userSearchService.getUserExistsByEmail(forgotPasswordDTO.getEmail())) {
+        if(!this.userSearchService.existsUserByUsername(forgotPasswordDTO.getUsername())
+                && !this.userSearchService.existsUserByEmail(forgotPasswordDTO.getEmail())) {
             throw new ResourceNotFoundException("No user with this name and email was found");
         }
     }

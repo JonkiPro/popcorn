@@ -28,6 +28,14 @@ public class UserResourceAssembler implements ResourceAssembler<User, UserResour
                 ).withSelfRel()
         );
 
+        userResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(UserRestController.class)
+                                .getFriends(user.getUsername())
+                ).withRel("friends")
+        );
+
         return userResource;
     }
 }

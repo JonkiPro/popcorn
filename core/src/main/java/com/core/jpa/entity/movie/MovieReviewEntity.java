@@ -1,7 +1,6 @@
 package com.core.jpa.entity.movie;
 
-import com.common.dto.movie.Review;
-import com.core.movie.MovieField;
+import com.common.dto.MovieField;
 import lombok.*;
 
 import javax.persistence.Basic;
@@ -16,6 +15,7 @@ import javax.persistence.Entity;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString(callSuper = true)
 @Entity
 @DiscriminatorValue(value = MovieField.Values.REVIEW)
 public class MovieReviewEntity extends MovieInfoEntity {
@@ -27,18 +27,6 @@ public class MovieReviewEntity extends MovieInfoEntity {
     private String title;
 
     @Basic
+    @Column(name = "review")
     private String review;
-
-
-    /**
-     * Get a DTO representing this box office.
-     *
-     * @return The read-only DTO.
-     */
-    public Review getDTO() {
-        return Review.builder()
-                .title(this.title)
-                .review(this.review)
-                .build();
-    }
 }

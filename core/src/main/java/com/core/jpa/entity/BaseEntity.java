@@ -1,32 +1,42 @@
 package com.core.jpa.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * Abstract class to support basic column UUID.
+ * The base for entities. e.g. Users and Messages.
  */
 @Getter
+@EqualsAndHashCode(of = "uniqueId", callSuper = false)
+@ToString(callSuper = true)
 @MappedSuperclass
-public class BaseEntity implements Serializable {
+public class BaseEntity extends AuditEntity {
 
     private static final long serialVersionUID = 4076477009276822012L;
 
     @Basic(optional = false)
-    @Column(updatable = false, nullable = false, unique = true)
-    private String uuid;
+    @Column(name = "unique_id", nullable = false, unique = true, updatable = false)
+    private String uniqueId;
 
     /**
-     * Generate a UUID if it is null.
+     * Default constructor.
+     */
+    BaseEntity() {
+        super();
+    }
+
+    /**
+     * Generate a uniqueId if it is null.
      */
     @PrePersist
     protected void onCreateBaseEntity() {
         // Make sure we have an uuid if one wasn't entered beforehand
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID().toString();
+        if (this.uniqueId == null) {
+            this.uniqueId = UUID.randomUUID().toString();
         }
     }
 }

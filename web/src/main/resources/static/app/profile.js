@@ -10,7 +10,7 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
 
     function initProfile() {
         $http({
-            url: '/api/v1.0/users/account/' + angular.element('#username').val(),
+            url: '/api/v1.0/users/' + angular.element('#username').val(),
             method: "GET"
         })
             .then(function (response) {

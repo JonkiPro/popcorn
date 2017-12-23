@@ -24,7 +24,7 @@ public class MovieSearchResultResourceAssembler implements ResourceAssembler<Mov
                 ControllerLinkBuilder.linkTo(
                         ControllerLinkBuilder
                                 .methodOn(MovieRestController.class)
-                                .getMovie(movie.getId())
+                                .getMovie(Long.valueOf(movie.getId()))
                 ).withSelfRel()
         );
 

@@ -2,9 +2,8 @@ package com.web.web.startup;
 
 import com.common.dto.request.RegisterDTO;
 import com.common.exception.ResourceNotFoundException;
-import com.core.jpa.service.UserPersistenceService;
-import com.core.jpa.service.UserSearchService;
-import com.core.utils.EncryptUtils;
+import com.core.service.UserPersistenceService;
+import com.core.service.UserSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;

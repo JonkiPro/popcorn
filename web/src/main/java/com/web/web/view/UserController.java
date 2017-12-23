@@ -1,6 +1,6 @@
 package com.web.web.view;
 
-import com.core.jpa.service.UserSearchService;
+import com.core.service.UserSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -45,7 +45,7 @@ public class UserController {
             @PathVariable final String username,
             final ModelMap modelMap
     ) {
-        if(!this.userSearchService.getUserExistsByUsername(username.trim())) {
+        if(!this.userSearchService.existsUserByUsername(username.trim())) {
             return new ModelAndView("redirect:/users");
         }
 

@@ -1,12 +1,14 @@
 package com.core.jpa.entity.movie;
 
-import com.core.movie.DataStatus;
-import com.core.movie.MovieField;
+import com.common.dto.DataStatus;
+import com.common.dto.MovieField;
 import com.core.jpa.entity.MovieEntity;
-import com.core.jpa.entity.UserEntity;
 import com.core.utils.EnumUtils;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,6 +18,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "movies_info")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -27,29 +30,38 @@ public class MovieInfoEntity implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(unique = true, nullable = false, updatable = false)
-    @GeneratedValue
+    @GenericGenerator(
+            name = "movieInfoSequenceGenerator", strategy = "enhanced-sequence",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(name = "optimizer", value = "pooled-lo"),
+                    @org.hibernate.annotations.Parameter(name = "initial_value", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "increment_size", value = "5")
+            }
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "movieInfoSequenceGenerator")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "movie_id", nullable = false)
     private MovieEntity movie;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    protected UserEntity user;
-
     @Basic(optional = false)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private DataStatus status;
 
     @Basic(optional = false)
-    @Column(nullable = false)
+    @Column(name = "reported_for_update", nullable = false)
     private boolean reportedForUpdate;
 
     @Basic(optional = false)
-    @Column(nullable = false)
+    @Column(name = "reported_for_delete", nullable = false)
     private boolean reportedForDelete;
+
+    @Version
+    @Column(name = "entity_version", nullable = false)
+    @Getter(AccessLevel.NONE)
+    private Integer entityVersion;
 
     /**
      * Assign the status "WAITING" when saving a object and the status is null.
@@ -67,8 +79,9 @@ public class MovieInfoEntity implements Serializable {
      * @return Movie field
      */
     @Transient
+    @Deprecated
     public MovieField getDiscriminatorValue(){
-        DiscriminatorValue val = this.getClass().getAnnotation( DiscriminatorValue.class );
+        final DiscriminatorValue val = this.getClass().getAnnotation( DiscriminatorValue.class );
 
         return val == null ? null : EnumUtils.getEnumFromString(MovieField.class, val.value());
     }

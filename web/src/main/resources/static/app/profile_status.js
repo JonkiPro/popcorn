@@ -16,7 +16,7 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
 
     function initProfile() {
         $http({
-            url: '/api/v1.0/users/account/' + angular.element('#username').val(),
+            url: '/api/v1.0/users/' + angular.element('#username').val(),
             method: "GET"
         })
             .then(function (response) {
@@ -26,31 +26,31 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
 
     function initBtnStatus() {
         $http({
-            url: '/api/v1.0/relations/status/' + angular.element('#username').val(),
+            url: '/api/v1.0/users/' + angular.element('#username').val() + '/status',
             method: "GET"
         })
             .then(function (result) {
-                if(result.data === 'FRIEND') {
+                if(result.data.status === 'FRIEND') {
                     $scope.btnText = 'Remove from friends!';
                     url = '/api/v1.0/relations/friends/';
                     method = 'DELETE';
-                } else if(result.data === 'INVITATION_FROM_YOU') {
+                } else if(result.data.status === 'INVITATION_FROM_YOU') {
                     $scope.btnText = 'Remove invitation!';
                     url = '/api/v1.0/relations/invitations/';
                     method = 'DELETE';
                     param = 'remove';
-                } else if(result.data === 'INVITATION_TO_YOU') {
+                } else if(result.data.status === 'INVITATION_TO_YOU') {
                     $scope.btnText = 'Accept the invitation!';
-                    url = '/api/v1.0/relations/friends/';
+                    url = '/api/v1.0/relations/friends';
                     method = 'POST';
 
                     /*
                         // Create an invitation rejection button
                      */
                     angular.element('.btn-group').append($compile('<button data-ng-click="rejectInvitation()" id="btnRejectInvitation" class="btn btn-danger ng-pristine ng-untouched ng-valid ng-binding ng-empty">Reject invitation!</button>')($scope));
-                } else if(result.data === 'UNKNOWN') {
+                } else if(result.data.status === 'UNKNOWN') {
                     $scope.btnText = 'Add to friends!';
-                    url = '/api/v1.0/relations/invitations/';
+                    url = '/api/v1.0/relations/invitations';
                     method = 'POST';
                 }
                 $scope.authorisedUser = true;
@@ -61,7 +61,7 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
     }
 
     $scope.sendAction = function () {
-        if(param === 'remove') {
+        if(method === 'DELETE') {
             sendDelete();
 
             return;
@@ -80,8 +80,11 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
 
     function sendPost() {
         $http({
-            url: url + angular.element('#username').val(),
-            method: method
+            url: url,
+            method: method,
+            params: {
+                username: angular.element('#username').val()
+            }
         })
             .then(function () {
                 initBtnStatus();
@@ -93,7 +96,7 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
         /*
           // After accepting the invitation, hide the button rejecting the invitation
          */
-        if(url === '/api/v1.0/relations/friends/' && method === 'POST') {
+        if(url === '/api/v1.0/relations/friends' && method === 'POST') {
             angular.element('#btnRejectInvitation')[0].style.display = 'none';
             param = null;
         }

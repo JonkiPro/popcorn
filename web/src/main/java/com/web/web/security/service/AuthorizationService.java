@@ -8,21 +8,21 @@ import com.common.dto.User;
 public interface AuthorizationService {
 
     /**
-     * This method returns the user object.
+     * Get an authorized user object.
      *
      * @return Returns the user object
      */
     User getUser();
 
     /**
-     * This method returns the user ID.
+     * Get an authorised user ID.
      *
      * @return Returns the user ID
      */
-    Long getUserId();
+    String getUserId();
 
     /**
-     * This method returns the username.
+     * Get an authorised username.
      *
      * @return Returns the username
      */

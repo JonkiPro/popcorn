@@ -4,11 +4,11 @@ import com.common.dto.Contribution;
 import com.common.dto.movie.*;
 import com.common.dto.movie.request.*;
 import com.common.dto.search.ContributionSearchResult;
-import com.core.jpa.service.MovieContributionPersistenceService;
-import com.core.jpa.service.MovieContributionSearchService;
-import com.core.movie.DataStatus;
-import com.core.movie.MovieField;
-import com.core.movie.VerificationStatus;
+import com.core.service.MovieContributionPersistenceService;
+import com.core.service.MovieContributionSearchService;
+import com.common.dto.DataStatus;
+import com.common.dto.MovieField;
+import com.common.dto.VerificationStatus;
 import com.web.web.hateoas.assembler.ContributionSearchResultResourceAssembler;
 import com.web.web.hateoas.resource.ContributionResource;
 import com.web.web.hateoas.resource.ContributionSearchResultResource;
@@ -80,27 +80,35 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateContributionStatus(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
-            @ApiParam(value = "Status for the contribution", required = true) @RequestParam final VerificationStatus status,
-            @ApiParam(value = "Comment for verification") @RequestParam(required = false) final String comment
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "Status for the contribution", required = true)
+            @RequestParam("status") final VerificationStatus status,
+            @ApiParam(value = "Comment for verification")
+            @RequestParam(value = "comment", required = false) final String comment
     ) {
         log.info("Called with id {}, status {}, comment {}", id, status, comment);
 
         this.movieContributionPersistenceService.updateContributionStatus(id, authorizationService.getUserId(), status, comment);
     }
 
-    @ApiOperation(value = "Get contributions")
+    @ApiOperation(value = "Find contributions")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/contributions", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public
-    PagedResources<ContributionSearchResultResource> getContributions(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
-            @RequestParam(required = false) final MovieField field,
-            @RequestParam(required = false) final DataStatus status,
-            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy-MM-dd") final Date fromDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy-MM-dd") final Date toDate,
-            @PageableDefault(sort = {"creationDate"}, direction = Sort.Direction.DESC) final Pageable page,
+    PagedResources<ContributionSearchResultResource> findContributions(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The movie field")
+            @RequestParam(value = "field", required = false) final MovieField field,
+            @ApiParam(value = "The data status")
+            @RequestParam(value = "status", required = false) final DataStatus status,
+            @ApiParam(value = "Creation date range \"from\"")
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") final Date fromDate,
+            @ApiParam(value = "Creation date range \"to\"")
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") final Date toDate,
+            @PageableDefault(sort = {"created"}, direction = Sort.Direction.DESC) final Pageable page,
             final PagedResourcesAssembler<ContributionSearchResult> assembler
     ) {
         log.info("Called with id {}, field {}, status {}, fromDate {}, toDate {}, page {}",
@@ -111,7 +119,7 @@ public class MovieContributionRestController {
                 .linkTo(
                         ControllerLinkBuilder
                                 .methodOn(MovieContributionRestController.class)
-                                .getContributions(
+                                .findContributions(
                                         id,
                                         field,
                                         status,
@@ -122,7 +130,7 @@ public class MovieContributionRestController {
                                 )
                 ).withSelfRel();
 
-        return assembler.toResource(this.movieContributionSearchService.getContributions(
+        return assembler.toResource(this.movieContributionSearchService.findContributions(
                 id, field, status, fromDate, toDate, page
         ), this.contributionSearchResultResourceAssembler, self);
     }
@@ -133,7 +141,8 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     ContributionResource<OtherTitle> getOtherTitleContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -150,14 +159,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/othertitles", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createOtherTitleContribution(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionNew<OtherTitle> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -179,14 +190,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/othertitles/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/othertitles", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateOtherTitleContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionUpdate<OtherTitle> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -200,7 +213,7 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     ContributionResource<ReleaseDate> getReleaseDateContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The contribution ID", required = true) @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -217,14 +230,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/releasedates", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createReleaseDateContribution(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionNew<ReleaseDate> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -246,14 +261,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/releasedates/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/releasedates", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateReleaseDateContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionUpdate<ReleaseDate> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -267,7 +284,8 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     ContributionResource<Storyline> getStorylineContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -284,14 +302,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/storylines", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createStorylineContribution(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionNew<Storyline> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -313,14 +333,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/storylines/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/storylines", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateStorylineContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionUpdate<Storyline> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -334,7 +356,8 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     ContributionResource<BoxOffice> getBoxOfficeContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -351,14 +374,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/boxoffices", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createBoxOfficeContribution(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionNew<BoxOffice> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -380,14 +405,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/boxoffices/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/boxoffices", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateBoxOfficeContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionUpdate<BoxOffice> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -401,7 +428,8 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     ContributionResource<Site> getSiteContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -418,14 +446,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/sites", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createSiteContribution(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionNew<Site> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -447,14 +477,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/sites/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/sites", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateSiteContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionUpdate<Site> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -468,7 +500,8 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     ContributionResource<Country> getCountryContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -485,14 +518,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/countries", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createCountryContribution(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionNew<Country> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -514,14 +549,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/countries/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/countries", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateCountryContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionUpdate<Country> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -535,7 +572,8 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     ContributionResource<Language> getLanguageContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -552,14 +590,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/languages", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createLanguageContribution(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionNew<Language> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -581,14 +621,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/languages/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/languages", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateLanguageContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionUpdate<Language> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -602,7 +644,8 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     ContributionResource<Genre> getGenreContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -619,14 +662,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/genres", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createGenreContribution(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionNew<Genre> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -648,14 +693,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/genres/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/genres", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateGenreContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionUpdate<Genre> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -669,7 +716,8 @@ public class MovieContributionRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     ContributionResource<Review> getReviewContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
@@ -686,14 +734,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/reviews", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createReviewContribution(
-            @ApiParam(value = "The movie ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionNew<Review> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
@@ -715,14 +765,16 @@ public class MovieContributionRestController {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
-            @ApiResponse(code = 404, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/reviews/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/reviews", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void updateReviewContribution(
-            @ApiParam(value = "The contribution ID", required = true) @PathVariable final Long id,
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
             @RequestBody @Valid final ContributionUpdate<Review> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);

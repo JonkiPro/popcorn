@@ -1,8 +1,7 @@
 package com.core.jpa.entity.movie;
 
 import com.common.dto.movie.type.CountryType;
-import com.common.dto.movie.BoxOffice;
-import com.core.movie.MovieField;
+import com.common.dto.MovieField;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,6 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString(callSuper = true)
 @Entity
 @DiscriminatorValue(value = MovieField.Values.BOX_OFFICE)
 public class MovieBoxOfficeEntity extends MovieInfoEntity {
@@ -28,17 +28,4 @@ public class MovieBoxOfficeEntity extends MovieInfoEntity {
     @Column(name = "box_office_country")
     @Enumerated(EnumType.STRING)
     private CountryType country;
-
-
-    /**
-     * Get a DTO representing this box office.
-     *
-     * @return The read-only DTO.
-     */
-    public BoxOffice getDTO() {
-        return BoxOffice.builder()
-                .boxOffice(this.boxOffice)
-                .country(this.country)
-                .build();
-    }
 }

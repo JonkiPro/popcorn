@@ -3,8 +3,8 @@ package com.web.web.controller;
 import com.common.dto.error.ValidationErrorDTO;
 import com.common.dto.request.RegisterDTO;
 import com.common.exception.FormBadRequestException;
-import com.core.jpa.service.UserPersistenceService;
-import com.core.jpa.service.UserSearchService;
+import com.core.service.UserPersistenceService;
+import com.core.service.UserSearchService;
 import com.core.properties.BundleProperties;
 import com.web.web.recaptcha.ReCaptchaProperties;
 import com.web.web.recaptcha.ReCaptchaResponse;
@@ -60,7 +60,8 @@ public class RegisterRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> register(
-            @ApiParam(value = "Registration form", required = true) @RequestBody @Valid final RegisterDTO registerDTO,
+            @ApiParam(value = "Registration form", required = true)
+            @RequestBody @Valid final RegisterDTO registerDTO,
             final UriComponentsBuilder uriComponentsBuilder
     ) {
         log.info("Called with {}", registerDTO);
@@ -82,7 +83,8 @@ public class RegisterRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void confirmAccount(
-            @ApiParam(value = "Account activation token", required = true) @PathVariable final String token
+            @ApiParam(value = "Account activation token", required = true)
+            @PathVariable("token") final String token
     ) {
         log.info("Called with token {}", token);
 
@@ -99,10 +101,10 @@ public class RegisterRestController {
     private void validRegisterDTO(final RegisterDTO registerDTO) {
         final ValidationErrorDTO validationErrorDTO = new ValidationErrorDTO();
 
-        if(this.userSearchService.getUserExistsByUsername(registerDTO.getUsername())) {
+        if(this.userSearchService.existsUserByUsername(registerDTO.getUsername())) {
             validationErrorDTO.addFieldError("username", this.bundle.getString("validation.existsUsername"));
         }
-        if(this.userSearchService.getUserExistsByEmail(registerDTO.getEmail())) {
+        if(this.userSearchService.existsUserByEmail(registerDTO.getEmail())) {
             validationErrorDTO.addFieldError("email", this.bundle.getString("validation.existsEmail"));
         }
 

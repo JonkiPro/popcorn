@@ -1,8 +1,7 @@
 package com.core.jpa.entity.movie;
 
 import com.common.dto.movie.type.CountryType;
-import com.common.dto.movie.OtherTitle;
-import com.core.movie.MovieField;
+import com.common.dto.MovieField;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,6 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString(callSuper = true)
 @Entity
 @DiscriminatorValue(value = MovieField.Values.OTHER_TITLE)
 public class MovieOtherTitleEntity extends MovieInfoEntity {
@@ -28,17 +28,4 @@ public class MovieOtherTitleEntity extends MovieInfoEntity {
     @Column(name = "other_title_country")
     @Enumerated(EnumType.STRING)
     private CountryType country;
-
-
-    /**
-     * Get a DTO representing this rate.
-     *
-     * @return The read-only DTO.
-     */
-    public OtherTitle getDTO() {
-        return OtherTitle.builder()
-                .title(this.title)
-                .country(this.country)
-                .build();
-    }
 }

@@ -1,25 +1,50 @@
 package com.common.dto.search;
 
 import com.common.dto.movie.type.MovieType;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.NotNull;
 
 @Getter
-@Builder
+@EqualsAndHashCode(callSuper = true)
 @ApiModel(description = "This class represents the subset of data returned from a Movie when a search for Movies is conducted")
-public class MovieSearchResult {
+public class MovieSearchResult extends BaseSearchResult {
 
-    @ApiModelProperty(notes = "The movie ID", required = true)
-    private Long id;
+    private static final long serialVersionUID = 7523781849986382925L;
 
     @ApiModelProperty(notes = "The title of the movie", required = true)
-    private String title;
+    private final String title;
 
     @ApiModelProperty(notes = "The type of the movie", required = true)
-    private MovieType type;
+    private final MovieType type;
 
     @ApiModelProperty(notes = "Movie rating", required = true)
-    private Float rating;
+    private final Float rating;
+
+    /**
+     * Constructor.
+     *
+     * @param id The movie ID
+     * @param title The title of the movie
+     * @param type The type of the movie
+     * @param rating The movie rating
+     */
+    @JsonCreator
+    public MovieSearchResult(
+            @NotNull @JsonProperty("id") final Long id,
+            @NotBlank @JsonProperty("title") final String title,
+            @NotNull @JsonProperty("type") final MovieType type,
+            @NotNull @JsonProperty("rating") final Float rating
+    ) {
+        super(id.toString());
+        this.title = title;
+        this.type = type;
+        this.rating = rating;
+    }
 }

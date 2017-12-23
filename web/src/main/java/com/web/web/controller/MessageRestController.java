@@ -4,9 +4,9 @@ import com.common.dto.error.ValidationErrorDTO;
 import com.common.dto.request.SendMessageDTO;
 import com.common.exception.FormBadRequestException;
 import com.common.exception.ResourceForbiddenException;
-import com.core.jpa.service.MessagePersistenceService;
-import com.core.jpa.service.MessageSearchService;
-import com.core.jpa.service.UserSearchService;
+import com.core.service.MessagePersistenceService;
+import com.core.service.MessageSearchService;
+import com.core.service.UserSearchService;
 import com.core.properties.BundleProperties;
 import com.web.web.hateoas.assembler.MessageReceivedResourceAssembler;
 import com.web.web.hateoas.assembler.MessageSentResourceAssembler;
@@ -26,7 +26,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -82,7 +81,8 @@ public class MessageRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public
     ResponseEntity<Void> createMessage(
-            @ApiParam(value = "MessageEntity", required = true) @RequestBody @Valid final SendMessageDTO sendMessageDTO,
+            @ApiParam(value = "New message", required = true)
+            @RequestBody @Valid final SendMessageDTO sendMessageDTO,
             final UriComponentsBuilder uriComponentsBuilder
     ) {
         log.info("Called with {}", sendMessageDTO);
@@ -106,7 +106,8 @@ public class MessageRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     MessageSentResource getMessageSent(
-            @ApiParam(value = "The message ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The message ID", required = true)
+            @PathVariable("id") final String id
     ) {
         log.info("Called with id {}", id);
 
@@ -119,7 +120,8 @@ public class MessageRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     MessageReceivedResource getMessageReceived(
-            @ApiParam(value = "The message ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The message ID", required = true)
+            @PathVariable("id") final String id
     ) {
         log.info("Called with id {}", id);
 
@@ -132,7 +134,8 @@ public class MessageRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void deleteMessageSent(
-            @ApiParam(value = "The message ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The message ID", required = true)
+            @PathVariable("id") final String id
     ) {
         log.info("Called with id {}", id);
 
@@ -145,7 +148,8 @@ public class MessageRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
     void deleteMessageReceived(
-            @ApiParam(value = "The message ID", required = true) @PathVariable final Long id
+            @ApiParam(value = "The message ID", required = true)
+            @PathVariable("id") final String id
     ) {
         log.info("Called with id {}", id);
 
@@ -158,25 +162,15 @@ public class MessageRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     List<MessageSentResource> getMessagesSent(
-            @ApiParam(value = "Search for a phrase") @RequestParam(required = false) final String q
+            @ApiParam(value = "Search for a phrase")
+            @RequestParam(value = "q", required = false) final String q
     ) {
         log.info("Called with q {}", q);
 
-        return Optional.ofNullable(q)
-                .map(var ->
-                        this.messageSearchService
-                                .getMessagesSent(this.authorizationService.getUserId(), q)
-                                .stream()
-                                .map(this.messageSentResourceAssembler::toResource)
-                                .collect(Collectors.toList())
-                )
-                .orElseGet(() ->
-                        this.messageSearchService
-                                .getMessagesSent(this.authorizationService.getUserId())
-                                .stream()
-                                .map(this.messageSentResourceAssembler::toResource)
-                                .collect(Collectors.toList())
-                );
+        return this.messageSearchService.getMessagesSent(this.authorizationService.getUserId(), q)
+                .stream()
+                .map(this.messageSentResourceAssembler::toResource)
+                .collect(Collectors.toList());
     }
 
     @ApiOperation(value = "Get received messages")
@@ -185,25 +179,15 @@ public class MessageRestController {
     @ResponseStatus(HttpStatus.OK)
     public
     List<MessageReceivedResource> getMessagesReceived(
-            @ApiParam(value = "Search for a phrase") @RequestParam(required = false) final String q
+            @ApiParam(value = "Search for a phrase")
+            @RequestParam(value = "q", required = false) final String q
     ) {
         log.info("Called with q {}", q);
 
-        return Optional.ofNullable(q)
-                .map(var ->
-                        this.messageSearchService
-                                .getMessagesReceived(this.authorizationService.getUserId(), q)
-                                .stream()
-                                .map(this.messageReceivedResourceAssembler::toResource)
-                                .collect(Collectors.toList())
-                )
-                .orElseGet(() ->
-                        this.messageSearchService
-                                .getMessagesReceived(this.authorizationService.getUserId())
-                                .stream()
-                                .map(this.messageReceivedResourceAssembler::toResource)
-                                .collect(Collectors.toList())
-                );
+        return this.messageSearchService.getMessagesReceived(this.authorizationService.getUserId(), q)
+                .stream()
+                .map(this.messageReceivedResourceAssembler::toResource)
+                .collect(Collectors.toList());
     }
 
 
@@ -217,7 +201,7 @@ public class MessageRestController {
         if(username.equals(this.authorizationService.getUsername()))
             throw new ResourceForbiddenException("Forbidden command");
 
-        if(!this.userSearchService.getUserExistsByUsername(username)) {
+        if(!this.userSearchService.existsUserByUsername(username)) {
             final ValidationErrorDTO validationErrorDTO = new ValidationErrorDTO();
             validationErrorDTO.addFieldError("to", this.bundle.getString("validation.noExistsUsername"));
 

@@ -1,34 +1,81 @@
 package com.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Date;
 
 @Getter
-@Builder
+@JsonDeserialize(builder = MessageReceived.Builder.class)
 @ApiModel(description = "Message data received")
-public class MessageReceived {
+public class MessageReceived extends Message {
 
-    @ApiModelProperty(notes = "The message ID", required = true)
-    private Long id;
+    private static final long serialVersionUID = -4764452135987289104L;
 
     @ApiModelProperty(notes = "The sender's username", required = true)
-    private String sender;
+    private final String sender;
 
-    @ApiModelProperty(notes = "The message subject", required = true)
-    private String subject;
-
-    @ApiModelProperty(notes = "The message text", required = true)
-    private String text;
-
-    @ApiModelProperty(notes = "The message date of sent", required = true)
-    private Date date;
-
-    @JsonProperty("date_of_read")
     @ApiModelProperty(notes = "The message date of read")
-    private Date dateOfRead;
+    @JsonProperty("date_of_read")
+    private final Date dateOfRead;
+
+    /**
+     * Constructor only accessible via builder build() method.
+     *
+     * @param builder The builder to get data from
+     */
+    private MessageReceived(final Builder builder) {
+        super(builder);
+        this.sender = builder.bSender;
+        this.dateOfRead = builder.bDateOfRead;
+    }
+
+    /**
+     * A builder to create received messages.
+     */
+    public static class Builder extends Message.Builder<Builder> {
+
+        private final String bSender;
+        private final Date bDateOfRead;
+
+        /**
+         * Constructor which has required fields.
+         *
+         * @param subject The message subject
+         * @param text The message text
+         * @param date The message date of sent
+         * @param sender The sender's name
+         * @param dateOfRead The movie ID
+         */
+        @JsonCreator
+        public Builder(
+                @JsonProperty("subject")
+                final String subject,
+                @JsonProperty("text")
+                final String text,
+                @JsonProperty("date")
+                final Date date,
+                @JsonProperty("sender")
+                final String sender,
+                @JsonProperty("dateOfRead")
+                final Date dateOfRead
+        ) {
+            super(subject, text, date);
+            this.bSender = sender;
+            this.bDateOfRead = dateOfRead;
+        }
+
+        /**
+         * Build the received messages.
+         *
+         * @return Create the final read-only MessageReceived instance
+         */
+        public MessageReceived build() {
+            return new MessageReceived(this);
+        }
+    }
 }

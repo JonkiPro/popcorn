@@ -1,6 +1,6 @@
 package com.web.web.view;
 
-import com.core.jpa.service.MessageSearchService;
+import com.core.service.MessageSearchService;
 import com.web.web.security.service.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,16 +72,16 @@ public class MessageController {
      */
     @GetMapping(value = "/{id}")
     public ModelAndView showMessage(
-            @PathVariable final Long id,
+            @PathVariable final String id,
             final ModelMap modelMap
     ) {
-        final boolean messageReceivedExists = this.messageSearchService.getMessageReceivedExists(id, authorizationService.getUserId());
+        final boolean messageReceivedExists = this.messageSearchService.existsMessageReceived(id, authorizationService.getUserId());
         if(messageReceivedExists) {
             modelMap.addAttribute("messageId", id);
             return new ModelAndView("showReceivedMessage", modelMap);
         }
 
-        final boolean messageSentExists = this.messageSearchService.getMessageSentExists(id, authorizationService.getUserId());
+        final boolean messageSentExists = this.messageSearchService.existsMessageSent(id, authorizationService.getUserId());
         if(messageSentExists) {
             modelMap.addAttribute("messageId", id);
             return new ModelAndView("showSentMessage", modelMap);

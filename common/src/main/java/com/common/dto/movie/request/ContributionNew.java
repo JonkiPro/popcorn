@@ -22,7 +22,7 @@ public class ContributionNew<T extends MovieInfoDTO> {
     private Map<Long, T> elementsToUpdate;
 
     @ApiModelProperty(notes = "Element IDs to be deleted <The ID of the element to be deleted>")
-    private List<Long> idsToDelete;
+    private Set<Long> idsToDelete;
 
     @ApiModelProperty(notes = "Sources of information(elements)", required = true)
     @NotEmpty
@@ -37,6 +37,6 @@ public class ContributionNew<T extends MovieInfoDTO> {
     public ContributionNew() {
         this.elementsToAdd = new ArrayList<>();
         this.elementsToUpdate = new HashMap<>();
-        this.idsToDelete = new ArrayList<>();
+        this.idsToDelete = new HashSet<>();
     }
 }
