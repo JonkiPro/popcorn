@@ -106,6 +106,22 @@ public class MovieResourceAssembler implements ResourceAssembler<Movie, MovieRes
                 ControllerLinkBuilder.linkTo(
                         ControllerLinkBuilder
                                 .methodOn(MovieRestController.class)
+                                .getPhotos(id)
+                ).withRel("photos")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getPosters(id)
+                ).withRel("posters")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
                                 .getRatings(id)
                 ).withRel("ratings")
         );

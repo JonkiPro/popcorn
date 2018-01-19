@@ -4,6 +4,7 @@ import com.common.dto.Contribution;
 import com.common.dto.DataStatus;
 import com.common.dto.MovieField;
 import com.common.dto.movie.*;
+import com.common.dto.movie.response.ImageResponse;
 import com.common.dto.search.ContributionSearchResult;
 import com.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
@@ -138,6 +139,28 @@ public interface MovieContributionSearchService {
      * @throws ResourceNotFoundException if no contribution found
      */
     Contribution<Review> getReviewContribution(
+            @Min(1) final Long contributionId
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get a contribution of photos.
+     *
+     * @param contributionId The contribution ID
+     * @return The contribution of photos
+     * @throws ResourceNotFoundException if no contribution found
+     */
+    Contribution<ImageResponse> getPhotoContribution(
+            @Min(1) final Long contributionId
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get a contribution of posters.
+     *
+     * @param contributionId The contribution ID
+     * @return The contribution of posters
+     * @throws ResourceNotFoundException if no contribution found
+     */
+    Contribution<ImageResponse> getPosterContribution(
             @Min(1) final Long contributionId
     ) throws ResourceNotFoundException;
 }

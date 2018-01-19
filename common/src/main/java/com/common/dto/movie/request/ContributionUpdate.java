@@ -4,12 +4,14 @@ import com.common.dto.movie.MovieInfoDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import java.util.*;
 
 @Getter
+@Setter
 @ApiModel(description = "An object representing the contribution to be updated")
 public class ContributionUpdate<T extends MovieInfoDTO> {
 
@@ -43,5 +45,6 @@ public class ContributionUpdate<T extends MovieInfoDTO> {
         this.newElementsToAdd = new ArrayList<>();
         this.elementsToUpdate = new HashMap<>();
         this.idsToDelete = new HashSet<>();
+        this.sources = new HashSet<>();
     }
 }

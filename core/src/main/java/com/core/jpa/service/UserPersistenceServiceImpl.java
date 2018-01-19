@@ -1,24 +1,27 @@
 package com.core.jpa.service;
 
+import com.common.dto.StorageDirectory;
+import com.common.dto.StorageProvider;
 import com.common.dto.request.ChangeEmailDTO;
 import com.common.dto.request.ChangePasswordDTO;
 import com.common.dto.request.ForgotPasswordDTO;
 import com.common.dto.request.RegisterDTO;
-import com.common.exception.ResourceBadRequestException;
-import com.common.exception.ResourceConflictException;
-import com.common.exception.ResourceNotFoundException;
+import com.common.exception.*;
 import com.core.jpa.entity.UserEntity;
 import com.core.jpa.repository.UserRepository;
+import com.core.service.StorageService;
 import com.core.service.UserPersistenceService;
 import com.common.dto.SecurityRole;
 import com.common.dto.UserMoviePermission;
 import com.core.service.MailService;
 import com.core.utils.EncryptUtils;
+import com.core.utils.FileUtils;
 import com.core.utils.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +29,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.EnumSet;
 
 /**
@@ -38,6 +44,8 @@ import java.util.EnumSet;
                 ResourceBadRequestException.class,
                 ResourceNotFoundException.class,
                 ResourceConflictException.class,
+                ResourcePreconditionException.class,
+                ResourceServerException.class,
                 ConstraintViolationException.class
         }
 )
@@ -46,20 +54,24 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
 
     private final UserRepository userRepository;
     private final MailService mailService;
+    private final StorageService storageService;
 
     /**
      * Constructor.
      *
      * @param userRepository The user repository to use
      * @param mailService The mail service to use
+     * @param storageService The storage service to use
      */
     @Autowired
     public UserPersistenceServiceImpl(
             @NotNull final UserRepository userRepository,
-            @NotNull final MailService mailService
+            @NotNull final MailService mailService,
+            @Qualifier("googleStorageService") @NotNull final StorageService storageService
     ) {
         this.userRepository = userRepository;
         this.mailService = mailService;
+        this.storageService = storageService;
     }
 
     /**
@@ -168,6 +180,23 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
         }
 
         user.setPassword(EncryptUtils.encrypt(changePasswordDTO.getNewPassword()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateAvatar(
+            @NotBlank final String id,
+            @NotNull final File file
+    ) throws ResourceBadRequestException, ResourceNotFoundException, ResourcePreconditionException, ResourceServerException {
+        log.info("Called with id {}, file {}", id, file);
+        FileUtils.validImage(file);
+
+        final UserEntity user = this.findUser(id);
+
+        user.setAvatarId(this.storageService.save(file, StorageDirectory.AVATAR));
+        user.setAvatarProvider(StorageProvider.GOOGLE);
     }
 
     /**

@@ -9,6 +9,7 @@ import com.core.service.UserSearchService;
 import com.core.properties.BundleProperties;
 import com.core.utils.EncryptUtils;
 import com.web.web.security.service.AuthorizationService;
+import com.web.web.utils.MultipartFileUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,10 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.ResourceBundle;
 
 @RestController
@@ -59,7 +62,7 @@ public class SettingsRestController {
     @PutMapping(value = "/email", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
-    void changeEmail(
+    void updateEmail(
             @ApiParam(value = "Form of e-mail change", required = true)
             @RequestBody @Valid final ChangeEmailDTO changeEmailDTO
     ) {
@@ -78,7 +81,7 @@ public class SettingsRestController {
     @PutMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
-    void changePassword(
+    void updatePassword(
             @ApiParam(value = "Form of password change", required = true)
             @RequestBody @Valid final ChangePasswordDTO changePasswordDTO
     ) {
@@ -87,6 +90,24 @@ public class SettingsRestController {
         this.validChangePasswordDTO(changePasswordDTO);
 
         this.userPersistenceService.updatePassword(this.authorizationService.getUserId(), changePasswordDTO);
+    }
+
+    @ApiOperation(value = "It changes the user's avatar")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No user found"),
+            @ApiResponse(code = 412, message = "An I/O error occurs or incorrect content type"),
+            @ApiResponse(code = 500, message = "An error occurred with the server")
+    })
+    @PutMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public
+    void updateAvatar(
+            @ApiParam(value = "A new avatar for the user", required = true)
+            @RequestPart final MultipartFile avatar
+    ) {
+        log.info("Called with avatar {}", avatar);
+
+        this.userPersistenceService.updateAvatar(this.authorizationService.getUserId(), MultipartFileUtils.convert(avatar));
     }
 
     @ApiOperation(value = "Activates e-mail change with token")

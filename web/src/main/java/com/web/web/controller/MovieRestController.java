@@ -1,6 +1,7 @@
 package com.web.web.controller;
 
 import com.common.dto.movie.*;
+import com.common.dto.movie.response.ImageResponse;
 import com.common.dto.movie.type.CountryType;
 import com.common.dto.movie.type.GenreType;
 import com.common.dto.movie.type.LanguageType;
@@ -312,6 +313,34 @@ public class MovieRestController {
         log.info("Called with id {}", id);
 
         return this.movieSearchService.getReviews(id);
+    }
+
+    @ApiOperation(value = "Get movie photos")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
+    @GetMapping(value = "/{id}/photos")
+    @ResponseStatus(HttpStatus.OK)
+    public
+    Set<ImageResponse> getPhotos(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        return this.movieSearchService.getPhotos(id);
+    }
+
+    @ApiOperation(value = "Get movie posters")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
+    @GetMapping(value = "/{id}/posters")
+    @ResponseStatus(HttpStatus.OK)
+    public
+    Set<ImageResponse> getPosters(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        return this.movieSearchService.getPosters(id);
     }
 
     @ApiOperation(value = "Rate the movie")

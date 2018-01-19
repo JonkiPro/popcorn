@@ -79,6 +79,18 @@ public enum MovieField {
         public Set<UserMoviePermission> getNecessaryPermissions() {
             return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.LANGUAGE);
         }
+    },
+    PHOTO(Values.PHOTO) {
+        @Override
+        public Set<UserMoviePermission> getNecessaryPermissions() {
+            return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.PHOTO);
+        }
+    },
+    POSTER(Values.POSTER) {
+        @Override
+        public Set<UserMoviePermission> getNecessaryPermissions() {
+            return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.POSTER);
+        }
     };
 
     /**
@@ -111,6 +123,8 @@ public enum MovieField {
         public static final String COUNTRY = "COUNTRY";
         public static final String GENRE = "GENRE";
         public static final String LANGUAGE = "LANGUAGE";
+        public static final String PHOTO = "PHOTO";
+        public static final String POSTER = "POSTER";
     }
 
     /**

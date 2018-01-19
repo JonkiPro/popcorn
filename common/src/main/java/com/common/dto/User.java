@@ -12,13 +12,16 @@ import lombok.Getter;
 @ApiModel(description = "User data")
 public class User extends BaseDTO {
 
-    private static final long serialVersionUID = 7459910144895421315L;
+    private static final long serialVersionUID = -4279148919241460704L;
 
     @ApiModelProperty(notes = "The user's name", required = true)
     private final String username;
 
     @ApiModelProperty(notes = "The user's e-mail", required = true)
     private final String email;
+
+    @ApiModelProperty(notes = "The user's avatar")
+    private final String avatarSrc;
 
     @ApiModelProperty(notes = "The number of friends", required = true)
     private final Integer numberOfFriends;
@@ -32,6 +35,7 @@ public class User extends BaseDTO {
         super(builder);
         this.username = builder.bUsername;
         this.email = builder.bEmail;
+        this.avatarSrc = builder.bAvatarSrc;
         this.numberOfFriends = builder.bNumberOfFriends;
     }
 
@@ -42,6 +46,7 @@ public class User extends BaseDTO {
 
         private final String bUsername;
         private final String bEmail;
+        private String bAvatarSrc;
         private final Integer bNumberOfFriends;
 
         /**
@@ -63,6 +68,16 @@ public class User extends BaseDTO {
             this.bUsername = username;
             this.bEmail = email;
             this.bNumberOfFriends = numberOfFriends;
+        }
+        /**
+         * Set the user's avatar.
+         *
+         * @param avatarSrc Address (URL) of avatar
+         * @return The builder
+         */
+        public Builder withAvatarSrc(final String avatarSrc) {
+            this.bAvatarSrc = avatarSrc;
+            return this;
         }
 
         /**

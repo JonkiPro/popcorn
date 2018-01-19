@@ -149,7 +149,7 @@ public class ContributionEntity implements Serializable {
      * @return The user's comment
      */
     public Optional<String> getUserComment() {
-        return Optional.ofNullable(userComment);
+        return Optional.ofNullable(this.userComment);
     }
 
     /**
@@ -158,7 +158,7 @@ public class ContributionEntity implements Serializable {
      * @return The verification date
      */
     public Optional<Date> getVerificationDate() {
-        return Optional.ofNullable(verificationDate);
+        return Optional.ofNullable(this.verificationDate);
     }
 
     /**
@@ -167,7 +167,7 @@ public class ContributionEntity implements Serializable {
      * @return The verification user
      */
     public Optional<UserEntity> getVerificationUser() {
-        return Optional.ofNullable(verificationUser);
+        return Optional.ofNullable(this.verificationUser);
     }
 
     /**
@@ -176,6 +176,6 @@ public class ContributionEntity implements Serializable {
      * @return The verification comment
      */
     public Optional<String> getVerificationComment() {
-        return Optional.ofNullable(verificationComment);
+        return Optional.ofNullable(this.verificationComment);
     }
 }

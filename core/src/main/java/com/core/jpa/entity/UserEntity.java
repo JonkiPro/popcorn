@@ -1,6 +1,7 @@
 package com.core.jpa.entity;
 
 import com.common.dto.SecurityRole;
+import com.common.dto.StorageProvider;
 import com.common.exception.ResourceConflictException;
 import com.common.exception.ResourceNotFoundException;
 import com.core.jpa.entity.movie.MovieRateEntity;
@@ -14,6 +15,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -26,7 +28,7 @@ import java.util.Set;
 @Table(name = "users")
 public class UserEntity extends BaseEntity {
 
-    private static final long serialVersionUID = -1588795025690250131L;
+    private static final long serialVersionUID = -7304519269103967289L;
 
     @Basic(optional = false)
     @Column(name = "username", length = 36, unique = true, nullable = false)
@@ -51,6 +53,15 @@ public class UserEntity extends BaseEntity {
     @Basic
     @Column(name = "new_email")
     private String newEmail;
+
+    @Basic
+    @Column(name = "avatar_id_in_cloud")
+    private String avatarId;
+
+    @Basic
+    @Column(name = "avatar_provider")
+    @Enumerated(EnumType.STRING)
+    private StorageProvider avatarProvider;
 
     @Basic(optional = false)
     @Column(name = "enabled", nullable = false)
@@ -136,6 +147,15 @@ public class UserEntity extends BaseEntity {
      */
     public UserEntity() {
         super();
+    }
+
+    /**
+     * Get the user's avatar ID.
+     *
+     * @return The user's avatar ID
+     */
+    public Optional<String> getAvatarId() {
+        return Optional.ofNullable(this.avatarId);
     }
 
     /**

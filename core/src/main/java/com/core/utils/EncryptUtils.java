@@ -5,7 +5,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 /**
  * Class for encryption.
  */
-public class EncryptUtils {
+public final class EncryptUtils {
 
     /**
      * Encryption strength.

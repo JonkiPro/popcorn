@@ -3,9 +3,9 @@ package com.web.web.controller;
 import com.common.dto.Contribution;
 import com.common.dto.movie.*;
 import com.common.dto.movie.request.*;
+import com.common.dto.movie.response.ImageResponse;
 import com.common.dto.search.ContributionSearchResult;
-import com.core.service.MovieContributionPersistenceService;
-import com.core.service.MovieContributionSearchService;
+import com.core.service.*;
 import com.common.dto.DataStatus;
 import com.common.dto.MovieField;
 import com.common.dto.VerificationStatus;
@@ -13,6 +13,8 @@ import com.web.web.hateoas.assembler.ContributionSearchResultResourceAssembler;
 import com.web.web.hateoas.resource.ContributionResource;
 import com.web.web.hateoas.resource.ContributionSearchResultResource;
 import com.web.web.security.service.AuthorizationService;
+import com.web.web.utils.MultipartFileUtils;
+import com.web.web.utils.MapUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +33,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.util.Date;
+import java.util.*;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
@@ -780,5 +783,279 @@ public class MovieContributionRestController {
         log.info("Called with id {}, contribution {}", id, contribution);
 
         this.movieContributionPersistenceService.updateReviewContribution(contribution, id, this.authorizationService.getUserId());
+    }
+
+    @ApiOperation(value = "Get the contribution of photos")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No contribution found") })
+    @GetMapping(value = "/contributions/{id}/photos", produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public
+    ContributionResource<ImageResponse> getPhotoContribution(
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        final Contribution<ImageResponse> photoContribution = this.movieContributionSearchService.getPhotoContribution(id);
+
+        final Link self = linkTo(
+                methodOn(MovieContributionRestController.class).getPhotoContribution(id)
+        ).withSelfRel();
+
+        return new ContributionResource<>(photoContribution, self);
+    }
+
+    @ApiOperation(value = "Create the contribution of photos")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Incorrect data"),
+            @ApiResponse(code = 404, message = "No movie found or no user found"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 412, message = "An I/O error occurs or incorrect content type"),
+            @ApiResponse(code = 500, message = "An error occurred with the server")
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/{id}/contributions/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public
+    ResponseEntity<Void> createPhotoContribution(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "Elements to be added")
+            @RequestPart(required = false) List<MultipartFile> elementsToAdd,
+            @ApiParam(value = "Element IDs to be updated")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToUpdate,
+            @ApiParam(value = "Element to be updated")
+            @RequestPart(required = false) List<MultipartFile> elementsToUpdate,
+            @ApiParam(value = "Element IDs to be deleted")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToDelete,
+            @ApiParam(value = "Sources of information(elements)", required = true)
+            @RequestParam final Set<String> sources,
+            @ApiParam(value = "Comment from the user")
+            @RequestParam(required = false) final String comment
+    ) {
+        log.info("Called with id {}, elementsToAdd {}, idsToUpdate {}, elementsToUpdate{}, idsToDelete {}," +
+                        " sources {}, comment {}",
+                id, elementsToAdd, idsToUpdate, elementsToUpdate, idsToDelete, sources, comment);
+
+        final ContributionNew<ImageRequest> contribution = new ContributionNew<>();
+
+        final List<ImageRequest> listPhotosToAdd = new ArrayList<>();
+        for(final MultipartFile multipartFile : elementsToAdd) {
+            final ImageRequest.Builder builder = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
+            listPhotosToAdd.add(builder.build());
+        }
+        contribution.setElementsToAdd(listPhotosToAdd);
+
+        final HashMap<Long, ImageRequest> mapPhotosToUpdate = MapUtils.merge(idsToUpdate, elementsToUpdate);
+        contribution.setElementsToUpdate(mapPhotosToUpdate);
+
+        contribution.setIdsToDelete(idsToDelete);
+        contribution.setSources(sources);
+
+        final Long cId = this.movieContributionPersistenceService.createPhotoContribution(contribution, id, this.authorizationService.getUserId());
+
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(
+                MvcUriComponentsBuilder
+                        .fromMethodName(MovieContributionRestController.class, "getPhotoContribution", cId)
+                        .buildAndExpand(cId)
+                        .toUri()
+        );
+
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Update the contribution of photos")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Incorrect data"),
+            @ApiResponse(code = 404, message = "No movie found or no user found"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 412, message = "An I/O error occurs or incorrect content type"),
+            @ApiResponse(code = 500, message = "An error occurred with the server")
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PutMapping(value = "/contributions/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public
+    void updatePhotoContribution(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "New elements to be added")
+            @RequestPart(required = false) List<MultipartFile> newElementsToAdd,
+            @ApiParam(value = "Element IDs to be added")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToAdd,
+            @ApiParam(value = "Element to be updated")
+            @RequestPart(required = false) List<MultipartFile> elementsToAdd,
+            @ApiParam(value = "Element IDs to be updated")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToUpdate,
+            @ApiParam(value = "Element to be updated")
+            @RequestPart(required = false) List<MultipartFile> elementsToUpdate,
+            @ApiParam(value = "Element IDs to be deleted")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToDelete,
+            @ApiParam(value = "Sources of information(elements)", required = true)
+            @RequestParam final Set<String> sources,
+            @ApiParam(value = "Comment from the user")
+            @RequestParam(required = false) final String comment
+    ) {
+        log.info("Called with id {}, idsToAdd {}, elementsToAdd{}, newElementsToAdd {}, idsToUpdate {}," +
+                "elementsToUpdate {}, idsToDelete {}, sources {}, comment {}", id, idsToAdd,
+                elementsToAdd, newElementsToAdd, idsToUpdate, elementsToUpdate, idsToDelete, sources, comment);
+
+        final ContributionUpdate<ImageRequest> contribution = new ContributionUpdate<>();
+
+        final HashMap<Long, ImageRequest> mapPhotosToAdd = MapUtils.merge(idsToAdd, elementsToAdd);
+        contribution.setElementsToAdd(mapPhotosToAdd);
+
+        final List<ImageRequest> listNewPhotosToAdd = new ArrayList<>();
+        for(final MultipartFile multipartFile : newElementsToAdd) {
+            final ImageRequest.Builder builder = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
+            listNewPhotosToAdd.add(builder.build());
+        }
+        contribution.setNewElementsToAdd(listNewPhotosToAdd);
+
+        final HashMap<Long, ImageRequest> mapPhotosToUpdate = MapUtils.merge(idsToUpdate, elementsToUpdate);
+        contribution.setElementsToUpdate(mapPhotosToUpdate);
+
+        contribution.setIdsToDelete(idsToDelete);
+        contribution.setSources(sources);
+
+        this.movieContributionPersistenceService.updatePhotoContribution(contribution, id, this.authorizationService.getUserId());
+    }
+
+    @ApiOperation(value = "Get the contribution of posters")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No contribution found") })
+    @GetMapping(value = "/contributions/{id}/posters", produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public
+    ContributionResource<ImageResponse> getPosterContribution(
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        final Contribution<ImageResponse> posterContribution = this.movieContributionSearchService.getPosterContribution(id);
+
+        final Link self = linkTo(
+                methodOn(MovieContributionRestController.class).getPosterContribution(id)
+        ).withSelfRel();
+
+        return new ContributionResource<>(posterContribution, self);
+    }
+
+    @ApiOperation(value = "Create the contribution of posters")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Incorrect data"),
+            @ApiResponse(code = 404, message = "No movie found or no user found"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 412, message = "An I/O error occurs or incorrect content type"),
+            @ApiResponse(code = 500, message = "An error occurred with the server")
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/{id}/contributions/posters", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public
+    ResponseEntity<Void> createPosterContribution(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "Elements to be added")
+            @RequestPart(required = false) List<MultipartFile> elementsToAdd,
+            @ApiParam(value = "Element IDs to be updated")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToUpdate,
+            @ApiParam(value = "Element to be updated")
+            @RequestPart(required = false) List<MultipartFile> elementsToUpdate,
+            @ApiParam(value = "Element IDs to be deleted")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToDelete,
+            @ApiParam(value = "Sources of information(elements)", required = true)
+            @RequestParam final Set<String> sources,
+            @ApiParam(value = "Comment from the user")
+            @RequestParam(required = false) final String comment
+    ) {
+        log.info("Called with id {}, elementsToAdd {}, idsToUpdate {}, elementsToUpdate{}, idsToDelete {}," +
+                        " sources {}, comment {}",
+                id, elementsToAdd, idsToUpdate, elementsToUpdate, idsToDelete, sources, comment);
+
+        final ContributionNew<ImageRequest> contribution = new ContributionNew<>();
+
+        final List<ImageRequest> listPhotosToAdd = new ArrayList<>();
+        for(final MultipartFile multipartFile : elementsToAdd) {
+            final ImageRequest.Builder builder = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
+            listPhotosToAdd.add(builder.build());
+        }
+        contribution.setElementsToAdd(listPhotosToAdd);
+
+        final HashMap<Long, ImageRequest> mapPhotosToUpdate = MapUtils.merge(idsToUpdate, elementsToUpdate);
+        contribution.setElementsToUpdate(mapPhotosToUpdate);
+
+        contribution.setIdsToDelete(idsToDelete);
+        contribution.setSources(sources);
+
+        final Long cId = this.movieContributionPersistenceService.createPosterContribution(contribution, id, this.authorizationService.getUserId());
+
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(
+                MvcUriComponentsBuilder
+                        .fromMethodName(MovieContributionRestController.class, "getPosterContribution", cId)
+                        .buildAndExpand(cId)
+                        .toUri()
+        );
+
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Update the contribution of posters")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Incorrect data"),
+            @ApiResponse(code = 404, message = "No movie found or no user found"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
+            @ApiResponse(code = 412, message = "An I/O error occurs or incorrect content type"),
+            @ApiResponse(code = 500, message = "An error occurred with the server")
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PutMapping(value = "/contributions/{id}/posters", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public
+    void updatePosterContribution(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "New elements to be added")
+            @RequestPart(required = false) List<MultipartFile> newElementsToAdd,
+            @ApiParam(value = "Element IDs to be added")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToAdd,
+            @ApiParam(value = "Element to be updated")
+            @RequestPart(required = false) List<MultipartFile> elementsToAdd,
+            @ApiParam(value = "Element IDs to be updated")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToUpdate,
+            @ApiParam(value = "Element to be updated")
+            @RequestPart(required = false) List<MultipartFile> elementsToUpdate,
+            @ApiParam(value = "Element IDs to be deleted")
+            @RequestParam(defaultValue = "", required = false) Set<Long> idsToDelete,
+            @ApiParam(value = "Sources of information(elements)", required = true)
+            @RequestParam final Set<String> sources,
+            @ApiParam(value = "Comment from the user")
+            @RequestParam(required = false) final String comment
+    ) {
+        log.info("Called with id {}, idsToAdd {}, elementsToAdd{}, newElementsToAdd {}, idsToUpdate {}," +
+                        "elementsToUpdate {}, idsToDelete {}, sources {}, comment {}", id, idsToAdd,
+                elementsToAdd, newElementsToAdd, idsToUpdate, elementsToUpdate, idsToDelete, sources, comment);
+
+        final ContributionUpdate<ImageRequest> contribution = new ContributionUpdate<>();
+
+        final HashMap<Long, ImageRequest> mapPhotosToAdd = MapUtils.merge(idsToAdd, elementsToAdd);
+        contribution.setElementsToAdd(mapPhotosToAdd);
+
+        final List<ImageRequest> listNewPhotosToAdd = new ArrayList<>();
+        for(final MultipartFile multipartFile : newElementsToAdd) {
+            final ImageRequest.Builder builder = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
+            listNewPhotosToAdd.add(builder.build());
+        }
+        contribution.setNewElementsToAdd(listNewPhotosToAdd);
+
+        final HashMap<Long, ImageRequest> mapPhotosToUpdate = MapUtils.merge(idsToUpdate, elementsToUpdate);
+        contribution.setElementsToUpdate(mapPhotosToUpdate);
+
+        contribution.setIdsToDelete(idsToDelete);
+        contribution.setSources(sources);
+
+        this.movieContributionPersistenceService.updatePosterContribution(contribution, id, this.authorizationService.getUserId());
     }
 }

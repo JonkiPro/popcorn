@@ -2,6 +2,7 @@ package com.core.jpa.service;
 
 import com.common.dto.Movie;
 import com.common.dto.movie.*;
+import com.common.dto.movie.response.ImageResponse;
 import com.common.dto.movie.response.RateResponse;
 import com.common.dto.movie.type.CountryType;
 import com.common.dto.movie.type.GenreType;
@@ -314,6 +315,38 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(review -> review.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toReviewDto)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<ImageResponse> getPhotos(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException {
+        log.info("Called with id {}", id);
+
+        return this.findMovie(id).getPhotos()
+                .stream()
+                .filter(photo -> photo.getStatus() == DataStatus.ACCEPTED)
+                .map(ServiceUtils::toImageResponseDto)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<ImageResponse> getPosters(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException {
+        log.info("Called with id {}", id);
+
+        return this.findMovie(id).getPosters()
+                .stream()
+                .filter(poster -> poster.getStatus() == DataStatus.ACCEPTED)
+                .map(ServiceUtils::toImageResponseDto)
                 .collect(Collectors.toSet());
     }
 

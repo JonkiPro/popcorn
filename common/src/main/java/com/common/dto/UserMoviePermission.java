@@ -28,4 +28,6 @@ public enum UserMoviePermission {
     COUNTRY,
     GENRE,
     LANGUAGE,
+    PHOTO,
+    POSTER
 }

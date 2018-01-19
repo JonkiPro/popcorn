@@ -1,10 +1,9 @@
 package com.core.jpa.service;
 
+import com.common.dto.StorageDirectory;
 import com.common.dto.movie.*;
 import com.common.dto.movie.request.*;
-import com.common.exception.ResourceConflictException;
-import com.common.exception.ResourceForbiddenException;
-import com.common.exception.ResourceNotFoundException;
+import com.common.exception.*;
 import com.core.jpa.entity.ContributionEntity;
 import com.core.jpa.entity.MovieEntity;
 import com.core.jpa.entity.UserEntity;
@@ -19,11 +18,13 @@ import com.core.service.MoviePersistenceService;
 import com.common.dto.DataStatus;
 import com.common.dto.MovieField;
 import com.common.dto.VerificationStatus;
+import com.core.service.StorageService;
 import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +35,9 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +51,8 @@ import java.util.stream.Collectors;
                 ResourceForbiddenException.class,
                 ResourceNotFoundException.class,
                 ResourceConflictException.class,
+                ResourcePreconditionException.class,
+                ResourceServerException.class,
                 ConstraintViolationException.class
         }
 )
@@ -58,6 +64,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
     private final ContributionRepository contributionRepository;
     private final UserRepository userRepository;
     private final MoviePersistenceService moviePersistenceService;
+    private final StorageService storageService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -70,6 +77,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      * @param contributionRepository The contribution repository to use
      * @param userRepository The user repository to use
      * @param moviePersistenceService The movie persistence service to use
+     * @param storageService The storage service to use
      */
     @Autowired
     public MovieContributionPersistenceServiceImpl(
@@ -77,13 +85,15 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
             @NotNull final MovieInfoRepository movieInfoRepository,
             @NotNull final ContributionRepository contributionRepository,
             @NotNull final UserRepository userRepository,
-            @NotNull final MoviePersistenceService moviePersistenceService
+            @NotNull final MoviePersistenceService moviePersistenceService,
+            @Qualifier("googleStorageService") @NotNull final StorageService storageService
     ) {
         this.movieRepository = movieRepository;
         this.movieInfoRepository = movieInfoRepository;
         this.contributionRepository = contributionRepository;
         this.userRepository = userRepository;
         this.moviePersistenceService = moviePersistenceService;
+        this.storageService = storageService;
     }
 
     /**
@@ -847,6 +857,210 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createPhotoContribution(
+            @NotNull @Valid final ContributionNew<ImageRequest> contribution,
+            @Min(1) final Long movieId,
+            @NotBlank final String userId
+    ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException {
+        log.info("Called with contribution {}, movieId {}, userId {}",
+                contribution, movieId, userId);
+
+        final UserEntity user = this.findUser(userId);
+        final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
+        final List<MoviePhotoEntity> photosEntities = movie.getPhotos().stream()
+                .filter(photo -> photo.getStatus() == DataStatus.ACCEPTED
+                        && !photo.isReportedForUpdate() && !photo.isReportedForDelete()
+                ).collect(Collectors.toList());
+        final Set<Long> idsToAdd = new HashSet<>();
+        final Map<Long, Long> idsToUpdate = new HashMap<>();
+
+        this.validIds(photosEntities, contribution);
+
+        if (CollectionUtils.containsAny(contribution.getElementsToUpdate().keySet(), contribution.getIdsToDelete())) {
+            throw new ResourceConflictException("Conflict of operation on the same element");
+        }
+
+        contribution.getElementsToAdd()
+                .forEach(photo -> {
+                    final String idInCloud = this.storageService.save(photo.getFile(), StorageDirectory.IMAGE);
+                    final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+                    final Long id = this.moviePersistenceService.createPhoto(builder.build(), movie);
+                    idsToAdd.add(id);
+                });
+        contribution.getElementsToUpdate()
+                .forEach((key, value) -> {
+                    final String idInCloud = this.storageService.save(value.getFile(), StorageDirectory.IMAGE);
+                    final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+                    final Long id = this.moviePersistenceService.createPhoto(builder.build(), movie);
+                    this.setReportedForUpdate(photosEntities, key);
+                    idsToUpdate.put(id, key);
+                });
+        contribution.getIdsToDelete()
+                .forEach(id ->
+                        this.setReportedForDelete(photosEntities, id)
+                );
+
+        return this.createContributions(idsToAdd, contribution.getIdsToDelete(), idsToUpdate, movie, user,
+                MovieField.PHOTO, contribution.getSources(), contribution.getComment());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updatePhotoContribution(
+            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution,
+            @Min(1) final Long contributionId,
+            @NotBlank final String userId
+    ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException {
+        log.info("Called with contribution {}, contributionId {}, userId {}",
+                contribution, contributionId, userId);
+
+        final UserEntity user = this.findUser(userId);
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.PHOTO);
+
+        final Set<Long> idsToAddBeforeCleanUp = new HashSet<>(contributionEntity.getIdsToAdd());
+        final Set<Long> idsToUpdateBeforeCleanUp = new HashSet<>(contributionEntity.getIdsToUpdate().keySet());
+
+        this.validIds(contributionEntity, contribution);
+        this.cleanUp(contributionEntity, contribution, contributionEntity.getMovie().getPhotos());
+
+        for(final Long id : idsToAddBeforeCleanUp) {
+            if(!contributionEntity.getIdsToAdd().contains(id)) {
+                this.storageService.delete(this.entityManager.find(MoviePhotoEntity.class, id).getIdInCloud());
+            }
+        }
+        for(final Long id : idsToUpdateBeforeCleanUp) {
+            if(!contributionEntity.getIdsToUpdate().keySet().contains(id)) {
+                this.storageService.delete(this.entityManager.find(MoviePhotoEntity.class, id).getIdInCloud());
+            }
+        }
+
+        contribution.getElementsToAdd().forEach((key, value) -> {
+            final String idInCloud = this.swap(key, value.getFile(), StorageDirectory.IMAGE, MoviePhotoEntity.class);
+            final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+            this.moviePersistenceService.updatePhoto(builder.build(), key, contributionEntity.getMovie());
+        });
+        contribution.getElementsToUpdate().forEach((key, value) -> {
+            final String idInCloud = this.swap(key, value.getFile(), StorageDirectory.IMAGE, MoviePhotoEntity.class);
+            final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+            this.moviePersistenceService.updatePhoto(builder.build(), key, contributionEntity.getMovie());
+        });
+        contribution.getNewElementsToAdd()
+                .forEach(photo -> {
+                    final String idInCloud = this.storageService.save(photo.getFile(), StorageDirectory.IMAGE);
+                    final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+                    final Long id = this.moviePersistenceService.createPhoto(builder.build(), contributionEntity.getMovie());
+                    contributionEntity.getIdsToAdd().add(id);
+                });
+
+        contributionEntity.setSources(contribution.getSources());
+        Optional.ofNullable(contribution.getComment()).ifPresent(contributionEntity::setUserComment);
+    }
+
+    @Override
+    public Long createPosterContribution(
+            @NotNull @Valid final ContributionNew<ImageRequest> contribution,
+            @Min(1) final Long movieId,
+            @NotBlank final String userId
+    ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException {
+        log.info("Called with contribution {}, movieId {}, userId {}",
+                contribution, movieId, userId);
+
+        final UserEntity user = this.findUser(userId);
+        final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
+        final List<MoviePosterEntity> postersEntities = movie.getPosters().stream()
+                .filter(poster -> poster.getStatus() == DataStatus.ACCEPTED
+                        && !poster.isReportedForUpdate() && !poster.isReportedForDelete()
+                ).collect(Collectors.toList());
+        final Set<Long> idsToAdd = new HashSet<>();
+        final Map<Long, Long> idsToUpdate = new HashMap<>();
+
+        this.validIds(postersEntities, contribution);
+
+        if (CollectionUtils.containsAny(contribution.getElementsToUpdate().keySet(), contribution.getIdsToDelete())) {
+            throw new ResourceConflictException("Conflict of operation on the same element");
+        }
+
+        contribution.getElementsToAdd()
+                .forEach(poster -> {
+                    final String idInCloud = this.storageService.save(poster.getFile(), StorageDirectory.IMAGE);
+                    final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+                    final Long id = this.moviePersistenceService.createPoster(builder.build(), movie);
+                    idsToAdd.add(id);
+                });
+        contribution.getElementsToUpdate()
+                .forEach((key, value) -> {
+                    final String idInCloud = this.storageService.save(value.getFile(), StorageDirectory.IMAGE);
+                    final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+                    final Long id = this.moviePersistenceService.createPoster(builder.build(), movie);
+                    this.setReportedForUpdate(postersEntities, key);
+                    idsToUpdate.put(id, key);
+                });
+        contribution.getIdsToDelete()
+                .forEach(id ->
+                        this.setReportedForDelete(postersEntities, id)
+                );
+
+        return this.createContributions(idsToAdd, contribution.getIdsToDelete(), idsToUpdate, movie, user,
+                MovieField.POSTER, contribution.getSources(), contribution.getComment());
+    }
+
+    @Override
+    public void updatePosterContribution(
+            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution,
+            @Min(1) final Long contributionId,
+            @NotBlank final String userId
+    ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException {
+        log.info("Called with contribution {}, contributionId {}, userId {}",
+                contribution, contributionId, userId);
+
+        final UserEntity user = this.findUser(userId);
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.POSTER);
+
+        final Set<Long> idsToAddBeforeCleanUp = new HashSet<>(contributionEntity.getIdsToAdd());
+        final Set<Long> idsToUpdateBeforeCleanUp = new HashSet<>(contributionEntity.getIdsToUpdate().keySet());
+
+        this.validIds(contributionEntity, contribution);
+        this.cleanUp(contributionEntity, contribution, contributionEntity.getMovie().getPosters());
+
+        for(final Long id : idsToAddBeforeCleanUp) {
+            if(!contributionEntity.getIdsToAdd().contains(id)) {
+                this.storageService.delete(this.entityManager.find(MoviePosterEntity.class, id).getIdInCloud());
+            }
+        }
+        for(final Long id : idsToUpdateBeforeCleanUp) {
+            if(!contributionEntity.getIdsToUpdate().keySet().contains(id)) {
+                this.storageService.delete(this.entityManager.find(MoviePosterEntity.class, id).getIdInCloud());
+            }
+        }
+
+        contribution.getElementsToAdd().forEach((key, value) -> {
+            final String idInCloud = this.swap(key, value.getFile(), StorageDirectory.IMAGE, MoviePhotoEntity.class);
+            final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+            this.moviePersistenceService.updatePoster(builder.build(), key, contributionEntity.getMovie());
+        });
+        contribution.getElementsToUpdate().forEach((key, value) -> {
+            final String idInCloud = this.swap(key, value.getFile(), StorageDirectory.IMAGE, MoviePhotoEntity.class);
+            final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+            this.moviePersistenceService.updatePoster(builder.build(), key, contributionEntity.getMovie());
+        });
+        contribution.getNewElementsToAdd()
+                .forEach(poster -> {
+                    final String idInCloud = this.storageService.save(poster.getFile(), StorageDirectory.IMAGE);
+                    final ImageRequest.Builder builder = new ImageRequest.Builder().withIdInCloud(idInCloud);
+                    final Long id = this.moviePersistenceService.createPoster(builder.build(), contributionEntity.getMovie());
+                    contributionEntity.getIdsToAdd().add(id);
+                });
+
+        contributionEntity.setSources(contribution.getSources());
+        Optional.ofNullable(contribution.getComment()).ifPresent(contributionEntity::setUserComment);
+    }
+
+    /**
      * Save the contribution.
      *
      * @param idsToAdd Set of IDs to add
@@ -1196,5 +1410,22 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
                 newReview.setStatus(DataStatus.AMENDMENT_ACCEPTED);
             });
         }
+    }
+
+    /**
+     * Helper method for replacing a file in the cloud.
+     *
+     * @param id Identity of the entity
+     * @param file File to save
+     * @param storageDirectory The directory to which the file should be saved
+     * @param clazz Type of entity class representing the file
+     * @return File ID in the cloud
+     * @throws ResourcePreconditionException if an I/O error occurs or incorrect content type
+     * @throws ResourceServerException if an error occurred with the server
+     */
+    private String swap(final Long id, final File file, final StorageDirectory storageDirectory, final Class<? extends MovieFileEntity> clazz)
+            throws ResourcePreconditionException, ResourceServerException {
+        this.storageService.delete(this.entityManager.find(clazz, id).getIdInCloud());
+        return this.storageService.save(file, storageDirectory);
     }
 }

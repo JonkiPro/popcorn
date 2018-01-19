@@ -1,4 +1,5 @@
 # REST-Web-Services
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ## Preconditions
 *  Java 8
 *  IntelliJ IDEA
@@ -34,6 +35,7 @@
 *  JUnit
 *  Mockito
 *  Swagger
+*  Google Drive API
 *  WebJars
 *  Thymeleaf
 *  HTML

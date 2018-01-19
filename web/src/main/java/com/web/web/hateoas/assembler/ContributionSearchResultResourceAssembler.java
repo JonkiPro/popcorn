@@ -88,6 +88,20 @@ public class ContributionSearchResultResourceAssembler implements ResourceAssemb
                                 .getReviewContribution(id)
                 ).withSelfRel();
                 break;
+            case PHOTO:
+                self = ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieContributionRestController.class)
+                                .getPhotoContribution(id)
+                ).withSelfRel();
+                break;
+            case POSTER:
+                self = ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieContributionRestController.class)
+                                .getPosterContribution(id)
+                ).withSelfRel();
+                break;
         }
 
         contributionResource.add(self);

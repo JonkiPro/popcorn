@@ -3,7 +3,7 @@ package com.core.utils;
 /**
  * Class for returning random texts.
  */
-public class RandomUtils {
+public final class RandomUtils {
 
     private static final char[] CHARACTERS = ("abcdefghijklmnopqrstuvwxyz" +
                                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +

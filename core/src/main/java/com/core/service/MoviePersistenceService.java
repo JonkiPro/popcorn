@@ -2,6 +2,7 @@ package com.core.service;
 
 import com.common.dto.VerificationStatus;
 import com.common.dto.movie.*;
+import com.common.dto.movie.request.ImageRequest;
 import com.common.dto.movie.request.Rate;
 import com.common.dto.request.MovieDTO;
 import com.common.exception.ResourceConflictException;
@@ -290,6 +291,56 @@ public interface MoviePersistenceService {
             @Min(1) final Long reviewId,
             @NotNull MovieEntity movie
     ) throws ResourceConflictException;
+
+    /**
+     * Save the photo for the movie.
+     *
+     * @param photo The Photo object to create and save
+     * @param movie The object of the movie to which the photo will be added and check the uniqueness
+     * @return The ID of the created element
+     */
+    Long createPhoto(
+            @NotNull @Valid final ImageRequest photo,
+            @NotNull final MovieEntity movie
+    );
+
+    /**
+     * Update the photo of the movie.
+     *
+     * @param photo The Photo object to update
+     * @param photoId The ID of the photo
+     * @param movie A movie object to check the existence of the same photo
+     */
+    void updatePhoto(
+            @NotNull @Valid final ImageRequest photo,
+            @Min(1) final Long photoId,
+            @NotNull MovieEntity movie
+    );
+
+    /**
+     * Save the poster for the movie.
+     *
+     * @param photo The Poster object to create and save
+     * @param movie The object of the movie to which the poster will be added and check the uniqueness
+     * @return The ID of the created element
+     */
+    Long createPoster(
+            @NotNull @Valid final ImageRequest photo,
+            @NotNull final MovieEntity movie
+    );
+
+    /**
+     * Update the poster of the movie.
+     *
+     * @param photo The Poster object to update
+     * @param photoId The ID of the poster
+     * @param movie A movie object to check the existence of the same poster
+     */
+    void updatePoster(
+            @NotNull @Valid final ImageRequest photo,
+            @Min(1) final Long photoId,
+            @NotNull MovieEntity movie
+    );
 
     /**
      * Save the rating for the movie.

@@ -1,5 +1,6 @@
 package com.web.web.config.swagger;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -16,6 +17,7 @@ import static springfox.documentation.builders.PathSelectors.any;
  * Spring configuration for Swagger via SpringFox.
  */
 @Configuration
+@ConditionalOnProperty(value = "swagger.enabled", havingValue = "true")
 @EnableSwagger2
 public class SwaggerConfig {
 

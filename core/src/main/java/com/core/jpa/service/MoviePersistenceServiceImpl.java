@@ -524,6 +524,78 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     @Override
+    public Long createPhoto(
+            @NotNull @Valid final ImageRequest photo,
+            @NotNull final MovieEntity movie
+    ) {
+        log.info("Called with photo {}, movie {}", photo, movie);
+
+        final MoviePhotoEntity moviePhoto = new MoviePhotoEntity();
+        moviePhoto.setIdInCloud(photo.getIdInCloud());
+        moviePhoto.setMovie(movie);
+
+        movie.getPhotos().add(moviePhoto);
+
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getPhotos()).getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updatePhoto(
+            @NotNull @Valid final ImageRequest photo,
+            @Min(1) final Long photoId,
+            @NotNull final MovieEntity movie
+    ) {
+        log.info("Called with photo {}, photoId {}, movie {}", photo, photoId, movie);
+
+        final MoviePhotoEntity moviePhoto = this.entityManager.find(MoviePhotoEntity.class, photoId);
+        moviePhoto.setIdInCloud(photo.getIdInCloud());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createPoster(
+            @NotNull @Valid final ImageRequest poster,
+            @NotNull final MovieEntity movie
+    ) {
+        log.info("Called with poster {}, movie {}", poster, movie);
+
+        final MoviePosterEntity moviePoster = new MoviePosterEntity();
+        moviePoster.setIdInCloud(poster.getIdInCloud());
+        moviePoster.setMovie(movie);
+
+        movie.getPosters().add(moviePoster);
+
+        this.movieRepository.save(movie);
+
+        return Iterables.getLast(movie.getPosters()).getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updatePoster(
+            @NotNull @Valid final ImageRequest poster,
+            @Min(1) final Long posterId,
+            @NotNull final MovieEntity movie
+    ) {
+        log.info("Called with poster {}, posterId {}, movie {}", poster, posterId, movie);
+
+        final MoviePosterEntity moviePoster = this.entityManager.find(MoviePosterEntity.class, posterId);
+        moviePoster.setIdInCloud(poster.getIdInCloud());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void saveRating(
             @NotNull @Valid final Rate rate,
             @Min(1) final Long movieId,

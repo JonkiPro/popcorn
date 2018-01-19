@@ -4,15 +4,15 @@ import com.common.dto.VerificationStatus;
 import com.common.dto.movie.*;
 import com.common.dto.movie.request.ContributionNew;
 import com.common.dto.movie.request.ContributionUpdate;
-import com.common.exception.ResourceConflictException;
-import com.common.exception.ResourceForbiddenException;
-import com.common.exception.ResourceNotFoundException;
+import com.common.dto.movie.request.ImageRequest;
+import com.common.exception.*;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 
 /**
  * Interfaces for providing persistence functions for contributions other than search.
@@ -43,9 +43,9 @@ public interface MovieContributionPersistenceService {
      * @param contribution The contribution of titles
      * @param movieId The movie ID
      * @param userId The user ID
+     * @return The ID of the contribution created
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if there is an IDs conflict or an element exists
-     * @return The ID of the contribution created
      */
     Long createOtherTitleContribution(
             @NotNull @Valid final ContributionNew<OtherTitle> contribution,
@@ -74,9 +74,9 @@ public interface MovieContributionPersistenceService {
      * @param contribution The contribution of release dates
      * @param movieId The movie ID
      * @param userId The user ID
+     * @return The ID of the contribution created
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if there is an IDs conflict or an element exists
-     * @return The ID of the contribution created
      */
     Long createReleaseDateContribution(
             @NotNull @Valid final ContributionNew<ReleaseDate> contribution,
@@ -105,9 +105,9 @@ public interface MovieContributionPersistenceService {
      * @param contribution The contribution of storylines
      * @param movieId The movie ID
      * @param userId The user ID
+     * @return The ID of the contribution created
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if there is an IDs conflict or an element exists
-     * @return The ID of the contribution created
      */
     Long createStorylineContribution(
             @NotNull @Valid final ContributionNew<Storyline> contribution,
@@ -136,9 +136,9 @@ public interface MovieContributionPersistenceService {
      * @param contribution The contribution of box offices
      * @param movieId The movie ID
      * @param userId The user ID
+     * @return The ID of the contribution created
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if there is an IDs conflict or an element exists
-     * @return The ID of the contribution created
      */
     Long createBoxOfficeContribution(
             @NotNull @Valid final ContributionNew<BoxOffice> contribution,
@@ -167,9 +167,9 @@ public interface MovieContributionPersistenceService {
      * @param contribution The contribution of sites
      * @param movieId The movie ID
      * @param userId The user ID
+     * @return The ID of the contribution created
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if there is an IDs conflict or an element exists
-     * @return The ID of the contribution created
      */
     Long createSiteContribution(
             @NotNull @Valid final ContributionNew<Site> contribution,
@@ -198,9 +198,9 @@ public interface MovieContributionPersistenceService {
      * @param contribution The contribution of countries
      * @param movieId The movie ID
      * @param userId The user ID
+     * @return The ID of the contribution created
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if there is an IDs conflict or an element exists
-     * @return The ID of the contribution created
      */
     Long createCountryContribution(
             @NotNull @Valid final ContributionNew<Country> contribution,
@@ -229,9 +229,9 @@ public interface MovieContributionPersistenceService {
      * @param contribution The contribution of languages
      * @param movieId The movie ID
      * @param userId The user ID
+     * @return The ID of the contribution created
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if there is an IDs conflict or an element exists
-     * @return The ID of the contribution created
      */
     Long createLanguageContribution(
             @NotNull @Valid final ContributionNew<Language> contribution,
@@ -260,9 +260,9 @@ public interface MovieContributionPersistenceService {
      * @param contribution The contribution of genres
      * @param movieId The movie ID
      * @param userId The user ID
+     * @return The ID of the contribution created
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if there is an IDs conflict or an element exists
-     * @return The ID of the contribution created
      */
     Long createGenreContribution(
             @NotNull @Valid final ContributionNew<Genre> contribution,
@@ -291,9 +291,9 @@ public interface MovieContributionPersistenceService {
      * @param contribution The contribution of reviews
      * @param movieId The movie ID
      * @param userId The user ID
+     * @return The ID of the contribution created
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if there is an IDs conflict or an element exists
-     * @return The ID of the contribution created
      */
     Long createReviewContribution(
             @NotNull @Valid final ContributionNew<Review> contribution,
@@ -315,4 +315,74 @@ public interface MovieContributionPersistenceService {
             @Min(1) final Long contributionId,
             @NotBlank final String userId
     ) throws ResourceNotFoundException, ResourceConflictException;
+
+    /**
+     * Save the contribution of the photos for the movie.
+     *
+     * @param contribution The contribution of photos
+     * @param movieId The movie ID
+     * @param userId The user ID
+     * @return The ID of the contribution created
+     * @throws ResourceNotFoundException if no movie found or no user found
+     * @throws ResourceConflictException if there is an IDs conflict or an element exists
+     * @throws ResourcePreconditionException if an I/O error occurs or incorrect content type
+     * @throws ResourceServerException if an error occurred with the server
+     */
+    Long createPhotoContribution(
+            @NotNull @Valid final ContributionNew<ImageRequest> contribution,
+            @Min(1) final Long movieId,
+            @NotBlank final String userId
+    ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException;
+
+    /**
+     * Update the contribution of the photos for the movie.
+     *
+     * @param contribution The contribution of photos
+     * @param contributionId The contribution ID
+     * @param userId The user ID
+     * @throws ResourceNotFoundException if no contribution found or no user found
+     * @throws ResourceConflictException if the element exists
+     * @throws ResourcePreconditionException if an I/O error occurs or incorrect content type
+     * @throws ResourceServerException if an error occurred with the server
+     */
+    void updatePhotoContribution(
+            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution,
+            @Min(1) final Long contributionId,
+            @NotBlank final String userId
+    ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException;
+
+    /**
+     * Save the contribution of the posters for the movie.
+     *
+     * @param contribution The contribution of posters
+     * @param movieId The movie ID
+     * @param userId The user ID
+     * @return The ID of the contribution created
+     * @throws ResourceNotFoundException if no movie found or no user found
+     * @throws ResourceConflictException if there is an IDs conflict or an element exists
+     * @throws ResourcePreconditionException if an I/O error occurs or incorrect content type
+     * @throws ResourceServerException if an error occurred with the server
+     */
+    Long createPosterContribution(
+            @NotNull @Valid final ContributionNew<ImageRequest> contribution,
+            @Min(1) final Long movieId,
+            @NotBlank final String userId
+    ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException;
+
+    /**
+     * Update the contribution of the posters for the movie.
+     *
+     * @param contribution The contribution of posters
+     * @param contributionId The contribution ID
+     * @param userId The user ID
+     * @throws ResourceNotFoundException if no contribution found or no user found
+     * @throws ResourceConflictException if the element exists
+     * @throws ResourcePreconditionException if an I/O error occurs or incorrect content type
+     * @throws ResourceServerException if an error occurred with the server
+     */
+    void updatePosterContribution(
+            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution,
+            @Min(1) final Long contributionId,
+            @NotBlank final String userId
+    ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException;
 }

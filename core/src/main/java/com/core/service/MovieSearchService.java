@@ -2,6 +2,7 @@ package com.core.service;
 
 import com.common.dto.Movie;
 import com.common.dto.movie.*;
+import com.common.dto.movie.response.ImageResponse;
 import com.common.dto.movie.response.RateResponse;
 import com.common.dto.movie.type.CountryType;
 import com.common.dto.movie.type.GenreType;
@@ -172,6 +173,28 @@ public interface MovieSearchService {
      * @throws ResourceNotFoundException if no movie found
      */
     Set<Review> getReviews(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get photos for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie photos
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<ImageResponse> getPhotos(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get posters for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie posters
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<ImageResponse> getPosters(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 }

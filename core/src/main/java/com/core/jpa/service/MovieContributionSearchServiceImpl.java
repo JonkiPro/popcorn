@@ -2,6 +2,7 @@ package com.core.jpa.service;
 
 import com.common.dto.Contribution;
 import com.common.dto.movie.*;
+import com.common.dto.movie.response.ImageResponse;
 import com.common.dto.search.ContributionSearchResult;
 import com.common.exception.ResourceNotFoundException;
 import com.core.jpa.entity.ContributionEntity;
@@ -438,6 +439,74 @@ public class MovieContributionSearchServiceImpl implements MovieContributionSear
                 .forEach(id -> {
                     final MovieReviewEntity review = this.entityManager.find(MovieReviewEntity.class, id);
                     contribution.getElementsToDelete().put(review.getId(), ServiceUtils.toReviewDto(review));
+                });
+
+        return contribution;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Contribution<ImageResponse> getPhotoContribution(
+            @Min(1) final Long contributionId
+    ) throws ResourceNotFoundException {
+        log.info("Called with contributionId {}", contributionId);
+
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, MovieField.PHOTO);
+        final Contribution<ImageResponse> contribution = ServiceUtils.toContributionDto(contributionEntity);
+
+        contributionEntity.getIdsToAdd()
+                .forEach(id -> {
+                    final MoviePhotoEntity photo = this.entityManager.find(MoviePhotoEntity.class, id);
+                    contribution.getElementsToAdd().put(photo.getId(), ServiceUtils.toImageResponseDto(photo));
+                });
+        contributionEntity.getIdsToUpdate()
+                .forEach((key, value) -> {
+                    final MoviePhotoEntity photoToUpdate = this.entityManager.find(MoviePhotoEntity.class, key);
+                    final MoviePhotoEntity photoUpdated = this.entityManager.find(MoviePhotoEntity.class, value);
+                    contribution.getElementsToUpdate().put(photoToUpdate.getId(), ServiceUtils.toImageResponseDto(photoToUpdate));
+                    contribution.getElementsUpdated().put(photoToUpdate.getId(), ServiceUtils.toImageResponseDto(photoUpdated));
+                });
+        contributionEntity.getIdsToDelete()
+                .forEach(id -> {
+                    final MoviePhotoEntity photo = this.entityManager.find(MoviePhotoEntity.class, id);
+                    contribution.getElementsToDelete().put(photo.getId(), ServiceUtils.toImageResponseDto(photo));
+                });
+
+        return contribution;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Contribution<ImageResponse> getPosterContribution(
+            @Min(1) final Long contributionId
+    ) throws ResourceNotFoundException {
+        log.info("Called with contributionId {}", contributionId);
+
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, MovieField.POSTER);
+        final Contribution<ImageResponse> contribution = ServiceUtils.toContributionDto(contributionEntity);
+
+        contributionEntity.getIdsToAdd()
+                .forEach(id -> {
+                    final MoviePosterEntity poster = this.entityManager.find(MoviePosterEntity.class, id);
+                    contribution.getElementsToAdd().put(poster.getId(), ServiceUtils.toImageResponseDto(poster));
+                });
+        contributionEntity.getIdsToUpdate()
+                .forEach((key, value) -> {
+                    final MoviePosterEntity posterToUpdate = this.entityManager.find(MoviePosterEntity.class, key);
+                    final MoviePosterEntity posterUpdated = this.entityManager.find(MoviePosterEntity.class, value);
+                    contribution.getElementsToUpdate().put(posterToUpdate.getId(), ServiceUtils.toImageResponseDto(posterToUpdate));
+                    contribution.getElementsUpdated().put(posterToUpdate.getId(), ServiceUtils.toImageResponseDto(posterUpdated));
+                });
+        contributionEntity.getIdsToDelete()
+                .forEach(id -> {
+                    final MoviePosterEntity poster = this.entityManager.find(MoviePosterEntity.class, id);
+                    contribution.getElementsToDelete().put(poster.getId(), ServiceUtils.toImageResponseDto(poster));
                 });
 
         return contribution;

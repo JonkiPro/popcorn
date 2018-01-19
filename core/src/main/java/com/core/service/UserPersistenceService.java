@@ -4,14 +4,14 @@ import com.common.dto.request.ChangeEmailDTO;
 import com.common.dto.request.ChangePasswordDTO;
 import com.common.dto.request.ForgotPasswordDTO;
 import com.common.dto.request.RegisterDTO;
-import com.common.exception.ResourceBadRequestException;
-import com.common.exception.ResourceConflictException;
-import com.common.exception.ResourceNotFoundException;
+import com.common.exception.*;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Interfaces for providing persistence functions for users other than search.
@@ -51,7 +51,7 @@ public interface UserPersistenceService {
     ) throws ResourceNotFoundException;
 
     /**
-     * Change a new e-mail.
+     * Update the new e-mail.
      *
      * @param id The user ID
      * @param changeEmailDTO DTO user whose new e-mail should be set
@@ -64,7 +64,7 @@ public interface UserPersistenceService {
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
-     * Change password.
+     * Update the password.
      *
      * @param id The user ID
      * @param changePasswordDTO DTO user whose password should be changed
@@ -75,6 +75,21 @@ public interface UserPersistenceService {
             @NotBlank final String id,
             @NotNull @Valid final ChangePasswordDTO changePasswordDTO
     ) throws ResourceBadRequestException, ResourceNotFoundException;
+
+    /**
+     * Update the avatar.
+     *
+     * @param id The user ID
+     * @param file A new avatar file for the user
+     * @throws ResourceBadRequestException if the password is incorrect
+     * @throws ResourceNotFoundException if no user found
+     * @throws ResourcePreconditionException if an I/O error occurs or incorrect content type
+     * @throws ResourceServerException if an error occurred with the server
+     */
+    void updateAvatar(
+            @NotBlank final String id,
+            @NotNull final File file
+    ) throws ResourceBadRequestException, ResourceNotFoundException, ResourcePreconditionException, ResourceServerException;
 
     /**
      * A new e-mail will be saved as an email.

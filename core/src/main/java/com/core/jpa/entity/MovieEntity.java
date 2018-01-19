@@ -77,6 +77,12 @@ public class MovieEntity implements Serializable {
     @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MovieReviewEntity> reviews = new ArrayList<>();
 
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MoviePhotoEntity> photos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MoviePosterEntity> posters = new ArrayList<>();
+
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MovieRateEntity> ratings = new ArrayList<>();
 

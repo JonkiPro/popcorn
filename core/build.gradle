@@ -28,6 +28,12 @@ dependencies {
 	compileOnly('org.projectlombok:lombok')
 	//
 
+	// Google API
+	compile 'com.google.api-client:google-api-client:1.23.0'
+	compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+	compile 'com.google.apis:google-api-services-drive:v2-rev289-1.23.0'
+	//
+
 	/*******************************
 	 * Test Dependencies
 	 *******************************/

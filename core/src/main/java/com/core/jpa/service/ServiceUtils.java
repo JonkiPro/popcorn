@@ -2,6 +2,7 @@ package com.core.jpa.service;
 
 import com.common.dto.*;
 import com.common.dto.movie.*;
+import com.common.dto.movie.response.ImageResponse;
 import com.common.dto.movie.response.RateResponse;
 import com.core.jpa.entity.ContributionEntity;
 import com.core.jpa.entity.MessageEntity;
@@ -27,6 +28,8 @@ public final class ServiceUtils {
                 userEntity.getFriends().size()
         )
                 .withId(userEntity.getUniqueId());
+
+        userEntity.getAvatarId().ifPresent(avatarId -> builder.withAvatarSrc(userEntity.getAvatarProvider().getUrlFile(avatarId)));
 
         return builder.build();
     }
@@ -238,6 +241,34 @@ public final class ServiceUtils {
         final Review.Builder builder = new Review.Builder(
                 movieReviewEntity.getTitle(),
                 movieReviewEntity.getReview()
+        );
+
+        return builder.build();
+    }
+
+    /**
+     * Convert a MoviePhotoEntity entity to a DTO for external exposure.
+     *
+     * @param moviePhotoEntity The entity to convert
+     * @return The immutable DTO representation of the entity data
+     */
+    static ImageResponse toImageResponseDto(final MoviePhotoEntity moviePhotoEntity) {
+        final ImageResponse.Builder builder = new ImageResponse.Builder(
+                moviePhotoEntity.getProvider().getUrlFile(moviePhotoEntity.getIdInCloud())
+        );
+
+        return builder.build();
+    }
+
+    /**
+     * Convert a MoviePosterEntity entity to a DTO for external exposure.
+     *
+     * @param moviePosterEntity The entity to convert
+     * @return The immutable DTO representation of the entity data
+     */
+    static ImageResponse toImageResponseDto(final MoviePosterEntity moviePosterEntity) {
+        final ImageResponse.Builder builder = new ImageResponse.Builder(
+                moviePosterEntity.getProvider().getUrlFile(moviePosterEntity.getIdInCloud())
         );
 
         return builder.build();

@@ -1,12 +1,29 @@
-#settings datasource
-spring.datasource:
-  driver-class-name: org.postgresql.Driver
-  url: jdbc:postgresql:database
-  username: root
-  password: root
-  schema: classpath:/db/init/schema.sql
+spring:
+  application:
+      name: REST-Web-Services
+  mail:
+      host: smtp.gmail.com
+      port: 587
+      username: TkM2Gs9Hrd@gmail.com
+      password: 8pKZu9SStJ
+      properties.mail.smtp:
+        auth: true
+        starttls.enable: true
+  messages:
+      basename: internationalization/viewMessages,\
+                internationalization/validationMessages,\
+                static/linkToCssAndJs
+      encoding: UTF-8
+      cache-seconds: -1
+      fallback-to-system-locale: true
+  profiles:
+      include: security
+      active: dev
+  http:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
 
-#EclipseLink
 eclipseLink:
   persistence-unit-name: unit
   database-platform: org.eclipse.persistence.platform.database.PostgreSQLPlatform
@@ -14,21 +31,9 @@ eclipseLink:
   show-sql: true
   weaving: static
 
-#EntityManagerFactory
 entityManager:
   packages-to-scan: com.core.jpa.entity
 
-#settings mail
-spring.mail:
-  host: smtp.gmail.com
-  port: 587
-  username: TkM2Gs9Hrd@gmail.com
-  password: 8pKZu9SStJ
-  properties.mail.smtp:
-    auth: true
-    starttls.enable: true
-
-#server
 server:
   port: 8443
   session.timeout: 25200
@@ -39,29 +44,21 @@ server:
     key-alias: some_alias
     enabled: true
 
-#security require SSL
 security.require-ssl: true
-security.basic.enabled: false
+security.basic.enabled: true
 
-#messages
-spring.messages:
-  basename: internationalization/viewMessages,\
-            internationalization/validationMessages,\
-            static/linkToCssAndJs
-  encoding: UTF-8
-  cache-seconds: -1
-  fallback-to-system-locale: true
+management:
+  context-path: /actuator
+  security:
+    roles: ADMIN
 
-#logging
+endpoints:
+  enabled: true
+  sensitive: true
+
 logging.level.org.springframework.web: DEBUG
 
-#Spring Profiles
-spring:
-  profiles:
-    include: security
-  application:
-    name: REST-Web-Services
+swagger.enabled: true
 
-#banner
 banner:
   location: banner.txt
