@@ -3,15 +3,17 @@ package com.core.service;
 import com.common.dto.StorageDirectory;
 import com.common.exception.ResourcePreconditionException;
 import com.common.exception.ResourceServerException;
-import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 
 /**
  * Interface for dealing with files.
  */
+@PreAuthorize("hasRole('ROLE_USER')")
 @Validated
 public interface StorageService {
 

@@ -29,7 +29,7 @@
                 </div>
                 <br />
             </div>
-            <div class="col-sm-2"><a href="#" class="pull-right"><img title="profile image" class="img-circle img-responsive" src="#"/></a>
+            <div class="col-sm-2"><a href="#" class="pull-right"><img title="profile image" class="img-circle img-responsive" data-ng-src="{{profile.avatarSrc}}"/></a>
 
             </div>
         </div>
@@ -55,7 +55,7 @@
                     <div class="panel-heading">Here will be something. <i class="fa fa-link fa-1x"></i>
 
                     </div>
-                    <div class="panel-body"><a href="#" class="">Friends 0 </a>
+                    <div class="panel-body"><a href="#" class="">Friends <span ng-bind="profile.numberOfFriends"></span> </a>
 
                     </div>
                 </div>
@@ -163,7 +163,7 @@
     <script type="text/javascript" th:src="#{jquery.js}"></script>
     <script type="text/javascript" th:src="#{bootstrap.js}"></script>
     <script type="text/javascript" th:src="#{angular.js}"></script>
-    <script type="text/javascript" src="../static/app/profile.js" th:src="@{/app/profile.js}"></script>
+    <script sec:authorize="!isAuthenticated()" type="text/javascript" src="../static/app/profile.js" th:src="@{/app/profile.js}"></script>
     <script sec:authorize="isAuthenticated()" type="text/javascript" src="../static/app/profile_status.js" th:src="@{/app/profile_status.js}"></script>
 </body>
 </html>

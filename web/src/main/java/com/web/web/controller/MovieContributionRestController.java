@@ -12,9 +12,8 @@ import com.common.dto.VerificationStatus;
 import com.web.web.hateoas.assembler.ContributionSearchResultResourceAssembler;
 import com.web.web.hateoas.resource.ContributionResource;
 import com.web.web.hateoas.resource.ContributionSearchResultResource;
-import com.web.web.security.service.AuthorizationService;
-import com.web.web.utils.MultipartFileUtils;
-import com.web.web.utils.MapUtils;
+import com.web.web.util.MultipartFileUtils;
+import com.web.web.util.MapUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,6 @@ public class MovieContributionRestController {
 
     private final MovieContributionPersistenceService movieContributionPersistenceService;
     private final MovieContributionSearchService movieContributionSearchService;
-    private final AuthorizationService authorizationService;
     private final ContributionSearchResultResourceAssembler contributionSearchResultResourceAssembler;
 
     /**
@@ -57,19 +55,16 @@ public class MovieContributionRestController {
      *
      * @param movieContributionPersistenceService The contribution persistence service to use
      * @param movieContributionSearchService The contribution search service to use
-     * @param authorizationService The authorization service to use
      * @param contributionSearchResultResourceAssembler Assemble contribution search resources out of contributions
      */
     @Autowired
     public MovieContributionRestController(
             final MovieContributionPersistenceService movieContributionPersistenceService,
             final MovieContributionSearchService movieContributionSearchService,
-            final AuthorizationService authorizationService,
             final ContributionSearchResultResourceAssembler contributionSearchResultResourceAssembler
     ) {
         this.movieContributionPersistenceService = movieContributionPersistenceService;
         this.movieContributionSearchService = movieContributionSearchService;
-        this.authorizationService = authorizationService;
         this.contributionSearchResultResourceAssembler = contributionSearchResultResourceAssembler;
     }
 
@@ -92,7 +87,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, status {}, comment {}", id, status, comment);
 
-        this.movieContributionPersistenceService.updateContributionStatus(id, authorizationService.getUserId(), status, comment);
+        this.movieContributionPersistenceService.updateContributionStatus(id, status, comment);
     }
 
     @ApiOperation(value = "Find contributions")
@@ -176,7 +171,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        final Long cId = this.movieContributionPersistenceService.createOtherTitleContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createOtherTitleContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -207,7 +202,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        this.movieContributionPersistenceService.updateOtherTitleContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updateOtherTitleContribution(id, contribution);
     }
 
     @ApiOperation(value = "Get the contribution of release dates")
@@ -247,7 +242,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        final Long cId = this.movieContributionPersistenceService.createReleaseDateContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createReleaseDateContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -278,53 +273,53 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        this.movieContributionPersistenceService.updateReleaseDateContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updateReleaseDateContribution(id, contribution);
     }
 
-    @ApiOperation(value = "Get the contribution of storylines")
+    @ApiOperation(value = "Get the contribution of outlines")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No contribution found") })
-    @GetMapping(value = "/contributions/{id}/storylines", produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/contributions/{id}/outlines", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public
-    ContributionResource<Storyline> getStorylineContribution(
+    ContributionResource<Outline> getOutlineContribution(
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
-        final Contribution<Storyline> storylineContribution = this.movieContributionSearchService.getStorylineContribution(id);
+        final Contribution<Outline> outlineContribution = this.movieContributionSearchService.getOutlineContribution(id);
 
         final Link self = linkTo(
-                methodOn(MovieContributionRestController.class).getStorylineContribution(id)
+                methodOn(MovieContributionRestController.class).getOutlineContribution(id)
         ).withSelfRel();
 
-        return new ContributionResource<>(storylineContribution, self);
+        return new ContributionResource<>(outlineContribution, self);
     }
 
-    @ApiOperation(value = "Create the contribution of storylines")
+    @ApiOperation(value = "Create the contribution of outlines")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
             @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PostMapping(value = "/{id}/contributions/storylines", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/contributions/outlines", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public
-    ResponseEntity<Void> createStorylineContribution(
+    ResponseEntity<Void> createOutlineContribution(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<Storyline> contribution
+            @RequestBody @Valid final ContributionNew<Outline> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        final Long cId = this.movieContributionPersistenceService.createStorylineContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createOutlineContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
                 MvcUriComponentsBuilder
-                        .fromMethodName(MovieContributionRestController.class, "getStorylineContribution", cId)
+                        .fromMethodName(MovieContributionRestController.class, "getOutlineContribution", cId)
                         .buildAndExpand(cId)
                         .toUri()
         );
@@ -332,25 +327,169 @@ public class MovieContributionRestController {
         return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "Update the contribution of storylines")
+    @ApiOperation(value = "Update the contribution of outlines")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
             @ApiResponse(code = 404, message = "No movie found or no user found"),
             @ApiResponse(code = 409, message = "An ID conflict or element exists"),
     })
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/contributions/{id}/storylines", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/contributions/{id}/outlines", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public
-    void updateStorylineContribution(
+    void updateOutlineContribution(
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<Storyline> contribution
+            @RequestBody @Valid final ContributionUpdate<Outline> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        this.movieContributionPersistenceService.updateStorylineContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updateOutlineContribution(id, contribution);
+    }
+
+    @ApiOperation(value = "Get the contribution of summaries")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No contribution found") })
+    @GetMapping(value = "/contributions/{id}/summaries", produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public
+    ContributionResource<Summary> getSummaryContribution(
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        final Contribution<Summary> summaryContribution = this.movieContributionSearchService.getSummaryContribution(id);
+
+        final Link self = linkTo(
+                methodOn(MovieContributionRestController.class).getSummaryContribution(id)
+        ).withSelfRel();
+
+        return new ContributionResource<>(summaryContribution, self);
+    }
+
+    @ApiOperation(value = "Create the contribution of summaries")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
+            @ApiResponse(code = 404, message = "No movie found or no user found"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/{id}/contributions/summaries", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public
+    ResponseEntity<Void> createSummaryContribution(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
+            @RequestBody @Valid final ContributionNew<Summary> contribution
+    ) {
+        log.info("Called with id {}, contribution {}", id, contribution);
+
+        final Long cId = this.movieContributionPersistenceService.createSummaryContribution(id, contribution);
+
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(
+                MvcUriComponentsBuilder
+                        .fromMethodName(MovieContributionRestController.class, "getSummaryContribution", cId)
+                        .buildAndExpand(cId)
+                        .toUri()
+        );
+
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Update the contribution of summaries")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
+            @ApiResponse(code = 404, message = "No movie found or no user found"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PutMapping(value = "/contributions/{id}/summaries", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public
+    void updateSummaryContribution(
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
+            @RequestBody @Valid final ContributionUpdate<Summary> contribution
+    ) {
+        log.info("Called with id {}, contribution {}", id, contribution);
+
+        this.movieContributionPersistenceService.updateSummaryContribution(id, contribution);
+    }
+
+    @ApiOperation(value = "Get the contribution of synopses")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No contribution found") })
+    @GetMapping(value = "/contributions/{id}/synopses", produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public
+    ContributionResource<Synopsis> getSynopsisContribution(
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        final Contribution<Synopsis> synopsisContribution = this.movieContributionSearchService.getSynopsisContribution(id);
+
+        final Link self = linkTo(
+                methodOn(MovieContributionRestController.class).getSynopsisContribution(id)
+        ).withSelfRel();
+
+        return new ContributionResource<>(synopsisContribution, self);
+    }
+
+    @ApiOperation(value = "Create the contribution of synopses")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
+            @ApiResponse(code = 404, message = "No movie found or no user found"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/{id}/contributions/synopses", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public
+    ResponseEntity<Void> createSynopsisContribution(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
+            @RequestBody @Valid final ContributionNew<Synopsis> contribution
+    ) {
+        log.info("Called with id {}, contribution {}", id, contribution);
+
+        final Long cId = this.movieContributionPersistenceService.createSynopsisContribution(id, contribution);
+
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(
+                MvcUriComponentsBuilder
+                        .fromMethodName(MovieContributionRestController.class, "getSynopsisContribution", cId)
+                        .buildAndExpand(cId)
+                        .toUri()
+        );
+
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Update the contribution of synopses")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
+            @ApiResponse(code = 404, message = "No movie found or no user found"),
+            @ApiResponse(code = 409, message = "An ID conflict or element exists"),
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PutMapping(value = "/contributions/{id}/synopses", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public
+    void updateSynopsisContribution(
+            @ApiParam(value = "The contribution ID", required = true)
+            @PathVariable("id") final Long id,
+            @ApiParam(value = "The contribution", required = true)
+            @RequestBody @Valid final ContributionUpdate<Synopsis> contribution
+    ) {
+        log.info("Called with id {}, contribution {}", id, contribution);
+
+        this.movieContributionPersistenceService.updateSynopsisContribution(id, contribution);
     }
 
     @ApiOperation(value = "Get the contribution of box offices")
@@ -391,7 +530,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        final Long cId = this.movieContributionPersistenceService.createBoxOfficeContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createBoxOfficeContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -422,7 +561,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        this.movieContributionPersistenceService.updateBoxOfficeContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updateBoxOfficeContribution(id, contribution);
     }
 
     @ApiOperation(value = "Get the contribution of sites")
@@ -463,7 +602,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        final Long cId = this.movieContributionPersistenceService.createSiteContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createSiteContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -494,7 +633,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        this.movieContributionPersistenceService.updateSiteContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updateSiteContribution(id, contribution);
     }
 
     @ApiOperation(value = "Get the contribution of countries")
@@ -535,7 +674,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        final Long cId = this.movieContributionPersistenceService.createCountryContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createCountryContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -566,7 +705,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        this.movieContributionPersistenceService.updateCountryContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updateCountryContribution(id, contribution);
     }
 
     @ApiOperation(value = "Get the contribution of languages")
@@ -607,7 +746,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        final Long cId = this.movieContributionPersistenceService.createLanguageContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createLanguageContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -638,7 +777,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        this.movieContributionPersistenceService.updateLanguageContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updateLanguageContribution(id, contribution);
     }
 
     @ApiOperation(value = "Get the contribution of genres")
@@ -679,7 +818,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        final Long cId = this.movieContributionPersistenceService.createGenreContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createGenreContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -710,7 +849,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        this.movieContributionPersistenceService.updateGenreContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updateGenreContribution(id, contribution);
     }
 
     @ApiOperation(value = "Get the contribution of reviews")
@@ -751,7 +890,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        final Long cId = this.movieContributionPersistenceService.createReviewContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createReviewContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -782,7 +921,7 @@ public class MovieContributionRestController {
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
-        this.movieContributionPersistenceService.updateReviewContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updateReviewContribution(id, contribution);
     }
 
     @ApiOperation(value = "Get the contribution of photos")
@@ -852,7 +991,7 @@ public class MovieContributionRestController {
         contribution.setIdsToDelete(idsToDelete);
         contribution.setSources(sources);
 
-        final Long cId = this.movieContributionPersistenceService.createPhotoContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createPhotoContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -919,7 +1058,7 @@ public class MovieContributionRestController {
         contribution.setIdsToDelete(idsToDelete);
         contribution.setSources(sources);
 
-        this.movieContributionPersistenceService.updatePhotoContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updatePhotoContribution(id, contribution);
     }
 
     @ApiOperation(value = "Get the contribution of posters")
@@ -989,7 +1128,7 @@ public class MovieContributionRestController {
         contribution.setIdsToDelete(idsToDelete);
         contribution.setSources(sources);
 
-        final Long cId = this.movieContributionPersistenceService.createPosterContribution(contribution, id, this.authorizationService.getUserId());
+        final Long cId = this.movieContributionPersistenceService.createPosterContribution(id, contribution);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -1056,6 +1195,6 @@ public class MovieContributionRestController {
         contribution.setIdsToDelete(idsToDelete);
         contribution.setSources(sources);
 
-        this.movieContributionPersistenceService.updatePosterContribution(contribution, id, this.authorizationService.getUserId());
+        this.movieContributionPersistenceService.updatePosterContribution(id, contribution);
     }
 }

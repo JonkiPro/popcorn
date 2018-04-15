@@ -1,6 +1,6 @@
 package com.web.web.view.error;
 
-import org.springframework.boot.autoconfigure.web.ErrorController;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -9,7 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
  * Controller for a page that has not been found.
  */
 @Controller
-public class PageNotFoundController implements ErrorController{
+public class PageNotFoundController implements ErrorController {
 
     private static final String PATH = "/error";
 

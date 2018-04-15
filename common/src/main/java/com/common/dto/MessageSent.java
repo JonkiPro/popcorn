@@ -17,7 +17,7 @@ public class MessageSent extends Message {
     private static final long serialVersionUID = -1737283506913214334L;
 
     @ApiModelProperty(notes = "The recipient's username", required = true)
-    private final String recipient;
+    private final ShallowUser recipient;
 
     /**
      * Constructor only accessible via builder build() method.
@@ -34,7 +34,7 @@ public class MessageSent extends Message {
      */
     public static class Builder extends Message.Builder<Builder> {
 
-        private final String bRecipient;
+        private final ShallowUser bRecipient;
 
         /**
          * Constructor which has required fields.
@@ -53,7 +53,7 @@ public class MessageSent extends Message {
                 @JsonProperty("date")
                 final Date date,
                 @JsonProperty("recipient")
-                final String recipient
+                final ShallowUser recipient
         ) {
             super(subject, text, date);
             this.bRecipient = recipient;

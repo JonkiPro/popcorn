@@ -17,7 +17,7 @@ public class MessageReceived extends Message {
     private static final long serialVersionUID = -4764452135987289104L;
 
     @ApiModelProperty(notes = "The sender's username", required = true)
-    private final String sender;
+    private final ShallowUser sender;
 
     @ApiModelProperty(notes = "The message date of read")
     @JsonProperty("date_of_read")
@@ -39,7 +39,7 @@ public class MessageReceived extends Message {
      */
     public static class Builder extends Message.Builder<Builder> {
 
-        private final String bSender;
+        private final ShallowUser bSender;
         private final Date bDateOfRead;
 
         /**
@@ -48,7 +48,7 @@ public class MessageReceived extends Message {
          * @param subject The message subject
          * @param text The message text
          * @param date The message date of sent
-         * @param sender The sender's name
+         * @param sender The sender user
          * @param dateOfRead The movie ID
          */
         @JsonCreator
@@ -60,7 +60,7 @@ public class MessageReceived extends Message {
                 @JsonProperty("date")
                 final Date date,
                 @JsonProperty("sender")
-                final String sender,
+                final ShallowUser sender,
                 @JsonProperty("dateOfRead")
                 final Date dateOfRead
         ) {

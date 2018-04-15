@@ -50,8 +50,24 @@ public class MovieResourceAssembler implements ResourceAssembler<Movie, MovieRes
                 ControllerLinkBuilder.linkTo(
                         ControllerLinkBuilder
                                 .methodOn(MovieRestController.class)
-                                .getStorylines(id)
-                ).withRel("storylines")
+                                .getOutlines(id)
+                ).withRel("outlines")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getSummaries(id)
+                ).withRel("summaries")
+        );
+
+        movieResource.add(
+                ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieRestController.class)
+                                .getSynopses(id)
+                ).withRel("synopses")
         );
 
         movieResource.add(

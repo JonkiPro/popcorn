@@ -37,8 +37,8 @@
                     <ul class="mail-list" data-ng-repeat="message in messages">
                         <li class="ng-cloak">
                             <a data-ng-href="/messages/{{message.id}}">
-                                <span class="mail-sender">{{message.sender}}</span>
-                                <span class="mail-sender">{{message.recipient}}</span>
+                                <span class="mail-sender">{{message.sender.username}}</span>
+                                <span class="mail-sender">{{message.recipient.username}}</span>
                                 <span class="mail-subject">{{message.subject}}</span>
                                 <span class="mail-message-preview">{{message.text}}</span>
                                 <span class="mail-message-preview pull-right">{{message.date | date:'dd/MM/yyyy HH:mm:ss'}}</span>

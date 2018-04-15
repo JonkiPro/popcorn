@@ -12,6 +12,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Representation of the movie.
@@ -57,7 +58,13 @@ public class MovieEntity implements Serializable {
     private List<MovieReleaseDateEntity> releaseDates = new ArrayList<>();
 
     @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<MovieStorylineEntity> storylines = new ArrayList<>();
+    private List<MovieOutlineEntity> outlines = new ArrayList<>();
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MovieSummaryEntity> summaries = new ArrayList<>();
+
+    @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MovieSynopsisEntity> synopses = new ArrayList<>();
 
     @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MovieBoxOfficeEntity> boxOffices = new ArrayList<>();
@@ -99,17 +106,34 @@ public class MovieEntity implements Serializable {
     @Column(name = "rating")
     private Float rating;
 
+    @Basic
+    @Column(name = "favorite_count", nullable = false)
+    private Integer favoriteCount;
+
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     @OrderBy("created ASC")
     private List<ContributionEntity> contributions = new ArrayList<>();
 
     /**
      * Assign the status "WAITING" when saving a object and the status is null.
+     * Initializing the favorite counter to zero.
      */
     @PrePersist
     protected void onCreateMovieEntity() {
         if(this.status == null) {
             status = DataStatus.WAITING;
         }
+        if (this.favoriteCount == null) {
+            this.favoriteCount = 0;
+        }
+    }
+
+    /**
+     * Get the movie's rating.
+     *
+     * @return The movie's rating
+     */
+    public Optional<Float> getRating() {
+        return Optional.ofNullable(this.rating);
     }
 }

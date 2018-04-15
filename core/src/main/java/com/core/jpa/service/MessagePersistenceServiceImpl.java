@@ -7,10 +7,10 @@ import com.core.jpa.entity.MessageEntity;
 import com.core.jpa.entity.UserEntity;
 import com.core.jpa.repository.MessageRepository;
 import com.core.jpa.repository.UserRepository;
+import com.core.service.AuthorizationService;
 import com.core.service.MessagePersistenceService;
 import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -37,20 +38,24 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
 
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final AuthorizationService authorizationService;
 
     /**
      * Constructor.
      *
      * @param messageRepository The message repository to use
      * @param userRepository The user repository to use
+     * @param authorizationService The authorization service to use
      */
     @Autowired
     public MessagePersistenceServiceImpl(
             @NotNull final MessageRepository messageRepository,
-            @NotNull final UserRepository userRepository
+            @NotNull final UserRepository userRepository,
+            @NotNull final AuthorizationService authorizationService
     ) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
+        this.authorizationService = authorizationService;
     }
 
     /**
@@ -58,17 +63,16 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
      */
     @Override
     public String createMessage(
-            @NotBlank final String senderId,
-            @NotNull @Valid SendMessageDTO sendMessageDTO
+            @NotNull @Valid final SendMessageDTO sendMessageDTO
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with senderId {}, sendMessageDTO {}", senderId, sendMessageDTO);
+        log.info("Called with sendMessageDTO {}", sendMessageDTO);
 
-        final UserEntity user = this.findUser(senderId);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MessageEntity message = this.sendMessageDtoToMessageEntity(sendMessageDTO);
 
         message.setSender(user);
 
-        if(message.getRecipient().getUniqueId().equals(senderId)) {
+        if(message.getRecipient().getUniqueId().equals(user.getUniqueId())) {
             throw new ResourceConflictException("The recipient's ID can't be the same as the sender's ID");
         }
 
@@ -83,15 +87,14 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
      */
     @Override
     public void deleteMessageSent(
-            @NotBlank final String messageId,
-            @NotBlank final String userId
+            @NotBlank final String id
     ) throws ResourceNotFoundException {
-        log.info("Called with messageId {}, userId {}", messageId, userId);
+        log.info("Called with id {}", id);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MessageEntity message
-                = this.messageRepository.findByUniqueIdAndSenderAndIsVisibleForSenderTrue(messageId, user)
-                         .orElseThrow(() -> new ResourceNotFoundException("No message sent found with id " + messageId));
+                = this.messageRepository.findByUniqueIdAndSenderAndIsVisibleForSenderTrue(id, user)
+                         .orElseThrow(() -> new ResourceNotFoundException("No message sent found with id " + id));
 
         message.setVisibleForSender(false);
 
@@ -103,15 +106,14 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
      */
     @Override
     public void deleteMessageReceived(
-            @NotBlank final String messageId,
-            @NotBlank final String userId
+            @NotBlank final String id
     ) throws ResourceNotFoundException {
-        log.info("Called with messageId {}, userId {}", messageId, userId);
+        log.info("Called with id {}", id);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MessageEntity message
-                = this.messageRepository.findByUniqueIdAndRecipientAndIsVisibleForRecipientTrue(messageId, user)
-                         .orElseThrow(() -> new ResourceNotFoundException("No message received found with id " + messageId));
+                = this.messageRepository.findByUniqueIdAndRecipientAndIsVisibleForRecipientTrue(id, user)
+                         .orElseThrow(() -> new ResourceNotFoundException("No message received found with id " + id));
 
         message.setVisibleForRecipient(false);
 

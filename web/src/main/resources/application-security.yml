@@ -23,6 +23,6 @@ security:
 
 
 #reCaptcha
-app.reCaptcha:
+app.re-captcha:
   api-url: https://www.google.com/recaptcha/api/siteverify
   secret-key: 6LeTEjAUAAAAAB23AV1aokKfDYhfP-HLIV90DRWq

@@ -17,7 +17,7 @@ import com.web.web.hateoas.assembler.MovieResourceAssembler;
 import com.web.web.hateoas.assembler.MovieSearchResultResourceAssembler;
 import com.web.web.hateoas.resource.MovieResource;
 import com.web.web.hateoas.resource.MovieSearchResultResource;
-import com.web.web.security.service.AuthorizationService;
+import com.core.service.AuthorizationService;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +91,7 @@ public class MovieRestController {
     ) {
         log.info("Called with movieDTO {}", movieDTO);
 
-        this.moviePersistenceService.createMovie(movieDTO, this.authorizationService.getUserId());
+        this.moviePersistenceService.createMovie(movieDTO);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
 
@@ -115,7 +115,7 @@ public class MovieRestController {
     ) {
         log.info("Called with id {}, status {}", id, status);
 
-        this.moviePersistenceService.updateMovieStatus(id, authorizationService.getUserId(), status);
+        this.moviePersistenceService.updateMovieStatus(id, status);
     }
 
     @ApiOperation(value = "Find movies")
@@ -176,7 +176,7 @@ public class MovieRestController {
     }
 
     @ApiOperation(value = "Get movie")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found or no user found") })
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public
@@ -186,7 +186,11 @@ public class MovieRestController {
     ) {
         log.info("Called with id {}", id);
 
-        return this.movieResourceAssembler.toResource(this.movieSearchService.getMovie(id));
+        if(this.authorizationService.isLogged()) {
+            return this.movieResourceAssembler.toResource(this.movieSearchService.getUserMovie(id));
+        } else {
+            return this.movieResourceAssembler.toResource(this.movieSearchService.getMovie(id));
+        }
     }
 
     @ApiOperation(value = "Get movie titles")
@@ -217,18 +221,46 @@ public class MovieRestController {
         return this.movieSearchService.getReleaseDates(id);
     }
 
-    @ApiOperation(value = "Get movie storylines")
+    @ApiOperation(value = "Get movie outlines")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
-    @GetMapping(value = "/{id}/storylines")
+    @GetMapping(value = "/{id}/outlines")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<Storyline> getStorylines(
+    Set<Outline> getOutlines(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
         log.info("Called with id {}", id);
 
-        return this.movieSearchService.getStorylines(id);
+        return this.movieSearchService.getOutlines(id);
+    }
+
+    @ApiOperation(value = "Get movie summaries")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
+    @GetMapping(value = "/{id}/summaries")
+    @ResponseStatus(HttpStatus.OK)
+    public
+    Set<Summary> getSummaries(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        return this.movieSearchService.getSummaries(id);
+    }
+
+    @ApiOperation(value = "Get movie synopses")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
+    @GetMapping(value = "/{id}/synopses")
+    @ResponseStatus(HttpStatus.OK)
+    public
+    Set<Synopsis> getSynopses(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        return this.movieSearchService.getSynopses(id);
     }
 
     @ApiOperation(value = "Get movie box offices")
@@ -360,7 +392,7 @@ public class MovieRestController {
     ) {
         log.info("Called with id {}, rate {}", id, rate);
 
-        this.moviePersistenceService.saveRating(rate, id, this.authorizationService.getUserId());
+        this.moviePersistenceService.saveRating(id, rate);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
 
@@ -379,5 +411,45 @@ public class MovieRestController {
         log.info("Called with id {}", id);
 
         return this.movieSearchService.getRatings(id);
+    }
+
+    @ApiOperation(value = "Add a movie to your favourites list")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No movie found"),
+            @ApiResponse(code = 409, message = "The movie is added to favorites")
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/{id}/favorite")
+    @ResponseStatus(HttpStatus.CREATED)
+    public
+    ResponseEntity<Void> favoriteMovie(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        this.moviePersistenceService.setFavoriteQuestion(id);
+
+        final HttpHeaders httpHeaders = new HttpHeaders();
+
+        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Remove a movie from your favourites list")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No movie found"),
+            @ApiResponse(code = 409, message = "The movie is not added to favorites")
+    })
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @DeleteMapping(value = "/{id}/favorite/undo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public
+    void undoFavoriteMovie(
+            @ApiParam(value = "The movie ID", required = true)
+            @PathVariable("id") final Long id
+    ) {
+        log.info("Called with id {}", id);
+
+        this.moviePersistenceService.undoFavoriteQuestion(id);
     }
 }

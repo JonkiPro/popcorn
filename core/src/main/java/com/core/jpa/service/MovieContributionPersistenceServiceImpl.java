@@ -13,6 +13,7 @@ import com.core.jpa.repository.ContributionRepository;
 import com.core.jpa.repository.MovieInfoRepository;
 import com.core.jpa.repository.MovieRepository;
 import com.core.jpa.repository.UserRepository;
+import com.core.service.AuthorizationService;
 import com.core.service.MovieContributionPersistenceService;
 import com.core.service.MoviePersistenceService;
 import com.common.dto.DataStatus;
@@ -22,7 +23,6 @@ import com.core.service.StorageService;
 import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -36,8 +36,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,6 +63,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
     private final UserRepository userRepository;
     private final MoviePersistenceService moviePersistenceService;
     private final StorageService storageService;
+    private final AuthorizationService authorizationServicea;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -78,6 +77,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      * @param userRepository The user repository to use
      * @param moviePersistenceService The movie persistence service to use
      * @param storageService The storage service to use
+     * @param authorizationService The authorization service to use
      */
     @Autowired
     public MovieContributionPersistenceServiceImpl(
@@ -86,7 +86,8 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
             @NotNull final ContributionRepository contributionRepository,
             @NotNull final UserRepository userRepository,
             @NotNull final MoviePersistenceService moviePersistenceService,
-            @Qualifier("googleStorageService") @NotNull final StorageService storageService
+            @Qualifier("googleStorageService") @NotNull final StorageService storageService,
+            @NotNull final AuthorizationService authorizationService
     ) {
         this.movieRepository = movieRepository;
         this.movieInfoRepository = movieInfoRepository;
@@ -94,6 +95,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         this.userRepository = userRepository;
         this.moviePersistenceService = moviePersistenceService;
         this.storageService = storageService;
+        this.authorizationServicea = authorizationService;
     }
 
     /**
@@ -101,15 +103,14 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updateContributionStatus(
-            @Min(1) final Long contributionId,
-            @NotBlank final String userId,
+            @Min(1) final Long id,
             @NotNull final VerificationStatus status,
             final String comment
     ) throws ResourceForbiddenException, ResourceNotFoundException {
-        log.info("Called with contributionId {}, userId {}, status {}, comment {}", contributionId, userId, status, comment);
+        log.info("Called with id {}, status {}, comment {}", id, status, comment);
 
-        final UserEntity user = this.findUser(userId);
-        final ContributionEntity contribution = this.findContribution(contributionId, DataStatus.WAITING);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final ContributionEntity contribution = this.findContribution(id, DataStatus.WAITING);
 
         if(!CollectionUtils.containsAny(user.getPermissions(), contribution.getField().getNecessaryPermissions())) {
             throw new ResourceForbiddenException("No permissions");
@@ -132,14 +133,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public Long createOtherTitleContribution(
-            @NotNull @Valid final ContributionNew<OtherTitle> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<OtherTitle> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieOtherTitleEntity> otherTitlesEntities = movie.getOtherTitles().stream()
                 .filter(otherTitle -> otherTitle.getStatus() == DataStatus.ACCEPTED
@@ -179,14 +179,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updateOtherTitleContribution(
-            @NotNull @Valid final ContributionUpdate<OtherTitle> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<OtherTitle> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.OTHER_TITLE);
 
         this.validIds(contributionEntity, contribution);
@@ -213,14 +212,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public Long createReleaseDateContribution(
-            @NotNull @Valid final ContributionNew<ReleaseDate> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<ReleaseDate> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieReleaseDateEntity> releaseDatesEntities = movie.getReleaseDates().stream()
                 .filter(releaseDate -> releaseDate.getStatus() == DataStatus.ACCEPTED
@@ -260,14 +258,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updateReleaseDateContribution(
-            @NotNull @Valid final ContributionUpdate<ReleaseDate> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<ReleaseDate> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.RELEASE_DATE);
 
         this.validIds(contributionEntity, contribution);
@@ -293,76 +290,232 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      * {@inheritDoc}
      */
     @Override
-    public Long createStorylineContribution(
-            @NotNull @Valid final ContributionNew<Storyline> contribution,
+    public Long createOutlineContribution(
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<Outline> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
-        final List<MovieStorylineEntity> storylinesEntities = movie.getStorylines().stream()
-                .filter(storyline -> storyline.getStatus() == DataStatus.ACCEPTED
-                        && !storyline.isReportedForUpdate() && !storyline.isReportedForDelete()
+        final List<MovieOutlineEntity> outlineEntities = movie.getOutlines().stream()
+                .filter(outline -> outline.getStatus() == DataStatus.ACCEPTED
+                        && !outline.isReportedForUpdate() && !outline.isReportedForDelete()
                 ).collect(Collectors.toList());
         final Set<Long> idsToAdd = new HashSet<>();
         final Map<Long, Long> idsToUpdate = new HashMap<>();
 
-        this.validIds(storylinesEntities, contribution);
+        this.validIds(outlineEntities, contribution);
 
         if (CollectionUtils.containsAny(contribution.getElementsToUpdate().keySet(), contribution.getIdsToDelete())) {
             throw new ResourceConflictException("Conflict of operation on the same element");
         }
 
         contribution.getElementsToAdd()
-                .forEach(storyline -> {
-                    final Long id = this.moviePersistenceService.createStoryline(storyline, movie);
+                .forEach(outline -> {
+                    final Long id = this.moviePersistenceService.createOutline(outline, movie);
                     idsToAdd.add(id);
                 });
         contribution.getElementsToUpdate()
                 .forEach((key, value) -> {
-                    final Long id = this.moviePersistenceService.createStoryline(value, movie);
-                    this.setReportedForUpdate(storylinesEntities, key);
+                    final Long id = this.moviePersistenceService.createOutline(value, movie);
+                    this.setReportedForUpdate(outlineEntities, key);
                     idsToUpdate.put(id, key);
                 });
         contribution.getIdsToDelete()
                 .forEach(id ->
-                        this.setReportedForDelete(storylinesEntities, id)
+                        this.setReportedForDelete(outlineEntities, id)
                 );
 
         return this.createContributions(idsToAdd, contribution.getIdsToDelete(), idsToUpdate, movie, user,
-                MovieField.STORYLINE, contribution.getSources(), contribution.getComment());
+                MovieField.OUTLINE, contribution.getSources(), contribution.getComment());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateStorylineContribution(
-            @NotNull @Valid final ContributionUpdate<Storyline> contribution,
+    public void updateOutlineContribution(
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<Outline> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
-        final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.STORYLINE);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.OUTLINE);
 
         this.validIds(contributionEntity, contribution);
-        this.cleanUp(contributionEntity, contribution, contributionEntity.getMovie().getStorylines());
+        this.cleanUp(contributionEntity, contribution, contributionEntity.getMovie().getOutlines());
 
         contribution.getElementsToAdd().forEach((key, value) -> {
-            this.moviePersistenceService.updateStoryline(value, key, contributionEntity.getMovie());
+            this.moviePersistenceService.updateOutline(value, key, contributionEntity.getMovie());
         });
         contribution.getElementsToUpdate().forEach((key, value) -> {
-            this.moviePersistenceService.updateStoryline(value, key, contributionEntity.getMovie());
+            this.moviePersistenceService.updateOutline(value, key, contributionEntity.getMovie());
         });
         contribution.getNewElementsToAdd()
-                .forEach(storyline -> {
-                    final Long id = this.moviePersistenceService.createStoryline(storyline, contributionEntity.getMovie());
+                .forEach(outline -> {
+                    final Long id = this.moviePersistenceService.createOutline(outline, contributionEntity.getMovie());
+                    contributionEntity.getIdsToAdd().add(id);
+                });
+
+        contributionEntity.setSources(contribution.getSources());
+        Optional.ofNullable(contribution.getComment()).ifPresent(contributionEntity::setUserComment);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createSummaryContribution(
+            @Min(1) final Long movieId,
+            @NotNull @Valid final ContributionNew<Summary> contribution
+    ) throws ResourceNotFoundException, ResourceConflictException {
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
+
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
+        final List<MovieSummaryEntity> summaryEntities = movie.getSummaries().stream()
+                .filter(summary -> summary.getStatus() == DataStatus.ACCEPTED
+                        && !summary.isReportedForUpdate() && !summary.isReportedForDelete()
+                ).collect(Collectors.toList());
+        final Set<Long> idsToAdd = new HashSet<>();
+        final Map<Long, Long> idsToUpdate = new HashMap<>();
+
+        this.validIds(summaryEntities, contribution);
+
+        if (CollectionUtils.containsAny(contribution.getElementsToUpdate().keySet(), contribution.getIdsToDelete())) {
+            throw new ResourceConflictException("Conflict of operation on the same element");
+        }
+
+        contribution.getElementsToAdd()
+                .forEach(summary -> {
+                    final Long id = this.moviePersistenceService.createSummary(summary, movie);
+                    idsToAdd.add(id);
+                });
+        contribution.getElementsToUpdate()
+                .forEach((key, value) -> {
+                    final Long id = this.moviePersistenceService.createSummary(value, movie);
+                    this.setReportedForUpdate(summaryEntities, key);
+                    idsToUpdate.put(id, key);
+                });
+        contribution.getIdsToDelete()
+                .forEach(id ->
+                        this.setReportedForDelete(summaryEntities, id)
+                );
+
+        return this.createContributions(idsToAdd, contribution.getIdsToDelete(), idsToUpdate, movie, user,
+                MovieField.SUMMARY, contribution.getSources(), contribution.getComment());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateSummaryContribution(
+            @Min(1) final Long contributionId,
+            @NotNull @Valid final ContributionUpdate<Summary> contribution
+    ) throws ResourceNotFoundException, ResourceConflictException {
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
+
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.SUMMARY);
+
+        this.validIds(contributionEntity, contribution);
+        this.cleanUp(contributionEntity, contribution, contributionEntity.getMovie().getSummaries());
+
+        contribution.getElementsToAdd().forEach((key, value) -> {
+            this.moviePersistenceService.updateSummary(value, key, contributionEntity.getMovie());
+        });
+        contribution.getElementsToUpdate().forEach((key, value) -> {
+            this.moviePersistenceService.updateSummary(value, key, contributionEntity.getMovie());
+        });
+        contribution.getNewElementsToAdd()
+                .forEach(summary -> {
+                    final Long id = this.moviePersistenceService.createSummary(summary, contributionEntity.getMovie());
+                    contributionEntity.getIdsToAdd().add(id);
+                });
+
+        contributionEntity.setSources(contribution.getSources());
+        Optional.ofNullable(contribution.getComment()).ifPresent(contributionEntity::setUserComment);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long createSynopsisContribution(
+            @Min(1) final Long movieId,
+            @NotNull @Valid final ContributionNew<Synopsis> contribution
+    ) throws ResourceNotFoundException, ResourceConflictException {
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
+
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
+        final List<MovieSynopsisEntity> synopsisEntities = movie.getSynopses().stream()
+                .filter(synopsis -> synopsis.getStatus() == DataStatus.ACCEPTED
+                        && !synopsis.isReportedForUpdate() && !synopsis.isReportedForDelete()
+                ).collect(Collectors.toList());
+        final Set<Long> idsToAdd = new HashSet<>();
+        final Map<Long, Long> idsToUpdate = new HashMap<>();
+
+        this.validIds(synopsisEntities, contribution);
+
+        if (CollectionUtils.containsAny(contribution.getElementsToUpdate().keySet(), contribution.getIdsToDelete())) {
+            throw new ResourceConflictException("Conflict of operation on the same element");
+        }
+
+        contribution.getElementsToAdd()
+                .forEach(synopsis -> {
+                    final Long id = this.moviePersistenceService.createSynopsis(synopsis, movie);
+                    idsToAdd.add(id);
+                });
+        contribution.getElementsToUpdate()
+                .forEach((key, value) -> {
+                    final Long id = this.moviePersistenceService.createSynopsis(value, movie);
+                    this.setReportedForUpdate(synopsisEntities, key);
+                    idsToUpdate.put(id, key);
+                });
+        contribution.getIdsToDelete()
+                .forEach(id ->
+                        this.setReportedForDelete(synopsisEntities, id)
+                );
+
+        return this.createContributions(idsToAdd, contribution.getIdsToDelete(), idsToUpdate, movie, user,
+                MovieField.SYNOPSIS, contribution.getSources(), contribution.getComment());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateSynopsisContribution(
+            @Min(1) final Long contributionId,
+            @NotNull @Valid final ContributionUpdate<Synopsis> contribution
+    ) throws ResourceNotFoundException, ResourceConflictException {
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
+
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.SYNOPSIS);
+
+        this.validIds(contributionEntity, contribution);
+        this.cleanUp(contributionEntity, contribution, contributionEntity.getMovie().getSynopses());
+
+        contribution.getElementsToAdd().forEach((key, value) -> {
+            this.moviePersistenceService.updateSynopsis(value, key, contributionEntity.getMovie());
+        });
+        contribution.getElementsToUpdate().forEach((key, value) -> {
+            this.moviePersistenceService.updateSynopsis(value, key, contributionEntity.getMovie());
+        });
+        contribution.getNewElementsToAdd()
+                .forEach(synopsis -> {
+                    final Long id = this.moviePersistenceService.createSynopsis(synopsis, contributionEntity.getMovie());
                     contributionEntity.getIdsToAdd().add(id);
                 });
 
@@ -375,14 +528,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public Long createBoxOfficeContribution(
-            @NotNull @Valid final ContributionNew<BoxOffice> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<BoxOffice> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieBoxOfficeEntity> boxOfficesEntities = movie.getBoxOffices().stream()
                 .filter(boxOffice -> boxOffice.getStatus() == DataStatus.ACCEPTED
@@ -422,14 +574,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updateBoxOfficeContribution(
-            @NotNull @Valid final ContributionUpdate<BoxOffice> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<BoxOffice> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.BOX_OFFICE);
 
         this.validIds(contributionEntity, contribution);
@@ -456,14 +607,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public Long createSiteContribution(
-            @NotNull @Valid final ContributionNew<Site> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<Site> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieSiteEntity> sitesEntities = movie.getSites().stream()
                 .filter(site -> site.getStatus() == DataStatus.ACCEPTED
@@ -503,14 +653,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updateSiteContribution(
-            @NotNull @Valid final ContributionUpdate<Site> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<Site> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.SITE);
 
         this.validIds(contributionEntity, contribution);
@@ -537,14 +686,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public Long createCountryContribution(
-            @NotNull @Valid final ContributionNew<Country> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<Country> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieCountryEntity> countriesEntities = movie.getCountries().stream()
                 .filter(country -> country.getStatus() == DataStatus.ACCEPTED
@@ -584,14 +732,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updateCountryContribution(
-            @NotNull @Valid final ContributionUpdate<Country> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<Country> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.COUNTRY);
 
         this.validIds(contributionEntity, contribution);
@@ -618,14 +765,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public Long createLanguageContribution(
-            @NotNull @Valid final ContributionNew<Language> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<Language> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieLanguageEntity> languagesEntities = movie.getLanguages().stream()
                 .filter(language -> language.getStatus() == DataStatus.ACCEPTED
@@ -665,14 +811,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updateLanguageContribution(
-            @NotNull @Valid final ContributionUpdate<Language> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<Language> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.LANGUAGE);
 
         this.validIds(contributionEntity, contribution);
@@ -699,14 +844,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public Long createGenreContribution(
-            @NotNull @Valid final ContributionNew<Genre> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<Genre> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieGenreEntity> genresEntities = movie.getGenres().stream()
                 .filter(genre -> genre.getStatus() == DataStatus.ACCEPTED
@@ -746,14 +890,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updateGenreContribution(
-            @NotNull @Valid final ContributionUpdate<Genre> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<Genre> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.GENRE);
 
         this.validIds(contributionEntity, contribution);
@@ -780,14 +923,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public Long createReviewContribution(
-            @NotNull @Valid final ContributionNew<Review> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<Review> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieReviewEntity> reviewsEntities = movie.getReviews().stream()
                 .filter(review -> review.getStatus() == DataStatus.ACCEPTED
@@ -827,14 +969,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updateReviewContribution(
-            @NotNull @Valid final ContributionUpdate<Review> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<Review> contribution
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.REVIEW);
 
         this.validIds(contributionEntity, contribution);
@@ -861,14 +1002,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public Long createPhotoContribution(
-            @NotNull @Valid final ContributionNew<ImageRequest> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<ImageRequest> contribution
     ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MoviePhotoEntity> photosEntities = movie.getPhotos().stream()
                 .filter(photo -> photo.getStatus() == DataStatus.ACCEPTED
@@ -912,14 +1052,13 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Override
     public void updatePhotoContribution(
-            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution
     ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.PHOTO);
 
         final Set<Long> idsToAddBeforeCleanUp = new HashSet<>(contributionEntity.getIdsToAdd());
@@ -961,16 +1100,18 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         Optional.ofNullable(contribution.getComment()).ifPresent(contributionEntity::setUserComment);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long createPosterContribution(
-            @NotNull @Valid final ContributionNew<ImageRequest> contribution,
             @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionNew<ImageRequest> contribution
     ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException {
-        log.info("Called with contribution {}, movieId {}, userId {}",
-                contribution, movieId, userId);
+        log.info("Called with movieId {}, contribution {}",
+                movieId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MoviePosterEntity> postersEntities = movie.getPosters().stream()
                 .filter(poster -> poster.getStatus() == DataStatus.ACCEPTED
@@ -1009,16 +1150,18 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
                 MovieField.POSTER, contribution.getSources(), contribution.getComment());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updatePosterContribution(
-            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution,
             @Min(1) final Long contributionId,
-            @NotBlank final String userId
+            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution
     ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException {
-        log.info("Called with contribution {}, contributionId {}, userId {}",
-                contribution, contributionId, userId);
+        log.info("Called with contributionId {}, contribution {}",
+                contributionId, contribution);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.POSTER);
 
         final Set<Long> idsToAddBeforeCleanUp = new HashSet<>(contributionEntity.getIdsToAdd());
@@ -1295,8 +1438,8 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
     private void cleanUpIdsToUpdate(final Map<Long, Long> idsToUpdateFromEntity, final Set<Long> idsToUpdateFromDto) {
         for (final Iterator<Map.Entry<Long, Long>> it = idsToUpdateFromEntity.entrySet().iterator(); it.hasNext(); ) {
             if (!idsToUpdateFromDto.contains(it.next().getKey())) {
-                final MovieInfoEntity oldElement = this.movieInfoRepository.findOne(it.next().getValue());
-                final MovieInfoEntity newElement = this.movieInfoRepository.findOne(it.next().getKey());
+                final MovieInfoEntity oldElement = this.movieInfoRepository.getOne(it.next().getValue());
+                final MovieInfoEntity newElement = this.movieInfoRepository.getOne(it.next().getKey());
 
                 it.remove();
                 this.entityManager.remove(newElement);
@@ -1315,7 +1458,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         for(final Iterator<Long> it = idsToDeleteFromEntity.iterator(); it.hasNext();) {
             final Long id = it.next();
             if(!idsToDeleteFromDto.contains(id)) {
-                this.movieInfoRepository.findOne(id).setReportedForDelete(false);
+                this.movieInfoRepository.getOne(id).setReportedForDelete(false);
                 it.remove();
             }
         }
@@ -1338,20 +1481,22 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     private void acceptContribution(final ContributionEntity contribution) {
         contribution.getIdsToAdd().forEach(id -> {
-            final MovieInfoEntity element = this.movieInfoRepository.findOne(id);
+            final MovieInfoEntity element = this.movieInfoRepository.getOne(id);
             element.setStatus(DataStatus.ACCEPTED);
         });
         contribution.getIdsToDelete().forEach(id -> {
-            final MovieInfoEntity element = this.movieInfoRepository.findOne(id);
+            final MovieInfoEntity element = this.movieInfoRepository.getOne(id);
             element.setStatus(DataStatus.DELETED);
         });
-        if(contribution.getField() == MovieField.STORYLINE
+        if(contribution.getField() == MovieField.OUTLINE
+                || contribution.getField() == MovieField.SUMMARY
+                || contribution.getField() == MovieField.SYNOPSIS
                 || contribution.getField() == MovieField.REVIEW) {
             this.updatePatch(contribution);
         } else {
             contribution.getIdsToUpdate().forEach((key, value) -> {
-                final MovieInfoEntity newElement = this.movieInfoRepository.findOne(key);
-                final MovieInfoEntity oldElement = this.movieInfoRepository.findOne(value);
+                final MovieInfoEntity newElement = this.movieInfoRepository.getOne(key);
+                final MovieInfoEntity oldElement = this.movieInfoRepository.getOne(value);
 
                 newElement.setStatus(DataStatus.ACCEPTED);
                 oldElement.setStatus(DataStatus.EDITED);
@@ -1366,16 +1511,16 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     private void rejectContribution(final ContributionEntity contribution) {
         contribution.getIdsToAdd().forEach(id -> {
-            final MovieInfoEntity element = this.movieInfoRepository.findOne(id);
+            final MovieInfoEntity element = this.movieInfoRepository.getOne(id);
             element.setStatus(DataStatus.REJECTED);
         });
         contribution.getIdsToDelete().forEach(id -> {
-            final MovieInfoEntity element = this.movieInfoRepository.findOne(id);
+            final MovieInfoEntity element = this.movieInfoRepository.getOne(id);
             element.setReportedForDelete(false);
         });
         contribution.getIdsToUpdate().forEach((key, value) -> {
-            final MovieInfoEntity newElement = this.movieInfoRepository.findOne(key);
-            final MovieInfoEntity oldElement = this.movieInfoRepository.findOne(value);
+            final MovieInfoEntity newElement = this.movieInfoRepository.getOne(key);
+            final MovieInfoEntity oldElement = this.movieInfoRepository.getOne(value);
 
             newElement.setStatus(DataStatus.REJECTED);
             oldElement.setReportedForUpdate(false);
@@ -1383,21 +1528,41 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
     }
 
     /**
-     * Helper method to update storyline and review.
+     * Helper method to update: outline, summary, synopsis, review.
      *
      * @param contribution The ContributionEntity object
      * @throws ResourceConflictException if the element exists
      */
     private void updatePatch(final ContributionEntity contribution) throws ResourceConflictException {
-        if(contribution.getField() == MovieField.STORYLINE) {
+        if(contribution.getField() == MovieField.OUTLINE) {
             contribution.getIdsToUpdate().forEach((key, value) -> {
-                final MovieStorylineEntity newStoryline = this.entityManager.find(MovieStorylineEntity.class, key);
-                final MovieStorylineEntity oldStoryline = this.entityManager.find(MovieStorylineEntity.class, value);
+                final MovieOutlineEntity newOutline = this.entityManager.find(MovieOutlineEntity.class, key);
+                final MovieOutlineEntity oldOutline = this.entityManager.find(MovieOutlineEntity.class, value);
 
-                this.moviePersistenceService.updateStoryline(ServiceUtils.toStorylineDto(newStoryline), value, contribution.getMovie());
+                this.moviePersistenceService.updateOutline(ServiceUtils.toOutlineDto(newOutline), value, contribution.getMovie());
 
-                oldStoryline.setReportedForUpdate(false);
-                newStoryline.setStatus(DataStatus.AMENDMENT_ACCEPTED);
+                oldOutline.setReportedForUpdate(false);
+                newOutline.setStatus(DataStatus.AMENDMENT_ACCEPTED);
+            });
+        } else if(contribution.getField() == MovieField.SUMMARY) {
+            contribution.getIdsToUpdate().forEach((key, value) -> {
+                final MovieSummaryEntity newSummary = this.entityManager.find(MovieSummaryEntity.class, key);
+                final MovieSummaryEntity oldSummary = this.entityManager.find(MovieSummaryEntity.class, value);
+
+                this.moviePersistenceService.updateSummary(ServiceUtils.toSummaryDto(newSummary), value, contribution.getMovie());
+
+                oldSummary.setReportedForUpdate(false);
+                newSummary.setStatus(DataStatus.AMENDMENT_ACCEPTED);
+            });
+        } else if(contribution.getField() == MovieField.SYNOPSIS) {
+            contribution.getIdsToUpdate().forEach((key, value) -> {
+                final MovieSynopsisEntity newSynopsis= this.entityManager.find(MovieSynopsisEntity.class, key);
+                final MovieSynopsisEntity oldSynopsis = this.entityManager.find(MovieSynopsisEntity.class, value);
+
+                this.moviePersistenceService.updateSynopsis(ServiceUtils.toSynopsisDto(newSynopsis), value, contribution.getMovie());
+
+                oldSynopsis.setReportedForUpdate(false);
+                newSynopsis.setStatus(DataStatus.AMENDMENT_ACCEPTED);
             });
         } else if(contribution.getField() == MovieField.REVIEW) {
             contribution.getIdsToUpdate().forEach((key, value) -> {

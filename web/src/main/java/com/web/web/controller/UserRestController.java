@@ -10,7 +10,7 @@ import com.web.web.hateoas.assembler.UserResourceAssembler;
 import com.web.web.hateoas.assembler.UserSearchResultResourceAssembler;
 import com.web.web.hateoas.resource.UserResource;
 import com.web.web.hateoas.resource.UserSearchResultResource;
-import com.web.web.security.service.AuthorizationService;
+import com.core.service.AuthorizationService;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,8 +123,9 @@ public class UserRestController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation(value = "Get user friends")
+    @ApiOperation(value = "Get user invitations")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping(value = "/{username}/invitations", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public
@@ -140,9 +141,7 @@ public class UserRestController {
             throw new ResourceForbiddenException("Forbidden command!");
         }
 
-        final String id = this.authorizationService.getUserId();
-
-        return this.userSearchService.getInvitations(id, outgoing)
+        return this.userSearchService.getInvitations(outgoing)
                 .stream()
                 .map(this.userResourceAssembler::toResource)
                 .collect(Collectors.toList());
@@ -170,6 +169,6 @@ public class UserRestController {
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory
                 .objectNode()
-                .set("status", factory.textNode(this.userSearchService.getUserFriendStatus(authId, otherId).toString()));
+                .set("status", factory.textNode(this.userSearchService.getUserFriendStatus(otherId).toString()));
     }
 }

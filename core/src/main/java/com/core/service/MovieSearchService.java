@@ -1,6 +1,7 @@
 package com.core.service;
 
 import com.common.dto.Movie;
+import com.common.dto.UserMovie;
 import com.common.dto.movie.*;
 import com.common.dto.movie.response.ImageResponse;
 import com.common.dto.movie.response.RateResponse;
@@ -67,6 +68,17 @@ public interface MovieSearchService {
     ) throws ResourceNotFoundException;
 
     /**
+     * Get user movie by ID.
+     *
+     * @param id The movie ID
+     * @return The movie
+     * @throws ResourceNotFoundException if no movie found or no user found
+     */
+    UserMovie getUserMovie(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
      * Get user ratings for the movie by ID.
      *
      * @param id The movie ID
@@ -100,13 +112,35 @@ public interface MovieSearchService {
     ) throws ResourceNotFoundException;
 
     /**
-     * Get storylines for the movie by ID.
+     * Get outlines for the movie by ID.
      *
      * @param id The movie ID
-     * @return Movie storylines
+     * @return Movie outlines
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<Storyline> getStorylines(
+    Set<Outline> getOutlines(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get summaries for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie summaries
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<Summary> getSummaries(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get synopses for the movie by ID.
+     *
+     * @param id The movie ID
+     * @return Movie synopses
+     * @throws ResourceNotFoundException if no movie found
+     */
+    Set<Synopsis> getSynopses(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 

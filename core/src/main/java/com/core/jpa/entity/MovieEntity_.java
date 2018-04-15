@@ -20,7 +20,9 @@ public abstract class MovieEntity_ {
     public static volatile SingularAttribute<MovieEntity, MovieType> type;
     public static volatile ListAttribute<MovieEntity, MovieOtherTitleEntity> otherTitles;
     public static volatile ListAttribute<MovieEntity, MovieReleaseDateEntity> releaseDates;
-    public static volatile ListAttribute<MovieEntity, MovieStorylineEntity> storylines;
+    public static volatile ListAttribute<MovieEntity, MovieOutlineEntity> outlines;
+    public static volatile ListAttribute<MovieEntity, MovieSummaryEntity> summaries;
+    public static volatile ListAttribute<MovieEntity, MovieSynopsisEntity> synopses;
     public static volatile ListAttribute<MovieEntity, MovieBoxOfficeEntity> boxOffices;
     public static volatile ListAttribute<MovieEntity, MovieSiteEntity> sites;
     public static volatile ListAttribute<MovieEntity, MovieCountryEntity> countries;

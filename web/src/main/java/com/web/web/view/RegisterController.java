@@ -1,6 +1,6 @@
 package com.web.web.view;
 
-import com.web.web.utils.SSLContextHelper;
+import com.web.web.util.SSLContextHelper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

@@ -9,7 +9,7 @@ import com.common.exception.ResourceConflictException;
 import com.common.exception.ResourceForbiddenException;
 import com.common.exception.ResourceNotFoundException;
 import com.core.jpa.entity.MovieEntity;
-import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Interfaces for providing persistence functions for movies other than search.
  */
+@PreAuthorize("hasRole('ROLE_USER')")
 @Validated
 public interface MoviePersistenceService {
 
@@ -26,26 +27,22 @@ public interface MoviePersistenceService {
      * Create movie with DTO data.
      *
      * @param movieDTO DTO with movie data
-     * @param userId The user ID
      * @throws ResourceNotFoundException if no user found
      */
     void createMovie(
-            @NotNull @Valid final MovieDTO movieDTO,
-            @NotBlank final String userId
+            @NotNull @Valid final MovieDTO movieDTO
     ) throws ResourceNotFoundException;
 
     /**
      * Update the movie status.
      *
-     * @param movieId The movie ID
-     * @param userId The user ID
+     * @param id The movie ID
      * @param status Status for the movie
      * @throws ResourceForbiddenException if no permissions
      * @throws ResourceNotFoundException if no movie found or no user found
      */
     void updateMovieStatus(
-            @Min(1) final Long movieId,
-            @NotBlank final String userId,
+            @Min(1) final Long id,
             @NotNull final VerificationStatus status
     ) throws ResourceForbiddenException, ResourceNotFoundException;
 
@@ -104,29 +101,83 @@ public interface MoviePersistenceService {
     ) throws ResourceConflictException;
 
     /**
-     * Save the storyline for the movie.
+     * Save the outline for the movie.
      *
-     * @param storyline The Storyline object to create and save
-     * @param movie The object of the movie to which the storyline will be added and check the uniqueness
+     * @param outline The Outline object to create and save
+     * @param movie The object of the movie to which the outline will be added and check the uniqueness
      * @return The ID of the created element
      * @throws ResourceConflictException if the element exists
      */
-    Long createStoryline(
-            @NotNull @Valid final Storyline storyline,
+    Long createOutline(
+            @NotNull @Valid final Outline outline,
             @NotNull final MovieEntity movie
     ) throws ResourceConflictException;
 
     /**
-     * Update the storyline of the movie.
+     * Update the outline of the movie.
      *
-     * @param storyline The Storyline object to update
-     * @param storylineId The ID of the storyline
-     * @param movie A movie object to check the existence of the same storyline
+     * @param outline The Outline object to update
+     * @param outlineId The ID of the outline
+     * @param movie A movie object to check the existence of the same outline
      * @throws ResourceConflictException if the element exists
      */
-    void updateStoryline(
-            @NotNull @Valid final Storyline storyline,
-            @Min(1) final Long storylineId,
+    void updateOutline(
+            @NotNull @Valid final Outline outline,
+            @Min(1) final Long outlineId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
+
+    /**
+     * Save the summary for the movie.
+     *
+     * @param summary The Summary object to create and save
+     * @param movie The object of the movie to which the summary will be added and check the uniqueness
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
+     */
+    Long createSummary(
+            @NotNull @Valid final Summary summary,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException;
+
+    /**
+     * Update the summary of the movie.
+     *
+     * @param summary The Summary object to update
+     * @param summaryId The ID of the summary
+     * @param movie A movie object to check the existence of the same summary
+     * @throws ResourceConflictException if the element exists
+     */
+    void updateSummary(
+            @NotNull @Valid final Summary summary,
+            @Min(1) final Long summaryId,
+            @NotNull MovieEntity movie
+    ) throws ResourceConflictException;
+
+    /**
+     * Save the synopsis for the movie.
+     *
+     * @param synopsis The Synopsis object to create and save
+     * @param movie The object of the movie to which the synopsis will be added and check the uniqueness
+     * @return The ID of the created element
+     * @throws ResourceConflictException if the element exists
+     */
+    Long createSynopsis(
+            @NotNull @Valid final Synopsis synopsis,
+            @NotNull final MovieEntity movie
+    ) throws ResourceConflictException;
+
+    /**
+     * Update the synopsis of the movie.
+     *
+     * @param synopsis The Synopsis object to update
+     * @param synopsisId The ID of the synopsis
+     * @param movie A movie object to check the existence of the same synopsis
+     * @throws ResourceConflictException if the element exists
+     */
+    void updateSynopsis(
+            @NotNull @Valid final Synopsis synopsis,
+            @Min(1) final Long synopsisId,
             @NotNull MovieEntity movie
     ) throws ResourceConflictException;
 
@@ -345,15 +396,35 @@ public interface MoviePersistenceService {
     /**
      * Save the rating for the movie.
      *
+     * @param id The movie ID
      * @param rate Rating for the movie
-     * @param movieId The movie ID
-     * @param userId The user ID
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if today's date is earlier than the release date of the movie
      */
     void saveRating(
-            @NotNull @Valid Rate rate,
-            @Min(1) final Long movieId,
-            @NotBlank final String userId
+            @Min(1) final Long id,
+            @NotNull @Valid Rate rate
+    ) throws ResourceNotFoundException, ResourceConflictException;
+
+    /**
+     * Add a movie to your favourites list.
+     *
+     * @param id The movie ID
+     * @throws ResourceNotFoundException if no movie found or no user found
+     * @throws ResourceConflictException if the movie is added to favorites
+     */
+    void setFavoriteQuestion(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException, ResourceConflictException;
+
+    /**
+     * Remove a movie from your favourites list.
+     *
+     * @param id The movie ID
+     * @throws ResourceNotFoundException if no movie found or no user found
+     * @throws ResourceConflictException if the movie is not added to favorites
+     */
+    void undoFavoriteQuestion(
+            @Min(1) final Long id
     ) throws ResourceNotFoundException, ResourceConflictException;
 }

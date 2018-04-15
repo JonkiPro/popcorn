@@ -41,7 +41,7 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
     private final String movieTitle;
 
     @ApiModelProperty(notes = "The name of the contribution author", required = true)
-    private final String username;
+    private final ShallowUser owner;
 
     @ApiModelProperty(notes = "The status of contribution", required = true)
     private final DataStatus status;
@@ -63,8 +63,8 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private final Date verificationDate;
 
-    @ApiModelProperty(notes = "The name of the verification user")
-    private final String verificationUsername;
+    @ApiModelProperty(notes = "The verification user")
+    private final ShallowUser verificationUser;
 
     @ApiModelProperty(notes = "The comment of the verification user")
     private final String verificationComment;
@@ -83,14 +83,14 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
         this.elementsUpdated = (Map<Long, T>) builder.bElementsUpdated;
         this.movieId = builder.bMovieId;
         this.movieTitle = builder.bMovieTitle;
-        this.username = builder.bUsername;
+        this.owner = builder.bOwner;
         this.status = builder.bStatus;
         this.field = builder.bField;
         this.sources = builder.bSources;
         this.userComment = builder.bUserComment;
         this.creationDate = builder.bCreationDate;
         this.verificationDate = builder.bVerificationDate;
-        this.verificationUsername = builder.bVerificationUsername;
+        this.verificationUser = builder.bVerificationUser;
         this.verificationComment = builder.bVerificationComment;
     }
 
@@ -105,14 +105,14 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
         private final Map<Long, ? extends MovieInfoDTO> bElementsUpdated = new HashMap<>();
         private final Long bMovieId;
         private final String bMovieTitle;
-        private final String bUsername;
+        private final ShallowUser bOwner;
         private final DataStatus bStatus;
         private final MovieField bField;
         private final Set<String> bSources;
         private String bUserComment;
         private final Date bCreationDate;
         private Date bVerificationDate;
-        private String bVerificationUsername;
+        private ShallowUser bVerificationUser;
         private String bVerificationComment;
 
         /**
@@ -120,7 +120,7 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
          *
          * @param movieId The movie ID
          * @param movieTitle The title of the movie
-         * @param username The author's name
+         * @param owner The author's name
          * @param status The data status
          * @param field The movie field
          * @param sources Sources of information
@@ -132,8 +132,8 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
                 final Long movieId,
                 @JsonProperty("movieTitle")
                 final String movieTitle,
-                @JsonProperty("username")
-                final String username,
+                @JsonProperty("owner")
+                final ShallowUser owner,
                 @JsonProperty("status")
                 final DataStatus status,
                 @JsonProperty("field")
@@ -145,7 +145,7 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
         ) {
             this.bMovieId = movieId;
             this.bMovieTitle = movieTitle;
-            this.bUsername = username;
+            this.bOwner = owner;
             this.bStatus = status;
             this.bField = field;
             this.bSources = sources;
@@ -175,13 +175,13 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
         }
 
         /**
-         * Set the verifier user name on this contribution.
+         * Set the verifier user on this contribution.
          *
-         * @param verificationUsername The name of the verifying user
+         * @param verificationUser The verifying user
          * @return The builder
          */
-        public Builder withVerificationUsername(@Nullable final String verificationUsername) {
-            this.bVerificationUsername = verificationUsername;
+        public Builder withVerificationUser(@Nullable final ShallowUser verificationUser) {
+            this.bVerificationUser = verificationUser;
             return this;
         }
 

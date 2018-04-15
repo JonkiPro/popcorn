@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Getter
 @JsonDeserialize(builder = BoxOffice.Builder.class)
@@ -19,7 +20,7 @@ public class BoxOffice extends MovieInfoDTO {
 
     @ApiModelProperty(notes = "Amount of money earned", required = true)
     @NotNull
-    private final String boxOffice;
+    private final BigDecimal boxOffice;
 
     @ApiModelProperty(notes = "Country of money earned", required = true)
     @NotNull
@@ -40,7 +41,7 @@ public class BoxOffice extends MovieInfoDTO {
      */
     public static class Builder {
 
-        private final String bBoxOffice;
+        private final BigDecimal bBoxOffice;
         private final CountryType bCountry;
 
         /**
@@ -51,7 +52,7 @@ public class BoxOffice extends MovieInfoDTO {
          */
         @JsonCreator
         public Builder(
-                @JsonProperty("boxOffice") final String boxOffice,
+                @JsonProperty("boxOffice") final BigDecimal boxOffice,
                 @JsonProperty("country") final CountryType country
         ) {
             this.bBoxOffice = boxOffice;

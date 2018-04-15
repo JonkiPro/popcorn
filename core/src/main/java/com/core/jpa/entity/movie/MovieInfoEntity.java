@@ -3,7 +3,7 @@ package com.core.jpa.entity.movie;
 import com.common.dto.DataStatus;
 import com.common.dto.MovieField;
 import com.core.jpa.entity.MovieEntity;
-import com.core.utils.EnumUtils;
+import com.core.util.EnumUtils;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

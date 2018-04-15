@@ -1,7 +1,7 @@
 package com.web.web.controller;
 
 import com.core.service.UserSearchService;
-import com.core.utils.EncryptUtils;
+import com.core.util.EncryptUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

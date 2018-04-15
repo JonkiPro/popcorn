@@ -1,11 +1,12 @@
 package com.web.web.recaptcha;
 
 import lombok.Data;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * Properties for ReCaptcha authorization.
@@ -13,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 @Component
 @Data
 @Validated
-@ConfigurationProperties("app.reCaptcha")
+@ConfigurationProperties(prefix = "app.re-captcha")
 public class ReCaptchaProperties {
 
     /**

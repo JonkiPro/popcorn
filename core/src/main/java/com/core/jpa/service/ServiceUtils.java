@@ -1,5 +1,6 @@
 package com.core.jpa.service;
 
+import com.common.constant.PathConstant;
 import com.common.dto.*;
 import com.common.dto.movie.*;
 import com.common.dto.movie.response.ImageResponse;
@@ -9,6 +10,13 @@ import com.core.jpa.entity.MessageEntity;
 import com.core.jpa.entity.MovieEntity;
 import com.core.jpa.entity.UserEntity;
 import com.core.jpa.entity.movie.*;
+
+import java.math.BigDecimal;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Utility methods for JPA services.
@@ -29,7 +37,9 @@ public final class ServiceUtils {
         )
                 .withId(userEntity.getUniqueId());
 
-        userEntity.getAvatarId().ifPresent(avatarId -> builder.withAvatarSrc(userEntity.getAvatarProvider().getUrlFile(avatarId)));
+        userEntity.getAvatarId()
+                .map(avatarId -> builder.withAvatarSrc(userEntity.getAvatarProvider().getUrlFile(avatarId)))
+                .orElseGet(() -> builder.withAvatarSrc(PathConstant.AVATAR_DEFAULT));
 
         return builder.build();
     }
@@ -44,7 +54,7 @@ public final class ServiceUtils {
         final Contribution.Builder builder = new Contribution.Builder(
                 contributionEntity.getMovie().getId(),
                 contributionEntity.getMovie().getTitle(),
-                contributionEntity.getUser().getUsername(),
+                toShallowUserDto(contributionEntity.getUser()),
                 contributionEntity.getStatus(),
                 contributionEntity.getField(),
                 contributionEntity.getSources(),
@@ -55,7 +65,7 @@ public final class ServiceUtils {
         contributionEntity.getUserComment().ifPresent(builder::withUserComment);
         contributionEntity.getVerificationDate().ifPresent(builder::withVerificationDate);
         contributionEntity.getVerificationUser().ifPresent(user ->
-            builder.withVerificationUsername(user.getUsername())
+            builder.withVerificationUser(toShallowUserDto(user))
         );
         contributionEntity.getVerificationComment().ifPresent(builder::withVerificationComment);
 
@@ -69,13 +79,84 @@ public final class ServiceUtils {
      * @return The immutable DTO representation of the entity data
      */
     static Movie toMovieDto(final MovieEntity movieEntity) {
-        final Movie.Builder builder = new Movie.Builder(
+        return initMovieDto(movieEntity).build();
+    }
+
+    /**
+     * Convert a movie entity to a DTO for external exposure.
+     *
+     * @param movieEntity The entity to convert
+     * @param userEntity The entity provides data
+     * @return The immutable DTO representation of the entity data
+     */
+    static UserMovie toUserMovieDto(final MovieEntity movieEntity, final UserEntity userEntity) {
+        final UserMovie.Builder builder = new UserMovie.Builder(initMovieDto(movieEntity).build());
+
+        final boolean isYourRating = movieEntity.getRatings().stream().map(MovieRateEntity::getUser).collect(Collectors.toList()).contains(userEntity);
+        if(isYourRating) {
+            final int i = movieEntity.getRatings().stream().map(MovieRateEntity::getUser).collect(Collectors.toList()).indexOf(userEntity);
+            builder.withYourRating((float) movieEntity.getRatings().stream().map(MovieRateEntity::getRate).collect(Collectors.toList()).get(i));
+        }
+        builder.withFavorited(userEntity.getFavoritesMovies().contains(movieEntity));
+
+        return builder.build();
+    }
+
+    /**
+     * Get and initialization of the movie's builder.
+     *
+     * @param movieEntity Movie entity to obtain data
+     * @return The builder of Movie DTO
+     */
+    private static Movie.Builder initMovieDto(final MovieEntity movieEntity) {
+        final Movie.Builder builder = (Movie.Builder) new Movie.Builder(
                 movieEntity.getTitle(),
                 movieEntity.getType()
         )
                 .withId(movieEntity.getId().toString());
 
-        return builder.build();
+        movieEntity.getRating().ifPresent(builder::withRating);
+        movieEntity.getRating().ifPresent(ratings -> builder.withNumberOfRating(movieEntity.getRatings().size()));
+        final Optional<String> locatedTitle = movieEntity.getOtherTitles().stream()
+                .filter(ot -> ot.getStatus() == DataStatus.ACCEPTED)
+                .map(ServiceUtils::toOtherTitleDto)
+                .filter(ot -> ot.getCountry() != null
+                        && ot.getCountry().getCode().equals(Locale.getDefault().getCountry()))
+                .map(OtherTitle::getTitle)
+                .findFirst();
+        locatedTitle.ifPresent(builder::withTitleLocated);
+        final Supplier<Stream<ReleaseDate>> releaseDateStream = () -> movieEntity.getReleaseDates().stream()
+                .filter(ot -> ot.getStatus() == DataStatus.ACCEPTED)
+                .map(ServiceUtils::toReleaseDateDto);
+        Optional<ReleaseDate> releaseDate = releaseDateStream.get()
+                .filter(rd -> rd.getCountry().getCode().equals(Locale.getDefault().getCountry()))
+                .findFirst();
+        if(releaseDate.isPresent()) {
+            builder.withReleaseDate(releaseDate.get());
+        } else {
+            releaseDate = releaseDateStream.get()
+                    .filter(rd -> movieEntity.getCountries().stream()
+                            .filter(c -> c.getStatus() == DataStatus.ACCEPTED)
+                            .map(ServiceUtils::toCountryDto)
+                            .collect(Collectors.toList()).stream()
+                            .map(Country::getCountry)
+                            .collect(Collectors.toList())
+                            .contains(rd.getCountry()))
+                    .findFirst();
+            if(releaseDate.isPresent()) {
+                builder.withReleaseDate(releaseDate.get());
+            } else {
+                releaseDate = releaseDateStream.get().findFirst();
+                builder.withReleaseDate(releaseDate.orElse(null));
+            }
+        }
+        builder.withCountries(movieEntity.getCountries().stream().filter(c -> c.getStatus() == DataStatus.ACCEPTED).map(MovieCountryEntity::getCountry).collect(Collectors.toList()));
+        builder.withLanguages(movieEntity.getLanguages().stream().filter(l -> l.getStatus() == DataStatus.ACCEPTED).map(MovieLanguageEntity::getLanguage).collect(Collectors.toList()));
+        builder.withGenres(movieEntity.getGenres().stream().filter(g -> g.getStatus() == DataStatus.ACCEPTED).map(MovieGenreEntity::getGenre).collect(Collectors.toList()));
+        builder.withBoxofficeCumulative(movieEntity.getBoxOffices().stream().filter(bo -> bo.getStatus() == DataStatus.ACCEPTED).map(MovieBoxOfficeEntity::getBoxOffice).reduce(BigDecimal::add).orElse(null));
+        builder.withOutline(movieEntity.getOutlines().stream().filter(o -> o.getStatus() == DataStatus.ACCEPTED).map(MovieOutlineEntity::getOutline).findFirst().orElse(null));
+        builder.withSummary(movieEntity.getSummaries().stream().filter(s -> s.getStatus() == DataStatus.ACCEPTED).map(MovieSummaryEntity::getSummary).findFirst().orElse(null));
+        return builder;
     }
 
     /**
@@ -89,7 +170,7 @@ public final class ServiceUtils {
                 messageEntity.getSubject(),
                 messageEntity.getText(),
                 messageEntity.getCreated(),
-                messageEntity.getRecipient().getUsername()
+                toShallowUserDto(messageEntity.getRecipient())
         )
                 .withId(messageEntity.getUniqueId());
 
@@ -107,10 +188,28 @@ public final class ServiceUtils {
                 messageEntity.getSubject(),
                 messageEntity.getText(),
                 messageEntity.getCreated(),
-                messageEntity.getSender().getUsername(),
+                toShallowUserDto(messageEntity.getSender()),
                 messageEntity.getDateOfRead()
         )
                 .withId(messageEntity.getUniqueId());
+
+        return builder.build();
+    }
+
+    /**
+     * Convert a user entity to a DTO for external exposure.
+     *
+     * @param userEntity The entity to convert
+     * @return The immutable DTO representation of the entity data
+     */
+    static ShallowUser toShallowUserDto(final UserEntity userEntity) {
+        final ShallowUser.Builder builder = new ShallowUser.Builder(
+                userEntity.getUsername(),
+                userEntity.getAvatarId()
+                        .map(avatarId -> userEntity.getAvatarProvider().getUrlFile(avatarId))
+                        .orElse(PathConstant.AVATAR_DEFAULT)
+        )
+                .withId(userEntity.getUniqueId());
 
         return builder.build();
     }
@@ -126,6 +225,8 @@ public final class ServiceUtils {
                 movieOtherTitleEntity.getTitle(),
                 movieOtherTitleEntity.getCountry()
         );
+
+        Optional.ofNullable(movieOtherTitleEntity.getAttribute()).ifPresent(builder::withAttribute);
 
         return builder.build();
     }
@@ -146,14 +247,42 @@ public final class ServiceUtils {
     }
 
     /**
-     * Convert a MovieStorylineEntity entity to a DTO for external exposure.
+     * Convert a MovieOutlineEntity entity to a DTO for external exposure.
      *
-     * @param movieStorylineEntity The entity to convert
+     * @param movieOutlineEntity The entity to convert
      * @return The immutable DTO representation of the entity data
      */
-    static Storyline toStorylineDto(final MovieStorylineEntity movieStorylineEntity) {
-        final Storyline.Builder builder = new Storyline.Builder(
-                movieStorylineEntity.getStoryline()
+    static Outline toOutlineDto(final MovieOutlineEntity movieOutlineEntity) {
+        final Outline.Builder builder = new Outline.Builder(
+                movieOutlineEntity.getOutline()
+        );
+
+        return builder.build();
+    }
+
+    /**
+     * Convert a MovieSummaryEntity entity to a DTO for external exposure.
+     *
+     * @param movieSummaryEntity The entity to convert
+     * @return The immutable DTO representation of the entity data
+     */
+    static Summary toSummaryDto(final MovieSummaryEntity movieSummaryEntity) {
+        final Summary.Builder builder = new Summary.Builder(
+                movieSummaryEntity.getSummary()
+        );
+
+        return builder.build();
+    }
+
+    /**
+     * Convert a MovieSynopsisEntity entity to a DTO for external exposure.
+     *
+     * @param movieSynopsisEntity The entity to convert
+     * @return The immutable DTO representation of the entity data
+     */
+    static Synopsis toSynopsisDto(final MovieSynopsisEntity movieSynopsisEntity) {
+        final Synopsis.Builder builder = new Synopsis.Builder(
+                movieSynopsisEntity.getSynopsis()
         );
 
         return builder.build();
@@ -240,7 +369,8 @@ public final class ServiceUtils {
     static Review toReviewDto(final MovieReviewEntity movieReviewEntity) {
         final Review.Builder builder = new Review.Builder(
                 movieReviewEntity.getTitle(),
-                movieReviewEntity.getReview()
+                movieReviewEntity.getReview(),
+                movieReviewEntity.isSpoiler()
         );
 
         return builder.build();

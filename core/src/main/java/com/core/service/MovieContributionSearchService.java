@@ -66,13 +66,35 @@ public interface MovieContributionSearchService {
     ) throws ResourceNotFoundException;
 
     /**
-     * Get a contribution of storylines.
+     * Get a contribution of outlines.
      *
      * @param contributionId The contribution ID
-     * @return The contribution of storylines
+     * @return The contribution of outlines
      * @throws ResourceNotFoundException if no contribution found
      */
-    Contribution<Storyline> getStorylineContribution(
+    Contribution<Outline> getOutlineContribution(
+            @Min(1) final Long contributionId
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get a contribution of summaries.
+     *
+     * @param contributionId The contribution ID
+     * @return The contribution of summaries
+     * @throws ResourceNotFoundException if no contribution found
+     */
+    Contribution<Summary> getSummaryContribution(
+            @Min(1) final Long contributionId
+    ) throws ResourceNotFoundException;
+
+    /**
+     * Get a contribution of synopses.
+     *
+     * @param contributionId The contribution ID
+     * @return The contribution of synopses
+     * @throws ResourceNotFoundException if no contribution found
+     */
+    Contribution<Synopsis> getSynopsisContribution(
             @Min(1) final Long contributionId
     ) throws ResourceNotFoundException;
 

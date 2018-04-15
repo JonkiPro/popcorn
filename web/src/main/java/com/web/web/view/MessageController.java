@@ -1,7 +1,6 @@
 package com.web.web.view;
 
 import com.core.service.MessageSearchService;
-import com.web.web.security.service.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -20,21 +19,17 @@ import java.util.Objects;
 public class MessageController {
 
     private final MessageSearchService messageSearchService;
-    private final AuthorizationService authorizationService;
 
     /**
      * Constructor.
      *
      * @param messageSearchService The message search service to use
-     * @param authorizationService The authorization service to use
      */
     @Autowired
     public MessageController(
-            final MessageSearchService messageSearchService,
-            final AuthorizationService authorizationService
+            final MessageSearchService messageSearchService
     ) {
         this.messageSearchService = messageSearchService;
-        this.authorizationService = authorizationService;
     }
 
     /**
@@ -75,13 +70,13 @@ public class MessageController {
             @PathVariable final String id,
             final ModelMap modelMap
     ) {
-        final boolean messageReceivedExists = this.messageSearchService.existsMessageReceived(id, authorizationService.getUserId());
+        final boolean messageReceivedExists = this.messageSearchService.existsMessageReceived(id);
         if(messageReceivedExists) {
             modelMap.addAttribute("messageId", id);
             return new ModelAndView("showReceivedMessage", modelMap);
         }
 
-        final boolean messageSentExists = this.messageSearchService.existsMessageSent(id, authorizationService.getUserId());
+        final boolean messageSentExists = this.messageSearchService.existsMessageSent(id);
         if(messageSentExists) {
             modelMap.addAttribute("messageId", id);
             return new ModelAndView("showSentMessage", modelMap);

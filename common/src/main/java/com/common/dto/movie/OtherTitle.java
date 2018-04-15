@@ -1,5 +1,6 @@
 package com.common.dto.movie;
 
+import com.common.dto.TitleAttribute;
 import com.common.dto.movie.type.CountryType;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,8 +8,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -26,6 +28,9 @@ public class OtherTitle extends MovieInfoDTO {
     @NotNull
     private final CountryType country;
 
+    @ApiModelProperty(notes = "Title attribute", required = true)
+    private final TitleAttribute attribute;
+
     /**
      * Constructor only accessible via builder build() method.
      *
@@ -34,6 +39,7 @@ public class OtherTitle extends MovieInfoDTO {
     private OtherTitle(final Builder builder) {
         this.title = builder.bTitle;
         this.country = builder.bCountry;
+        this.attribute = builder.bAttribute;
     }
 
     /**
@@ -43,6 +49,7 @@ public class OtherTitle extends MovieInfoDTO {
 
         private final String bTitle;
         private final CountryType bCountry;
+        private TitleAttribute bAttribute;
 
         /**
          * Constructor which has required fields.
@@ -57,6 +64,17 @@ public class OtherTitle extends MovieInfoDTO {
         ) {
             this.bTitle = title;
             this.bCountry = country;
+        }
+
+        /**
+         * Set attribute of the title.
+         *
+         * @param attribute Title attribute
+         * @return The builder
+         */
+        public Builder withAttribute(@Nullable final TitleAttribute attribute) {
+            this.bAttribute = attribute;
+            return this;
         }
 
         /**

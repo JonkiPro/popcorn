@@ -56,10 +56,22 @@ public enum MovieField {
             return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.RELEASE_DATE);
         }
     },
-    STORYLINE(Values.STORYLINE) {
+    OUTLINE(Values.OUTLINE) {
         @Override
         public Set<UserMoviePermission> getNecessaryPermissions() {
-            return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.STORYLINE);
+            return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.OUTLINE);
+        }
+    },
+    SUMMARY(Values.SUMMARY) {
+        @Override
+        public Set<UserMoviePermission> getNecessaryPermissions() {
+            return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.SUMMARY);
+        }
+    },
+    SYNOPSIS(Values.SYNOPSIS) {
+        @Override
+        public Set<UserMoviePermission> getNecessaryPermissions() {
+            return Sets.newHashSet(UserMoviePermission.ALL, UserMoviePermission.SYNOPSIS);
         }
     },
     COUNTRY(Values.COUNTRY) {
@@ -119,7 +131,9 @@ public enum MovieField {
         public static final String BOX_OFFICE = "BOX_OFFICE";
         public static final String SITE = "SITE";
         public static final String RELEASE_DATE = "RELEASE_DATE";
-        public static final String STORYLINE = "STORYLINE";
+        public static final String OUTLINE = "OUTLINE";
+        public static final String SUMMARY = "SUMMARY";
+        public static final String SYNOPSIS = "SYNOPSIS";
         public static final String COUNTRY = "COUNTRY";
         public static final String GENRE = "GENRE";
         public static final String LANGUAGE = "LANGUAGE";

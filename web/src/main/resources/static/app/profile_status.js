@@ -4,7 +4,6 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
 
     var url;
     var method;
-    var param;
 
     init();
 
@@ -38,10 +37,9 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
                     $scope.btnText = 'Remove invitation!';
                     url = '/api/v1.0/relations/invitations/';
                     method = 'DELETE';
-                    param = 'remove';
                 } else if(result.data.status === 'INVITATION_TO_YOU') {
                     $scope.btnText = 'Accept the invitation!';
-                    url = '/api/v1.0/relations/friends';
+                    url = '/api/v1.0/relations/friends/';
                     method = 'POST';
 
                     /*
@@ -50,7 +48,7 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
                     angular.element('.btn-group').append($compile('<button data-ng-click="rejectInvitation()" id="btnRejectInvitation" class="btn btn-danger ng-pristine ng-untouched ng-valid ng-binding ng-empty">Reject invitation!</button>')($scope));
                 } else if(result.data.status === 'UNKNOWN') {
                     $scope.btnText = 'Add to friends!';
-                    url = '/api/v1.0/relations/invitations';
+                    url = '/api/v1.0/relations/invitations/';
                     method = 'POST';
                 }
                 $scope.authorisedUser = true;
@@ -61,67 +59,46 @@ app.controller('ProfileController', function ($scope, $http, $compile) {
     }
 
     $scope.sendAction = function () {
-        if(method === 'DELETE') {
-            sendDelete();
-
-            return;
-        }
-
-        sendPost()
+        send()
     };
 
     $scope.rejectInvitation = function () {
-        url = '/api/v1.0/relations/invitations/';
-        method = 'DELETE';
-        param = 'reject';
-
-        sendDelete();
+        rejectInvitation();
     };
 
-    function sendPost() {
-        $http({
-            url: url,
-            method: method,
-            params: {
-                username: angular.element('#username').val()
-            }
-        })
-            .then(function () {
-                initBtnStatus();
-            })
-            .catch(function (error) {
-                initBtnStatus();
-            });
-
-        /*
-          // After accepting the invitation, hide the button rejecting the invitation
-         */
-        if(url === '/api/v1.0/relations/friends' && method === 'POST') {
-            angular.element('#btnRejectInvitation')[0].style.display = 'none';
-            param = null;
-        }
-    }
-
-    function sendDelete() {
+    function send() {
         $http({
             url: url + angular.element('#username').val(),
-            method: method,
-            params: {
-                action: param
-            }
+            method: method
         })
             .then(function () {
+                /*
+                  // After accepting the invitation, hide the button rejecting the invitation
+                 */
+                if(url === '/api/v1.0/relations/friends/' && method === 'POST') {
+                    angular.element('#btnRejectInvitation')[0].style.display = 'none';
+                }
                 initBtnStatus();
             })
             .catch(function (error) {
                 initBtnStatus();
             });
-        /*
-          // After accepting the invitation or rejection, hide the button rejecting the invitation
-         */
-        if(param === 'reject') {
-            angular.element('#btnRejectInvitation')[0].style.display = 'none';
-        }
-        param = null;
+    }
+
+    function rejectInvitation() {
+        $http({
+            url: '/api/v1.0/relations/invitations/' + angular.element('#username').val() + '/reject',
+            method: 'DELETE'
+        })
+            .then(function () {
+                /*
+                  // After rejection the invitation, hide the button rejecting the invitation
+                 */
+                angular.element('#btnRejectInvitation')[0].style.display = 'none';
+                initBtnStatus();
+            })
+            .catch(function (error) {
+                initBtnStatus();
+            });
     }
 });

@@ -1,13 +1,17 @@
 package com.web.web.config.properties;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties for EntityManager configuration.
  */
-@Data
-@ConfigurationProperties("entityManager")
+@ConfigurationProperties(prefix = "entity-manager")
+@Getter
+@Setter
+@Validated
 public class EntityManagerProperties {
 
     /**

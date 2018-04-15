@@ -39,11 +39,25 @@ public class ContributionSearchResultResourceAssembler implements ResourceAssemb
                                 .getReleaseDateContribution(id)
                 ).withSelfRel();
                 break;
-            case STORYLINE:
+            case OUTLINE:
                 self = ControllerLinkBuilder.linkTo(
                         ControllerLinkBuilder
                                 .methodOn(MovieContributionRestController.class)
-                                .getStorylineContribution(id)
+                                .getOutlineContribution(id)
+                ).withSelfRel();
+                break;
+            case SUMMARY:
+                self = ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieContributionRestController.class)
+                                .getSummaryContribution(id)
+                ).withSelfRel();
+                break;
+            case SYNOPSIS:
+                self = ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder
+                                .methodOn(MovieContributionRestController.class)
+                                .getSynopsisContribution(id)
                 ).withSelfRel();
                 break;
             case BOX_OFFICE:

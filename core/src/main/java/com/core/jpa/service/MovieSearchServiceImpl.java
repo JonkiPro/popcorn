@@ -1,6 +1,7 @@
 package com.core.jpa.service;
 
 import com.common.dto.Movie;
+import com.common.dto.UserMovie;
 import com.common.dto.movie.*;
 import com.common.dto.movie.response.ImageResponse;
 import com.common.dto.movie.response.RateResponse;
@@ -12,9 +13,12 @@ import com.common.dto.search.MovieSearchResult;
 import com.common.exception.ResourceNotFoundException;
 import com.core.jpa.entity.MovieEntity;
 import com.core.jpa.entity.MovieEntity_;
+import com.core.jpa.entity.UserEntity;
 import com.core.jpa.repository.MovieRepository;
-import com.core.jpa.specifications.MovieSpecs;
+import com.core.jpa.repository.UserRepository;
+import com.core.jpa.specification.MovieSpecs;
 import com.common.dto.DataStatus;
+import com.core.service.AuthorizationService;
 import com.core.service.MovieSearchService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +53,8 @@ import java.util.stream.Collectors;
 public class MovieSearchServiceImpl implements MovieSearchService {
 
     private final MovieRepository movieRepository;
+    private final UserRepository userRepository;
+    private final AuthorizationService authorizationService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -57,12 +63,18 @@ public class MovieSearchServiceImpl implements MovieSearchService {
      * Constructor.
      *
      * @param movieRepository The movie repository to use
+     * @param userRepository The user repository to use
+     * @param authorizationService The authorization service to use
      */
     @Autowired
     public MovieSearchServiceImpl(
-            @NotNull final MovieRepository movieRepository
+            @NotNull final MovieRepository movieRepository,
+            @NotNull final UserRepository userRepository,
+            @NotNull final AuthorizationService authorizationService
     ) {
         this.movieRepository = movieRepository;
+        this.userRepository = userRepository;
+        this.authorizationService = authorizationService;
     }
 
     /**
@@ -137,7 +149,7 @@ public class MovieSearchServiceImpl implements MovieSearchService {
 
             final List<MovieSearchResult> results = this.entityManager
                     .createQuery(contentQuery)
-                    .setFirstResult(page.getOffset())
+                    .setFirstResult(((Long) page.getOffset()).intValue())
                     .setMaxResults(page.getPageSize())
                     .getResultList();
 
@@ -157,6 +169,18 @@ public class MovieSearchServiceImpl implements MovieSearchService {
         log.info("Called with id {}", id);
 
         return ServiceUtils.toMovieDto(this.findMovie(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserMovie getUserMovie(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException {
+        log.info("Called with id {}", id);
+
+        return ServiceUtils.toUserMovieDto(this.findMovie(id), this.findUser(this.authorizationService.getUserId()));
     }
 
     /**
@@ -210,15 +234,47 @@ public class MovieSearchServiceImpl implements MovieSearchService {
      * {@inheritDoc}
      */
     @Override
-    public Set<Storyline> getStorylines(
+    public Set<Outline> getOutlines(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
 
-        return this.findMovie(id).getStorylines()
+        return this.findMovie(id).getOutlines()
                 .stream()
-                .filter(storyline -> storyline.getStatus() == DataStatus.ACCEPTED)
-                .map(ServiceUtils::toStorylineDto)
+                .filter(outline -> outline.getStatus() == DataStatus.ACCEPTED)
+                .map(ServiceUtils::toOutlineDto)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Summary> getSummaries(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException {
+        log.info("Called with id {}", id);
+
+        return this.findMovie(id).getSummaries()
+                .stream()
+                .filter(summary -> summary.getStatus() == DataStatus.ACCEPTED)
+                .map(ServiceUtils::toSummaryDto)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Synopsis> getSynopses(
+            @Min(1) final Long id
+    ) throws ResourceNotFoundException {
+        log.info("Called with id {}", id);
+
+        return this.findMovie(id).getSynopses()
+                .stream()
+                .filter(synopsis -> synopsis.getStatus() == DataStatus.ACCEPTED)
+                .map(ServiceUtils::toSynopsisDto)
                 .collect(Collectors.toSet());
     }
 
@@ -348,6 +404,19 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .filter(poster -> poster.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toImageResponseDto)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * Helper method to find the user entity.
+     *
+     * @param id The user ID
+     * @return The user
+     * @throws ResourceNotFoundException if no user found
+     */
+    private UserEntity findUser(final String id) throws ResourceNotFoundException {
+        return this.userRepository
+                .findByUniqueIdAndEnabledTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No user found with id " + id));
     }
 
     /**

@@ -5,6 +5,7 @@ import com.common.dto.MovieField;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * Representation of the movie box office.
@@ -18,11 +19,11 @@ import javax.persistence.*;
 @DiscriminatorValue(value = MovieField.Values.BOX_OFFICE)
 public class MovieBoxOfficeEntity extends MovieInfoEntity {
 
-    private static final long serialVersionUID = -5218345980795995085L;
+    private static final long serialVersionUID = -4457912816896552310L;
 
     @Basic
     @Column(name = "box_office")
-    private String boxOffice;
+    private BigDecimal boxOffice;
 
     @Basic
     @Column(name = "box_office_country")

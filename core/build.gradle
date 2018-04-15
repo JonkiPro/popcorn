@@ -6,39 +6,34 @@ dependencies {
 	 * Compile Dependencies
 	 *******************************/
 
-	compile project(':common')
+	compile project(":common")
 
-	// Spring Libs
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('org.springframework.boot:spring-boot-starter-mail')
-	compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '4.2.3.RELEASE'
-	compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '1.5.7.RELEASE'
-	//
+	compile("org.springframework.boot:spring-boot-starter-data-jpa") {
+		exclude group: "org.apache.tomcat", module: "tomcat-jdbc"
+		exclude group: "org.hibernate", module: "hibernate-entitymanager"
+	}
+	compile("org.springframework.boot:spring-boot-starter-security")
+	compile("org.springframework.boot:spring-boot-starter-mail")
+	compile "org.springframework.security:spring-security-crypto:5.0.3.RELEASE"
+	compile "org.springframework.boot:spring-boot-configuration-processor:2.0.0.RELEASE"
+	compile "org.eclipse.persistence:org.eclipse.persistence.jpa:2.7.1"
+	compile "org.eclipse.persistence:org.eclipse.persistence.jpa.modelgen.processor:2.7.1"
+	compile "com.google.api-client:google-api-client:1.23.0"
+	compile "com.google.oauth-client:google-oauth-client-jetty:1.23.0"
+	compile "com.google.apis:google-api-services-drive:v2-rev289-1.23.0"
 
-	// EclipseLink
-	compile group: 'org.eclipse.persistence', name: 'org.eclipse.persistence.jpa', version: '2.7.0'
-	compile group: 'org.eclipse.persistence', name: 'org.eclipse.persistence.jpa.modelgen.processor', version: '2.7.0'
-	//
+	/*******************************
+	 * Runtime Dependencies
+	 *******************************/
 
-	// PostgreSQL
-	compile group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
-	//
-
-	// Lombok
-	compileOnly('org.projectlombok:lombok')
-	//
-
-	// Google API
-	compile 'com.google.api-client:google-api-client:1.23.0'
-	compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
-	compile 'com.google.apis:google-api-services-drive:v2-rev289-1.23.0'
-	//
+	runtime("org.postgresql:postgresql")
+	runtime("mysql:mysql-connector-java")
+	runtime("com.h2database:h2")
 
 	/*******************************
 	 * Test Dependencies
 	 *******************************/
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.8.47'
-	testCompile group: 'org.assertj', name: 'assertj-core', version: '3.8.0'
+	testCompile "org.mockito:mockito-core:2.8.47"
+	testCompile "org.assertj:assertj-core:3.8.0"
 }

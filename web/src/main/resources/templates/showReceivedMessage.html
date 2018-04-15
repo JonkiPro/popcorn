@@ -29,7 +29,7 @@
             <h1 class="content-title"><span th:text="#{showReceivedMessage.title}">Received message</span></h1>
             <div class="col-md-12">
                 <div class="form-group">
-                    <a data-ng-href="/profile/{{message.sender}}"><input data-ng-model="message.sender" id="sender" type="text" class="form-control" style="font-weight:bold;" readonly="readonly"/></a>
+                    <a data-ng-href="/profile/{{message.sender.username}}"><input data-ng-model="message.sender.username" id="sender" type="text" class="form-control" style="font-weight:bold;" readonly="readonly"/></a>
                 </div>
                 <div class="form-group">
                     <input data-ng-model="message.subject" type="text" class="form-control" readonly="readonly"/>

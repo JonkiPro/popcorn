@@ -19,19 +19,17 @@ spring:
   profiles:
       include: security
       active: dev
-  http:
+  servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 50MB
+  flyway:
+    locations: classpath:db/migration/{vendor}
+    baselineDescription: Base Version
+    baselineOnMigrate: true
+    baselineVersion: 1
 
-eclipseLink:
-  persistence-unit-name: unit
-  database-platform: org.eclipse.persistence.platform.database.PostgreSQLPlatform
-  generate-dll: true
-  show-sql: true
-  weaving: static
-
-entityManager:
+entity-manager:
   packages-to-scan: com.core.jpa.entity
 
 server:
@@ -48,15 +46,17 @@ security.require-ssl: true
 security.basic.enabled: true
 
 management:
-  context-path: /actuator
-  security:
-    roles: ADMIN
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /actuator
 
-endpoints:
-  enabled: true
-  sensitive: true
-
-logging.level.org.springframework.web: DEBUG
+logging.level:
+  org:
+    springframework.web: DEBUG
+  com:
+    zaxxer.hikari.HikariConfig: DEBUG
 
 swagger.enabled: true
 

@@ -8,38 +8,19 @@ dependencies {
 
 	compile project(':core')
 
-	// Spring Libs
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('org.springframework.boot:spring-boot-starter-security')
-	compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-rest', version: '1.5.7.RELEASE'
-	//
-
-	// Lombok
-	compileOnly('org.projectlombok:lombok')
-	//
-
-	// Commons
-	compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
-	//
-
-	// Thymeleaf
-	compile group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.7.RELEASE'
-	compile group: 'org.thymeleaf', name: 'thymeleaf-spring4', version: '3.0.7.RELEASE'
-	compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity4', version: '3.0.2.RELEASE'
-	//
-
-	// WebJars
-	compile 'org.webjars:bootstrap:3.3.7-1'
-	compile 'org.webjars:jquery:3.2.1'
-	compile 'org.webjars:angularjs:1.6.4'
-	compile 'org.webjars:jquery-validation:1.17.0'
-	//
+	compile("org.springframework.boot:spring-boot-starter-actuator")
+	compile("org.springframework.boot:spring-boot-starter-web")
+	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+	compile "org.springframework.boot:spring-boot-starter-data-rest:2.0.0.RELEASE"
+	compile "org.thymeleaf.extras:thymeleaf-extras-springsecurity4:3.0.2.RELEASE"
+	compile "org.webjars:bootstrap:3.3.7-1"
+	compile "org.webjars:jquery:3.2.1"
+	compile "org.webjars:angularjs:1.6.4"
+	compile "org.webjars:jquery-validation:1.17.0"
 
 	/*******************************
 	 * Test Dependencies
 	 *******************************/
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '4.2.3.RELEASE'
+	testCompile "org.springframework.security:spring-security-test:5.0.3.RELEASE"
 }

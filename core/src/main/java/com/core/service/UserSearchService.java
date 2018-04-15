@@ -4,13 +4,14 @@ import com.common.dto.RelationshipStatus;
 import com.common.dto.User;
 import com.common.dto.search.UserSearchResult;
 import com.common.exception.ResourceNotFoundException;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
@@ -100,26 +101,24 @@ public interface UserSearchService {
     /**
      * Get the user invitations.
      *
-     * @param id The user ID
-     * @param outgoing True, if invitations sent
+     * @param outgoing True, if invitations sent. False, if invitations received
      * @return List of invitations
      * @throws ResourceNotFoundException if no user found
      */
+    @PreAuthorize("hasRole('ROLE_USER')")
     List<User> getInvitations(
-            @NotBlank final String id,
             @NotNull final Boolean outgoing
     ) throws ResourceNotFoundException;
 
     /**
      * Get the status of the relationship between users.
      *
-     * @param fromId From the user ID
-     * @param toId To the user ID
+     * @param id The user ID
      * @return Status between users
      * @throws ResourceNotFoundException if no user found
      */
+    @PreAuthorize("hasRole('ROLE_USER')")
     RelationshipStatus getUserFriendStatus(
-            @NotBlank final String fromId,
-            @NotBlank final String toId
+            @NotBlank final String id
     ) throws ResourceNotFoundException;
 }

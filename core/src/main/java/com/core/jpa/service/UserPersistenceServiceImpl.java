@@ -9,17 +9,17 @@ import com.common.dto.request.RegisterDTO;
 import com.common.exception.*;
 import com.core.jpa.entity.UserEntity;
 import com.core.jpa.repository.UserRepository;
+import com.core.service.AuthorizationService;
 import com.core.service.StorageService;
 import com.core.service.UserPersistenceService;
 import com.common.dto.SecurityRole;
 import com.common.dto.UserMoviePermission;
 import com.core.service.MailService;
-import com.core.utils.EncryptUtils;
-import com.core.utils.FileUtils;
-import com.core.utils.RandomUtils;
+import com.core.util.EncryptUtils;
+import com.core.util.FileUtils;
+import com.core.util.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -27,11 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.EnumSet;
 
 /**
@@ -55,6 +53,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
     private final UserRepository userRepository;
     private final MailService mailService;
     private final StorageService storageService;
+    private final AuthorizationService authorizationService;
 
     /**
      * Constructor.
@@ -62,16 +61,19 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      * @param userRepository The user repository to use
      * @param mailService The mail service to use
      * @param storageService The storage service to use
+     * @param authorizationService The authorization service to use
      */
     @Autowired
     public UserPersistenceServiceImpl(
             @NotNull final UserRepository userRepository,
             @NotNull final MailService mailService,
-            @Qualifier("googleStorageService") @NotNull final StorageService storageService
+            @Qualifier("googleStorageService") @NotNull final StorageService storageService,
+            @NotNull final AuthorizationService authorizationService
     ) {
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.storageService = storageService;
+        this.authorizationService = authorizationService;
     }
 
     /**
@@ -146,12 +148,11 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void updateNewEmail(
-            @NotBlank final String id,
             @NotNull @Valid final ChangeEmailDTO changeEmailDTO
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with id {}, changeEmailDTO {}", id, changeEmailDTO);
+        log.info("Called with changeEmailDTO {}", changeEmailDTO);
 
-        final UserEntity user = this.findUser(id);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
         if(this.userRepository.existsByEmailIgnoreCase(changeEmailDTO.getEmail())) {
             throw new ResourceConflictException("The e-mail " + changeEmailDTO.getEmail() + " exists");
@@ -168,12 +169,11 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void updatePassword(
-            @NotBlank final String id,
             @NotNull @Valid final ChangePasswordDTO changePasswordDTO
     ) throws ResourceNotFoundException, ResourceBadRequestException {
-        log.info("Called with id {}, changePasswordDTO {}", id, changePasswordDTO);
+        log.info("Called with changePasswordDTO {}", changePasswordDTO);
 
-        final UserEntity user = this.findUser(id);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
         if(!EncryptUtils.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
             throw new ResourceBadRequestException("The entered password doesn't match the old password");
@@ -187,13 +187,12 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void updateAvatar(
-            @NotBlank final String id,
             @NotNull final File file
     ) throws ResourceBadRequestException, ResourceNotFoundException, ResourcePreconditionException, ResourceServerException {
-        log.info("Called with id {}, file {}", id, file);
+        log.info("Called with file {}", file);
         FileUtils.validImage(file);
 
-        final UserEntity user = this.findUser(id);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
         user.setAvatarId(this.storageService.save(file, StorageDirectory.AVATAR));
         user.setAvatarProvider(StorageProvider.GOOGLE);
@@ -222,13 +221,12 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void addFriend(
-            @NotBlank final String fromId,
-            @NotBlank final String toId
+            @NotBlank final String id
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with fromId {}, toId {}", fromId, toId);
+        log.info("Called with id {}", id);
 
-        final UserEntity authUser = this.findUser(fromId);
-        final UserEntity sendingInvitationUser = this.findUser(toId);
+        final UserEntity authUser = this.findUser(this.authorizationService.getUserId());
+        final UserEntity sendingInvitationUser = this.findUser(id);
 
         sendingInvitationUser.removeSentInvitation(authUser);
         authUser.addFriend(sendingInvitationUser);
@@ -239,12 +237,11 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void removeFriend(
-            @NotBlank final String fromId,
-            @NotBlank final String toId
+            @NotBlank final String id
     ) throws ResourceNotFoundException {
-        log.info("Called with fromId {}, toId {}", fromId, toId);
+        log.info("Called with id {}", id);
 
-        this.findUser(fromId).removeFriend(this.findUser(toId));
+        this.findUser(this.authorizationService.getUserId()).removeFriend(this.findUser(id));
     }
 
     /**
@@ -252,19 +249,18 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void addInvitation(
-            @NotBlank final String fromId,
-            @NotBlank final String toId
+            @NotBlank final String id
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with fromId {}, toId {}", fromId, toId);
+        log.info("Called with id {}", id);
 
-        final UserEntity fromUser = this.findUser(fromId);
-        final UserEntity toUser = this.findUser(toId);
+        final UserEntity authUser = this.findUser(this.authorizationService.getUserId());
+        final UserEntity toUser = this.findUser(id);
 
-        if(toUser.getSentInvitations().contains(fromUser)) {
+        if(toUser.getSentInvitations().contains(authUser)) {
             throw new ResourceConflictException("There is an invitation from the user with ID " + toUser.getUniqueId());
         }
 
-        fromUser.addSentInvitation(toUser);
+        authUser.addSentInvitation(toUser);
     }
 
     /**
@@ -272,12 +268,23 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void removeInvitation(
-            @NotBlank final String fromId,
-            @NotBlank final String toId
+            @NotBlank final String id
     ) throws ResourceNotFoundException {
-        log.info("Called with fromId {}, toId {}", fromId, toId);
+        log.info("Called with id {}", id);
 
-        this.findUser(fromId).removeSentInvitation(this.findUser(toId));
+        this.findUser(this.authorizationService.getUserId()).removeSentInvitation(this.findUser(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void rejectInvitation(
+            @NotBlank final String id
+    ) throws ResourceNotFoundException {
+        log.info("Called with id {}", id);
+
+        this.findUser(id).removeSentInvitation(this.findUser(this.authorizationService.getUserId()));
     }
 
     /**

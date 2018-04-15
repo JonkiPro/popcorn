@@ -8,16 +8,17 @@ import com.core.jpa.entity.MessageEntity;
 import com.core.jpa.entity.UserEntity;
 import com.core.jpa.repository.MessageRepository;
 import com.core.jpa.repository.UserRepository;
+import com.core.service.AuthorizationService;
 import com.core.service.MessageSearchService;
-import com.core.jpa.specifications.MessageSpecs;
+import com.core.jpa.specification.MessageSpecs;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,20 +37,24 @@ public class MessageSearchServiceImpl implements MessageSearchService {
 
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final AuthorizationService authorizationService;
 
     /**
      * Constructor.
      *
      * @param messageRepository The message repository to use
      * @param userRepository The user repository to use
+     * @param authorizationService The authorization service to use
      */
     @Autowired
     public MessageSearchServiceImpl(
             @NotNull final MessageRepository messageRepository,
-            @NotNull final UserRepository userRepository
+            @NotNull final UserRepository userRepository,
+            @NotNull final AuthorizationService authorizationService
     ) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
+        this.authorizationService = authorizationService;
     }
 
     /**
@@ -57,16 +62,15 @@ public class MessageSearchServiceImpl implements MessageSearchService {
      */
     @Override
     public MessageSent getMessageSent(
-            @NotBlank final String messageId,
-            @NotBlank final String userId
+            @NotBlank final String id
     ) throws ResourceNotFoundException {
-        log.info("Called with messageId {}, userId {}", messageId, userId);
+        log.info("Called with id {}", id);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
-        return this.messageRepository.findByUniqueIdAndSenderAndIsVisibleForSenderTrue(messageId, user)
+        return this.messageRepository.findByUniqueIdAndSenderAndIsVisibleForSenderTrue(id, user)
                 .map(ServiceUtils::toMessageSentDto)
-                .orElseThrow(() -> new ResourceNotFoundException("No message found with id " + messageId));
+                .orElseThrow(() -> new ResourceNotFoundException("No message found with id " + id));
     }
 
     /**
@@ -74,14 +78,13 @@ public class MessageSearchServiceImpl implements MessageSearchService {
      */
     @Override
     public List<MessageSent> getMessagesSent(
-            @NotBlank final String userId,
             @Nullable final String content
     ) throws ResourceNotFoundException {
-        log.info("Called with userId {}, content {}", userId, content);
+        log.info("Called with content {}", content);
 
         @SuppressWarnings("unchecked") final List<MessageEntity> messageEntities = this.messageRepository.findAll(
                 MessageSpecs.findSentMessagesForUser(
-                        this.findUser(userId),
+                        this.findUser(this.authorizationService.getUserId()),
                         content,
                         content)
         );
@@ -103,16 +106,15 @@ public class MessageSearchServiceImpl implements MessageSearchService {
     @Override
     @Transactional(readOnly = false)
     public MessageReceived getMessageReceived(
-            @NotBlank final String messageId,
-            @NotBlank final String userId
+            @NotBlank final String id
     ) throws ResourceNotFoundException {
-        log.info("Called with messageId {}, userId {}", messageId, userId);
+        log.info("Called with id {}", id);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
         final MessageEntity message
-                = this.messageRepository.findByUniqueIdAndRecipientAndIsVisibleForRecipientTrue(messageId, user)
-                .orElseThrow(() -> new ResourceNotFoundException("No message found with id " + messageId));
+                = this.messageRepository.findByUniqueIdAndRecipientAndIsVisibleForRecipientTrue(id, user)
+                .orElseThrow(() -> new ResourceNotFoundException("No message found with id " + id));
 
         if(message.getDateOfRead() == null) {
             message.setDateOfRead(new Date());
@@ -126,14 +128,13 @@ public class MessageSearchServiceImpl implements MessageSearchService {
      */
     @Override
     public List<MessageReceived> getMessagesReceived(
-            @NotBlank final String userId,
             @Nullable final String content
     ) throws ResourceNotFoundException {
-        log.info("Called with userId {}, content {}", userId, content);
+        log.info("Called with content {}", content);
 
         @SuppressWarnings("unchecked") final List<MessageEntity> messageEntities = this.messageRepository.findAll(
                 MessageSpecs.findReceivedMessagesForUser(
-                        this.findUser(userId),
+                        this.findUser(this.authorizationService.getUserId()),
                         content,
                         content)
         );
@@ -154,14 +155,13 @@ public class MessageSearchServiceImpl implements MessageSearchService {
      */
     @Override
     public boolean existsMessageSent(
-            @NotBlank final String messageId,
-            @NotBlank final String userId
+            @NotBlank final String id
     ) throws ResourceNotFoundException {
-        log.info("Called with messageId {}, userId {}", messageId, userId);
+        log.info("Called with id {}", id);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
-        return this.messageRepository.existsByUniqueIdAndSenderAndIsVisibleForSenderTrue(messageId, user);
+        return this.messageRepository.existsByUniqueIdAndSenderAndIsVisibleForSenderTrue(id, user);
     }
 
     /**
@@ -169,14 +169,13 @@ public class MessageSearchServiceImpl implements MessageSearchService {
      */
     @Override
     public boolean existsMessageReceived(
-            @NotBlank final String messageId,
-            @NotBlank final String userId
+            @NotBlank final String id
     ) throws ResourceNotFoundException {
-        log.info("Called with messageId {}, userId {}", messageId, userId);
+        log.info("Called with id {}", id);
 
-        final UserEntity user = this.findUser(userId);
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
-        return this.messageRepository.existsByUniqueIdAndRecipientAndIsVisibleForRecipientTrue(messageId, user);
+        return this.messageRepository.existsByUniqueIdAndRecipientAndIsVisibleForRecipientTrue(id, user);
     }
 
     /**

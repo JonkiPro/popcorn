@@ -13,10 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Representation of the user.
@@ -131,11 +128,23 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Set<UserMoviePermission> permissions;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<MovieRateEntity> ratings;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<ContributionEntity> contributions;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "users_favorites_movies",
+            joinColumns = {
+                    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "movie_id", referencedColumnName = "id", nullable = false, updatable = false)
+            }
+    )
+    private Set<MovieEntity> favoritesMovies = new HashSet<>();
 
     @Basic
     @Column(name = "modified_date", nullable = false)
@@ -219,5 +228,33 @@ public class UserEntity extends BaseEntity {
         }
         this.sentInvitations.remove(user);
         user.getReceivedInvitations().remove(this);
+    }
+
+    /**
+     * Add a movie to your favourites list. Manages both sides of relationship.
+     *
+     * @param movie The movie to add. Not null.
+     * @throws ResourceConflictException if the movie is added to favorites
+     */
+    public void addFavoriteMovie(@NotNull final MovieEntity movie) throws ResourceConflictException {
+        if (this.favoritesMovies.contains(movie)) {
+            throw new ResourceConflictException("A movie with id " + movie.getId() + " is already added to favorites");
+        }
+        this.favoritesMovies.add(movie);
+        movie.setFavoriteCount(movie.getFavoriteCount()+1);
+    }
+
+    /**
+     * Remove a movie from your favourites list. Manages both sides of relationship.
+     *
+     * @param movie The movie to remove. Not null.
+     * @throws ResourceConflictException if the movie is not added to favorites
+     */
+    public void removeFavoriteMovie(@NotNull final MovieEntity movie) throws ResourceConflictException {
+        if (!this.favoritesMovies.contains(movie)) {
+            throw new ResourceConflictException("A movie with id " + movie.getId() + " is not added to favorites");
+        }
+        this.favoritesMovies.remove(movie);
+        movie.setFavoriteCount(movie.getFavoriteCount()-1);
     }
 }

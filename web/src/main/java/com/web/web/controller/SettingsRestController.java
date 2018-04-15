@@ -7,9 +7,9 @@ import com.common.exception.FormBadRequestException;
 import com.core.service.UserPersistenceService;
 import com.core.service.UserSearchService;
 import com.core.properties.BundleProperties;
-import com.core.utils.EncryptUtils;
-import com.web.web.security.service.AuthorizationService;
-import com.web.web.utils.MultipartFileUtils;
+import com.core.util.EncryptUtils;
+import com.core.service.AuthorizationService;
+import com.web.web.util.MultipartFileUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.ResourceBundle;
 
 @RestController
@@ -70,7 +69,7 @@ public class SettingsRestController {
 
         this.validChangeEmailDTO(changeEmailDTO);
 
-        this.userPersistenceService.updateNewEmail(this.authorizationService.getUserId(), changeEmailDTO);
+        this.userPersistenceService.updateNewEmail(changeEmailDTO);
     }
 
     @ApiOperation(value = "It changes the user's password")
@@ -89,7 +88,7 @@ public class SettingsRestController {
 
         this.validChangePasswordDTO(changePasswordDTO);
 
-        this.userPersistenceService.updatePassword(this.authorizationService.getUserId(), changePasswordDTO);
+        this.userPersistenceService.updatePassword(changePasswordDTO);
     }
 
     @ApiOperation(value = "It changes the user's avatar")
@@ -107,7 +106,7 @@ public class SettingsRestController {
     ) {
         log.info("Called with avatar {}", avatar);
 
-        this.userPersistenceService.updateAvatar(this.authorizationService.getUserId(), MultipartFileUtils.convert(avatar));
+        this.userPersistenceService.updateAvatar(MultipartFileUtils.convert(avatar));
     }
 
     @ApiOperation(value = "Activates e-mail change with token")

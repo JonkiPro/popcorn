@@ -12,7 +12,7 @@ import com.core.jpa.entity.movie.*;
 import com.core.jpa.repository.ContributionRepository;
 import com.core.jpa.repository.MovieRepository;
 import com.core.service.MovieContributionSearchService;
-import com.core.jpa.specifications.ContributionSpecs;
+import com.core.jpa.specification.ContributionSpecs;
 import com.common.dto.DataStatus;
 import com.common.dto.MovieField;
 import com.google.common.collect.Lists;
@@ -128,7 +128,7 @@ public class MovieContributionSearchServiceImpl implements MovieContributionSear
 
             final List<ContributionSearchResult> results = this.entityManager
                     .createQuery(contentQuery)
-                    .setFirstResult(page.getOffset())
+                    .setFirstResult(((Long) page.getOffset()).intValue())
                     .setMaxResults(page.getPageSize())
                     .getResultList();
 
@@ -211,30 +211,98 @@ public class MovieContributionSearchServiceImpl implements MovieContributionSear
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Contribution<Storyline> getStorylineContribution(
+    public Contribution<Outline> getOutlineContribution(
             @Min(1) final Long contributionId
     ) throws ResourceNotFoundException {
         log.info("Called with contributionId {}", contributionId);
 
-        final ContributionEntity contributionEntity = this.findContribution(contributionId, MovieField.STORYLINE);
-        final Contribution<Storyline> contribution = ServiceUtils.toContributionDto(contributionEntity);
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, MovieField.OUTLINE);
+        final Contribution<Outline> contribution = ServiceUtils.toContributionDto(contributionEntity);
 
         contributionEntity.getIdsToAdd()
                 .forEach(id -> {
-                    final MovieStorylineEntity storyline = this.entityManager.find(MovieStorylineEntity.class, id);
-                    contribution.getElementsToAdd().put(storyline.getId(), ServiceUtils.toStorylineDto(storyline));
+                    final MovieOutlineEntity outline = this.entityManager.find(MovieOutlineEntity.class, id);
+                    contribution.getElementsToAdd().put(outline.getId(), ServiceUtils.toOutlineDto(outline));
                 });
         contributionEntity.getIdsToUpdate()
                 .forEach((key, value) -> {
-                    final MovieStorylineEntity storylineToUpdate = this.entityManager.find(MovieStorylineEntity.class, key);
-                    final MovieStorylineEntity storylineUpdated = this.entityManager.find(MovieStorylineEntity.class, value);
-                    contribution.getElementsToUpdate().put(storylineToUpdate.getId(), ServiceUtils.toStorylineDto(storylineToUpdate));
-                    contribution.getElementsUpdated().put(storylineToUpdate.getId(), ServiceUtils.toStorylineDto(storylineUpdated));
+                    final MovieOutlineEntity outlineToUpdate = this.entityManager.find(MovieOutlineEntity.class, key);
+                    final MovieOutlineEntity outlineUpdated = this.entityManager.find(MovieOutlineEntity.class, value);
+                    contribution.getElementsToUpdate().put(outlineToUpdate.getId(), ServiceUtils.toOutlineDto(outlineToUpdate));
+                    contribution.getElementsUpdated().put(outlineToUpdate.getId(), ServiceUtils.toOutlineDto(outlineUpdated));
                 });
         contributionEntity.getIdsToDelete()
                 .forEach(id -> {
-                    final MovieStorylineEntity storyline = this.entityManager.find(MovieStorylineEntity.class, id);
-                    contribution.getElementsToDelete().put(storyline.getId(), ServiceUtils.toStorylineDto(storyline));
+                    final MovieOutlineEntity outline = this.entityManager.find(MovieOutlineEntity.class, id);
+                    contribution.getElementsToDelete().put(outline.getId(), ServiceUtils.toOutlineDto(outline));
+                });
+
+        return contribution;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Contribution<Summary> getSummaryContribution(
+            @Min(1) final Long contributionId
+    ) throws ResourceNotFoundException {
+        log.info("Called with contributionId {}", contributionId);
+
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, MovieField.SUMMARY);
+        final Contribution<Summary> contribution = ServiceUtils.toContributionDto(contributionEntity);
+
+        contributionEntity.getIdsToAdd()
+                .forEach(id -> {
+                    final MovieSummaryEntity summary = this.entityManager.find(MovieSummaryEntity.class, id);
+                    contribution.getElementsToAdd().put(summary.getId(), ServiceUtils.toSummaryDto(summary));
+                });
+        contributionEntity.getIdsToUpdate()
+                .forEach((key, value) -> {
+                    final MovieSummaryEntity summaryToUpdate = this.entityManager.find(MovieSummaryEntity.class, key);
+                    final MovieSummaryEntity summaryUpdated = this.entityManager.find(MovieSummaryEntity.class, value);
+                    contribution.getElementsToUpdate().put(summaryToUpdate.getId(), ServiceUtils.toSummaryDto(summaryToUpdate));
+                    contribution.getElementsUpdated().put(summaryToUpdate.getId(), ServiceUtils.toSummaryDto(summaryUpdated));
+                });
+        contributionEntity.getIdsToDelete()
+                .forEach(id -> {
+                    final MovieSummaryEntity summary = this.entityManager.find(MovieSummaryEntity.class, id);
+                    contribution.getElementsToDelete().put(summary.getId(), ServiceUtils.toSummaryDto(summary));
+                });
+
+        return contribution;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Contribution<Synopsis> getSynopsisContribution(
+            @Min(1) final Long contributionId
+    ) throws ResourceNotFoundException {
+        log.info("Called with contributionId {}", contributionId);
+
+        final ContributionEntity contributionEntity = this.findContribution(contributionId, MovieField.SYNOPSIS);
+        final Contribution<Synopsis> contribution = ServiceUtils.toContributionDto(contributionEntity);
+
+        contributionEntity.getIdsToAdd()
+                .forEach(id -> {
+                    final MovieSynopsisEntity synopsis = this.entityManager.find(MovieSynopsisEntity.class, id);
+                    contribution.getElementsToAdd().put(synopsis.getId(), ServiceUtils.toSynopsisDto(synopsis));
+                });
+        contributionEntity.getIdsToUpdate()
+                .forEach((key, value) -> {
+                    final MovieSynopsisEntity synopsisToUpdate = this.entityManager.find(MovieSynopsisEntity.class, key);
+                    final MovieSynopsisEntity synopsisUpdated = this.entityManager.find(MovieSynopsisEntity.class, value);
+                    contribution.getElementsToUpdate().put(synopsisToUpdate.getId(), ServiceUtils.toSynopsisDto(synopsisToUpdate));
+                    contribution.getElementsUpdated().put(synopsisToUpdate.getId(), ServiceUtils.toSynopsisDto(synopsisUpdated));
+                });
+        contributionEntity.getIdsToDelete()
+                .forEach(id -> {
+                    final MovieSynopsisEntity synopsis = this.entityManager.find(MovieSynopsisEntity.class, id);
+                    contribution.getElementsToDelete().put(synopsis.getId(), ServiceUtils.toSynopsisDto(synopsis));
                 });
 
         return contribution;

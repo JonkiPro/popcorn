@@ -12,7 +12,7 @@ import com.web.web.hateoas.assembler.MessageReceivedResourceAssembler;
 import com.web.web.hateoas.assembler.MessageSentResourceAssembler;
 import com.web.web.hateoas.resource.MessageReceivedResource;
 import com.web.web.hateoas.resource.MessageSentResource;
-import com.web.web.security.service.AuthorizationService;
+import com.core.service.AuthorizationService;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +89,7 @@ public class MessageRestController {
 
         this.validUsername(sendMessageDTO.getTo());
 
-        this.messagePersistenceService.createMessage(this.authorizationService.getUserId(), sendMessageDTO);
+        this.messagePersistenceService.createMessage(sendMessageDTO);
 
         final UriComponents uriComponents
                 = uriComponentsBuilder.path("/profile/{username}").buildAndExpand(sendMessageDTO.getTo());
@@ -111,7 +111,7 @@ public class MessageRestController {
     ) {
         log.info("Called with id {}", id);
 
-        return this.messageSentResourceAssembler.toResource(this.messageSearchService.getMessageSent(id, this.authorizationService.getUserId()));
+        return this.messageSentResourceAssembler.toResource(this.messageSearchService.getMessageSent(id));
     }
 
     @ApiOperation(value = "Get received message by ID")
@@ -125,7 +125,7 @@ public class MessageRestController {
     ) {
         log.info("Called with id {}", id);
 
-        return this.messageReceivedResourceAssembler.toResource(this.messageSearchService.getMessageReceived(id, this.authorizationService.getUserId()));
+        return this.messageReceivedResourceAssembler.toResource(this.messageSearchService.getMessageReceived(id));
     }
 
     @ApiOperation(value = "Delete sent message by ID")
@@ -139,7 +139,7 @@ public class MessageRestController {
     ) {
         log.info("Called with id {}", id);
 
-        this.messagePersistenceService.deleteMessageSent(id, this.authorizationService.getUserId());
+        this.messagePersistenceService.deleteMessageSent(id);
     }
 
     @ApiOperation(value = "Delete received message by ID")
@@ -153,7 +153,7 @@ public class MessageRestController {
     ) {
         log.info("Called with id {}", id);
 
-        this.messagePersistenceService.deleteMessageReceived(id, this.authorizationService.getUserId());
+        this.messagePersistenceService.deleteMessageReceived(id);
     }
 
     @ApiOperation(value = "Get sent messages")
@@ -167,7 +167,7 @@ public class MessageRestController {
     ) {
         log.info("Called with q {}", q);
 
-        return this.messageSearchService.getMessagesSent(this.authorizationService.getUserId(), q)
+        return this.messageSearchService.getMessagesSent(q)
                 .stream()
                 .map(this.messageSentResourceAssembler::toResource)
                 .collect(Collectors.toList());
@@ -184,7 +184,7 @@ public class MessageRestController {
     ) {
         log.info("Called with q {}", q);
 
-        return this.messageSearchService.getMessagesReceived(this.authorizationService.getUserId(), q)
+        return this.messageSearchService.getMessagesReceived(q)
                 .stream()
                 .map(this.messageReceivedResourceAssembler::toResource)
                 .collect(Collectors.toList());

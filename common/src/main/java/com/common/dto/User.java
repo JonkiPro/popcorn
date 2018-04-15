@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
+
 @Getter
 @JsonDeserialize(builder = User.Builder.class)
 @ApiModel(description = "User data")
@@ -69,13 +71,14 @@ public class User extends BaseDTO {
             this.bEmail = email;
             this.bNumberOfFriends = numberOfFriends;
         }
+
         /**
          * Set the user's avatar.
          *
          * @param avatarSrc Address (URL) of avatar
          * @return The builder
          */
-        public Builder withAvatarSrc(final String avatarSrc) {
+        public Builder withAvatarSrc(@Nullable final String avatarSrc) {
             this.bAvatarSrc = avatarSrc;
             return this;
         }

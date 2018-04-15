@@ -7,12 +7,11 @@ import com.common.exception.ResourceNotFoundException;
 import com.core.jpa.entity.UserEntity;
 import com.core.jpa.entity.UserEntity_;
 import com.core.jpa.repository.UserRepository;
+import com.core.service.AuthorizationService;
 import com.core.service.UserSearchService;
-import com.core.jpa.specifications.UserSpecs;
+import com.core.jpa.specification.UserSpecs;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,8 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 public class UserSearchServiceImpl implements UserSearchService {
 
     private final UserRepository userRepository;
+    private final AuthorizationService authorizationService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -47,12 +49,15 @@ public class UserSearchServiceImpl implements UserSearchService {
      * Constructor.
      *
      * @param userRepository The user repository to use
+     * @param authorizationService The authorization service to use
      */
     @Autowired
     public UserSearchServiceImpl(
-            @NotNull final UserRepository userRepository
+            @NotNull final UserRepository userRepository,
+            @NotNull final AuthorizationService authorizationService
     ) {
         this.userRepository = userRepository;
+        this.authorizationService = authorizationService;
     }
 
     /**
@@ -108,7 +113,7 @@ public class UserSearchServiceImpl implements UserSearchService {
 
             final List<UserSearchResult> results = this.entityManager
                     .createQuery(contentQuery)
-                    .setFirstResult(page.getOffset())
+                    .setFirstResult(((Long) page.getOffset()).intValue())
                     .setMaxResults(page.getPageSize())
                     .getResultList();
 
@@ -204,10 +209,11 @@ public class UserSearchServiceImpl implements UserSearchService {
      */
     @Override
     public List<User> getInvitations(
-            @NotBlank final String id,
             @NotNull final Boolean outgoing
     ) throws ResourceNotFoundException {
-        log.info("Called with id {}, outgoing {}", id, outgoing);
+        log.info("Called with outgoing {}", outgoing);
+
+        final String id = this.authorizationService.getUserId();
 
         if(outgoing) {
             return this.findUser(id).getSentInvitations()
@@ -227,20 +233,19 @@ public class UserSearchServiceImpl implements UserSearchService {
      */
     @Override
     public RelationshipStatus getUserFriendStatus(
-            @NotBlank final String fromId,
-            @NotBlank final String toId
+            @NotBlank final String id
     ) throws ResourceNotFoundException {
-        log.info("Called with fromId {}, fromId {}", fromId, toId);
+        log.info("Called with id {}", id);
 
         final RelationshipStatus status;
-        final UserEntity fromUser = this.findUser(fromId);
-        final UserEntity toUser = this.findUser(toId);
+        final UserEntity authUser = this.findUser(this.authorizationService.getUserId());
+        final UserEntity toUser = this.findUser(id);
 
-        if (fromUser.getFriends().contains(toUser)) {
+        if (authUser.getFriends().contains(toUser)) {
             status = RelationshipStatus.FRIEND;
-        } else if (fromUser.getSentInvitations().contains(toUser)) {
+        } else if (authUser.getSentInvitations().contains(toUser)) {
             status = RelationshipStatus.INVITATION_FROM_YOU;
-        } else if (toUser.getSentInvitations().contains(fromUser)) {
+        } else if (toUser.getSentInvitations().contains(authUser)) {
             status = RelationshipStatus.INVITATION_TO_YOU;
         } else {
             status = RelationshipStatus.UNKNOWN;

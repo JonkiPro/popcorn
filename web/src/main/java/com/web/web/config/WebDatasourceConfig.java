@@ -6,9 +6,9 @@ import org.eclipse.persistence.internal.databaseaccess.DatabasePlatform;
 import org.eclipse.persistence.platform.database.MySQLPlatform;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -68,6 +68,9 @@ public class WebDatasourceConfig {
         //following code will be used for static weaving. Uncomment when creating war.
 		final Map<String, String> propMap = new HashMap<String, String>();
 		propMap.put("eclipselink.weaving", eclipseLinkProperties.getWeaving());
+//        propMap.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
+//        propMap.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_BOTH_GENERATION);
+//        propMap.put(PersistenceUnitProperties.CREATE_JDBC_DDL_FILE, "create.sql");
 		em.setJpaPropertyMap(propMap);
 
 //        em.setLoadTimeWeaver(loadTimeWeaver()); //comment this when using static weaving. Mostly in development environment inside eclipse
