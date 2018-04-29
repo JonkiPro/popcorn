@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    jdbcUrl: jdbc:postgresql:database
+    username: root
+    password: root
+    hikari:
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+#        useLocalSessionState: true
+#        useLocalTransactionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+
+eclipse-link:
+  generate-dll: true
+  show-sql: true
+  weaving: static

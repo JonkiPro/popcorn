@@ -1,17 +1,14 @@
 buildscript {
-	ext {
-		springBootVersion = '2.0.0.RELEASE'
-	}
 	repositories {
 		jcenter()
 	}
 	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}")
 	}
 }
 
 def javaProjects = subprojects.findAll {
-	it.name == "common" & it.name == "core" && it.name == "web"
+	it.name in ["common", "core", "web", "app"]
 }
 
 allprojects {
@@ -33,25 +30,54 @@ idea {
 
 configure(javaProjects) {
 	apply plugin: 'java'
-	apply plugin: 'org.springframework.boot'
+	apply plugin: 'build-dashboard'
+	apply plugin: 'checkstyle'
+	apply plugin: 'findbugs'
+	apply plugin: 'pmd'
 	apply plugin: 'io.spring.dependency-management'
 
-	sourceCompatibility = 1.8
+    sourceCompatibility = 1.8
 	targetCompatibility = 1.8
+
+	dependencyManagement {
+		imports {
+			mavenBom "io.spring.platform:platform-bom:${spring_platform_version}"
+		}
+		dependencies {
+			dependency("com.google.code.findbugs:annotations:3.0.1")
+			dependencySet(group: "io.springfox", version: "2.8.0") {
+				entry "springfox-swagger2"
+				entry "springfox-swagger-ui"
+				entry "springfox-bean-validators"
+			}
+			dependencySet(group: "org.eclipse.persistence", version: "2.7.1") {
+				entry "org.eclipse.persistence.jpa"
+				entry "org.eclipse.persistence.jpa.modelgen.processor"
+			}
+			dependency("commons-validator:commons-validator:1.6")
+			dependency("org.apache.commons:commons-lang3:3.6")
+			dependency("com.google.api-client:google-api-client:1.23.0")
+			dependency("com.google.oauth-client:google-oauth-client-jetty:1.23.0")
+			dependency("com.google.apis:google-api-services-drive:v2-rev289-1.23.0")
+		}
+	}
 
 	dependencies {
 		/*******************************
 		 * Compile Dependencies
 		 *******************************/
 
-		compile "io.springfox:springfox-swagger2:2.8.0"
-		compile "io.springfox:springfox-swagger-ui:2.8.0"
+		compile("io.springfox:springfox-swagger2")
+		compile("io.springfox:springfox-swagger-ui")
+		compile("io.springfox:springfox-bean-validators")
 
 		/*******************************
 		 * Provided Dependencies
 		 *******************************/
 
+		annotationProcessor("org.projectlombok:lombok")
 		compileOnly("org.projectlombok:lombok")
+		compileOnly("com.google.code.findbugs:annotations")
 
 		/*******************************
 		 * Runtime Dependencies
@@ -62,5 +88,39 @@ configure(javaProjects) {
 		 *******************************/
 
 		testCompile("org.springframework.boot:spring-boot-starter-test")
+	}
+
+	task removeIdeaOutDirectory(type: Delete) {
+		file("${projectDir}/out").deleteDir()
+	}
+
+	clean {
+		dependsOn(removeIdeaOutDirectory)
+	}
+
+	compileJava {
+		options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+		options.incremental = true
+	}
+
+    checkstyle {
+        configFile = new File(project.parent.projectDir, "codequality/checkstyle/checkstyle.xml")
+    }
+
+	findbugs {
+		excludeFilter = new File(project.parent.projectDir, "codequality/findbugs/excludeFilter.xml")
+		ignoreFailures = true
+	}
+
+	pmd {
+		ruleSetConfig = rootProject.resources.text.fromFile("codequality/pmd/pmd.xml")
+		ignoreFailures = true
+	}
+
+	tasks.withType(FindBugs) {
+		reports {
+			xml.enabled = false
+			html.enabled = true
+		}
 	}
 }

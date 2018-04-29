@@ -2,8 +2,6 @@ package com.web.web.config;
 
 import com.web.web.config.properties.EclipseLinkProperties;
 import com.web.web.config.properties.EntityManagerProperties;
-import org.eclipse.persistence.internal.databaseaccess.DatabasePlatform;
-import org.eclipse.persistence.platform.database.MySQLPlatform;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -61,12 +59,10 @@ public class WebDatasourceConfig {
         em.setDataSource(getDatasource());
         em.setJpaDialect(jpaDialect());
         em.setPackagesToScan(entityManagerProperties.getPackagesToScan());
-        em.setPersistenceUnitName(eclipseLinkProperties.getPersistenceUnitName());
-        final DatabasePlatform dp = new MySQLPlatform();
         em.setJpaVendorAdapter(getEclipseLinkJpaVendorAdapter());
 
         //following code will be used for static weaving. Uncomment when creating war.
-		final Map<String, String> propMap = new HashMap<String, String>();
+		final Map<String, String> propMap = new HashMap<>();
 		propMap.put("eclipselink.weaving", eclipseLinkProperties.getWeaving());
 //        propMap.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
 //        propMap.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_BOTH_GENERATION);
@@ -84,7 +80,6 @@ public class WebDatasourceConfig {
     @Bean
     public EclipseLinkJpaVendorAdapter getEclipseLinkJpaVendorAdapter() {
         final EclipseLinkJpaVendorAdapter vendorAdapter = new EclipseLinkJpaVendorAdapter();
-        vendorAdapter.setDatabasePlatform(eclipseLinkProperties.getDatabasePlatform());
         vendorAdapter.setGenerateDdl(eclipseLinkProperties.isGenerateDll());
         vendorAdapter.setShowSql(eclipseLinkProperties.isShowSql());
         return vendorAdapter;

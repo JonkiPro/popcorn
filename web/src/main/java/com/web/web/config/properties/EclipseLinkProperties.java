@@ -15,16 +15,6 @@ import org.springframework.validation.annotation.Validated;
 public class EclipseLinkProperties {
 
     /**
-     * Persistence unit name
-     */
-    private String persistenceUnitName;
-
-    /**
-     * Database platform
-     */
-    private String databasePlatform;
-
-    /**
      * Generate DLL
      */
     private boolean generateDll;

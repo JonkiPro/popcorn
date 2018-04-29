@@ -1,5 +1,3 @@
-group = 'com.common'
-
 apply plugin: "java-library"
 
 dependencies {
@@ -9,12 +7,24 @@ dependencies {
 
 	api("com.fasterxml.jackson.core:jackson-databind")
 	api("org.hibernate.validator:hibernate-validator")
-	api "commons-validator:commons-validator:1.6"
-	api "org.apache.commons:commons-lang3:3.6"
+	api("commons-validator:commons-validator")
+	api("org.apache.commons:commons-lang3")
 
 	/*******************************
 	 * Implementation Dependencies
 	 *******************************/
 
 	implementation("com.google.guava:guava")
+
+	/*******************************
+	 * Provided Dependencies
+	 *******************************/
+
+	/*******************************
+	 * Runtime Dependencies
+	 *******************************/
+
+	/*******************************
+	 * Test Dependencies
+	 *******************************/
 }

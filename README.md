@@ -22,10 +22,9 @@
 ### REST
 *  Visit [https://localhost:8443/swagger-ui.html].
 ## Tech Stack
-*  Java
-*  Spring
+*  Java 8
+*  Spring Boot 2
 *  Spring MVC
-*  Spring Boot
 *  Spring Data
 *  Spring Security
 *  EclipseLink / JPA / ORM
@@ -44,7 +43,6 @@
 *  jQuery
 *  AJAX
 *  AngularJS
-*  IntelliJ
 *  Gradle
 
 

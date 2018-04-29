@@ -1,3 +1,3 @@
 rootProject.name='REST-Web-Services'
 
-include 'core', 'web', 'common'
+include 'common', 'core', 'web', 'app'

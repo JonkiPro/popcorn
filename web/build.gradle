@@ -1,17 +1,15 @@
-group = 'com.web'
-
-
 dependencies {
 	/*******************************
 	 * Compile Dependencies
 	 *******************************/
 
-	compile project(':core')
+	compile(project(":core"))
 
 	compile("org.springframework.boot:spring-boot-starter-actuator")
 	compile("org.springframework.boot:spring-boot-starter-web")
 	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
-	compile "org.springframework.boot:spring-boot-starter-data-rest:2.0.0.RELEASE"
+	compile("org.springframework.boot:spring-boot-starter-data-rest")
+	compile("org.flywaydb:flyway-core")
 	compile "org.thymeleaf.extras:thymeleaf-extras-springsecurity4:3.0.2.RELEASE"
 	compile "org.webjars:bootstrap:3.3.7-1"
 	compile "org.webjars:jquery:3.2.1"
@@ -19,8 +17,16 @@ dependencies {
 	compile "org.webjars:jquery-validation:1.17.0"
 
 	/*******************************
+	 * Provided Dependencies
+	 *******************************/
+
+	/*******************************
+	 * Runtime Dependencies
+	 *******************************/
+
+	/*******************************
 	 * Test Dependencies
 	 *******************************/
 
-	testCompile "org.springframework.security:spring-security-test:5.0.3.RELEASE"
+	testCompile("org.springframework.security:spring-security-test")
 }
