@@ -20,7 +20,6 @@ public class MessageReceived extends Message {
     private final ShallowUser sender;
 
     @ApiModelProperty(notes = "The message date of read")
-    @JsonProperty("date_of_read")
     private final Date dateOfRead;
 
     /**

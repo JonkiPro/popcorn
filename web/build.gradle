@@ -28,5 +28,6 @@ dependencies {
 	 * Test Dependencies
 	 *******************************/
 
+	testCompile(project(":test"))
 	testCompile("org.springframework.security:spring-security-test")
 }

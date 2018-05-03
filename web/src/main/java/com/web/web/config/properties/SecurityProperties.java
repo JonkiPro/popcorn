@@ -1,13 +1,17 @@
 package com.web.web.config.properties;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties for Spring Security configuration.
  */
-@Data
-@ConfigurationProperties("security")
+@ConfigurationProperties(prefix = "security")
+@Getter
+@Setter
+@Validated
 public class SecurityProperties {
 
     // Pattern

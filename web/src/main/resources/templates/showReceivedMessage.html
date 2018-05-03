@@ -42,7 +42,7 @@
                     <button data-ng-click="replyMessage={'display':''}" class="btn btn-success btn-lg"><span
                             class="glyphicon glyphicon-send"></span> <span th:text="#{showReceivedMessage.btnReply}">REPLY</span>
                     </button>
-                    <p class="pull-right" style="margin-top: 5px;">Date of read: <span ng-bind="message.date_of_read | date:'dd/MM/yyyy HH:mm:ss'"></span></p>
+                    <p class="pull-right" style="margin-top: 5px;">Date of read: <span ng-bind="message.dateOfRead | date:'dd/MM/yyyy HH:mm:ss'"></span></p>
                 </div>
             </div>
         </div>

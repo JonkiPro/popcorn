@@ -8,7 +8,7 @@ buildscript {
 }
 
 def javaProjects = subprojects.findAll {
-	it.name in ["common", "core", "web", "app"]
+	it.name in ["test", "common", "core", "web", "app", "war"]
 }
 
 allprojects {

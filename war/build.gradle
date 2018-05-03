@@ -1,0 +1,33 @@
+apply plugin: 'war'
+
+dependencies {
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    compile(project(":web"))
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+
+    /*******************************
+     * Optional Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+    testCompile(project(":test"))
+}
+
+war {
+    baseName = "WebApplication"
+}
