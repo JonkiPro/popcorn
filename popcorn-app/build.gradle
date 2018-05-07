@@ -1,0 +1,29 @@
+apply plugin: "org.springframework.boot"
+
+dependencies {
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    compile(project(":popcorn-web"))
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    /*******************************
+     * Optional Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+}
+
+springBoot {
+    mainClassName = "com.jonki.popcorn.PopcornWeb"
+}

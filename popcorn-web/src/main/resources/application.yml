@@ -1,0 +1,59 @@
+spring:
+  application:
+      name: popcorn
+  banner:
+    location: banner.txt
+  mail:
+      host: smtp.gmail.com
+      port: 587
+      username: TkM2Gs9Hrd@gmail.com
+      password: 8pKZu9SStJ
+      properties.mail.smtp:
+        auth: true
+        starttls.enable: true
+  messages:
+      basename: internationalization/viewMessages,\
+                internationalization/validationMessages,\
+                static/linkToCssAndJs
+      encoding: UTF-8
+      fallback-to-system-locale: true
+  profiles:
+      include: security
+      active: dev
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+  flyway:
+    locations: classpath:db/migration/{vendor}
+    baselineDescription: Base Version
+    baselineOnMigrate: true
+    baselineVersion: 1
+
+entity-manager:
+  packages-to-scan: com.jonki.popcorn.core.jpa.entity
+
+server:
+  port: 8443
+  servlet.session.timeout: 25200s
+  ssl:
+    key-store: classpath:keystore/keyStore.jks
+    key-store-password: JonkiPro
+    key-password: JonkiPro
+    key-alias: some_alias
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /actuator
+
+logging.level:
+  org:
+    springframework.web: DEBUG
+  com:
+    zaxxer.hikari.HikariConfig: DEBUG
+
+swagger.enabled: true

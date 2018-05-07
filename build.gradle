@@ -7,8 +7,10 @@ buildscript {
 	}
 }
 
+ext.githubProjectName = rootProject.name
+
 def javaProjects = subprojects.findAll {
-	it.name in ["test", "common", "core", "web", "app", "war"]
+	it.name in ["popcorn-test", "popcorn-common", "popcorn-core", "popcorn-web", "popcorn-app", "popcorn-war"]
 }
 
 allprojects {
@@ -35,6 +37,8 @@ configure(javaProjects) {
 	apply plugin: 'findbugs'
 	apply plugin: 'pmd'
 	apply plugin: 'io.spring.dependency-management'
+
+	group = "com.jonki.${githubProjectName}"
 
     sourceCompatibility = 1.8
 	targetCompatibility = 1.8

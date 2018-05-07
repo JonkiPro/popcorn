@@ -1,0 +1,21 @@
+spring.h2.console:
+  enabled: true
+  path: /h2
+
+spring:
+  datasource:
+    jdbcUrl: jdbc:h2:mem:database
+    username: root
+    password:
+    hikari:
+      auto-commit: false
+      connection-test-query: select 0;
+      leak-detection-threshold: 30000
+      maximum-pool-size: 40
+      minimum-idle: 5
+      pool-name: popcorn-hikari-db-pool
+
+eclipse-link:
+  generate-dll: true
+  show-sql: true
+  weaving: static

@@ -1,3 +1,3 @@
-rootProject.name='REST-Web-Services'
+rootProject.name='popcorn'
 
-include 'test', 'common', 'core', 'web', 'app', 'war'
+include 'popcorn-test', 'popcorn-common', 'popcorn-core', 'popcorn-web', 'popcorn-app', 'popcorn-war'
