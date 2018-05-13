@@ -1,5 +1,6 @@
 package com.jonki.popcorn.core.jpa.service;
 
+import com.google.common.collect.Iterables;
 import com.jonki.popcorn.common.dto.request.SendMessageDTO;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
@@ -9,7 +10,6 @@ import com.jonki.popcorn.core.jpa.repository.MessageRepository;
 import com.jonki.popcorn.core.jpa.repository.UserRepository;
 import com.jonki.popcorn.core.service.AuthorizationService;
 import com.jonki.popcorn.core.service.MessagePersistenceService;
-import com.google.common.collect.Iterables;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

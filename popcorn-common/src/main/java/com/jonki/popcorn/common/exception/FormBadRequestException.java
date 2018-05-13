@@ -1,7 +1,7 @@
 package com.jonki.popcorn.common.exception;
 
-import com.jonki.popcorn.common.dto.error.ValidationErrorDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jonki.popcorn.common.dto.error.ValidationErrorDTO;
 import lombok.AllArgsConstructor;
 
 /**

@@ -1,7 +1,7 @@
 package com.jonki.popcorn.web.hateoas.resource;
 
-import com.jonki.popcorn.common.dto.User;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.jonki.popcorn.common.dto.User;
 import org.springframework.hateoas.Resource;
 
 /**

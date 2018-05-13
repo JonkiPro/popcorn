@@ -1,23 +1,37 @@
 package com.jonki.popcorn.web.controller;
 
 import com.jonki.popcorn.common.dto.Contribution;
-import com.jonki.popcorn.common.dto.movie.*;
+import com.jonki.popcorn.common.dto.DataStatus;
+import com.jonki.popcorn.common.dto.MovieField;
+import com.jonki.popcorn.common.dto.VerificationStatus;
+import com.jonki.popcorn.common.dto.movie.BoxOffice;
+import com.jonki.popcorn.common.dto.movie.Country;
+import com.jonki.popcorn.common.dto.movie.Genre;
+import com.jonki.popcorn.common.dto.movie.Language;
+import com.jonki.popcorn.common.dto.movie.OtherTitle;
+import com.jonki.popcorn.common.dto.movie.Outline;
+import com.jonki.popcorn.common.dto.movie.ReleaseDate;
+import com.jonki.popcorn.common.dto.movie.Review;
+import com.jonki.popcorn.common.dto.movie.Site;
+import com.jonki.popcorn.common.dto.movie.Summary;
+import com.jonki.popcorn.common.dto.movie.Synopsis;
 import com.jonki.popcorn.common.dto.movie.request.ContributionNew;
 import com.jonki.popcorn.common.dto.movie.request.ContributionUpdate;
 import com.jonki.popcorn.common.dto.movie.request.ImageRequest;
 import com.jonki.popcorn.common.dto.movie.response.ImageResponse;
 import com.jonki.popcorn.common.dto.search.ContributionSearchResult;
-import com.jonki.popcorn.common.dto.DataStatus;
-import com.jonki.popcorn.common.dto.MovieField;
-import com.jonki.popcorn.common.dto.VerificationStatus;
 import com.jonki.popcorn.core.service.MovieContributionPersistenceService;
 import com.jonki.popcorn.core.service.MovieContributionSearchService;
 import com.jonki.popcorn.web.hateoas.assembler.ContributionSearchResultResourceAssembler;
-import com.jonki.popcorn.web.hateoas.resource.ContributionSearchResultResource;
 import com.jonki.popcorn.web.hateoas.resource.ContributionResource;
-import com.jonki.popcorn.web.util.MultipartFileUtils;
+import com.jonki.popcorn.web.hateoas.resource.ContributionSearchResultResource;
 import com.jonki.popcorn.web.util.MapUtils;
-import io.swagger.annotations.*;
+import com.jonki.popcorn.web.util.MultipartFileUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -34,14 +48,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping(value = "/api/v1.0/movies")

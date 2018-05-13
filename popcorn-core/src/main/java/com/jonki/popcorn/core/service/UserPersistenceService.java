@@ -4,7 +4,11 @@ import com.jonki.popcorn.common.dto.request.ChangeEmailDTO;
 import com.jonki.popcorn.common.dto.request.ChangePasswordDTO;
 import com.jonki.popcorn.common.dto.request.ForgotPasswordDTO;
 import com.jonki.popcorn.common.dto.request.RegisterDTO;
-import com.jonki.popcorn.common.exception.*;
+import com.jonki.popcorn.common.exception.ResourceBadRequestException;
+import com.jonki.popcorn.common.exception.ResourceConflictException;
+import com.jonki.popcorn.common.exception.ResourceNotFoundException;
+import com.jonki.popcorn.common.exception.ResourcePreconditionException;
+import com.jonki.popcorn.common.exception.ResourceServerException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 

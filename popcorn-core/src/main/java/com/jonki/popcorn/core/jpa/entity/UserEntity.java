@@ -2,18 +2,35 @@ package com.jonki.popcorn.core.jpa.entity;
 
 import com.jonki.popcorn.common.dto.SecurityRole;
 import com.jonki.popcorn.common.dto.StorageProvider;
+import com.jonki.popcorn.common.dto.UserMoviePermission;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
 import com.jonki.popcorn.core.jpa.entity.movie.MovieRateEntity;
-import com.jonki.popcorn.common.dto.UserMoviePermission;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Representation of the user.

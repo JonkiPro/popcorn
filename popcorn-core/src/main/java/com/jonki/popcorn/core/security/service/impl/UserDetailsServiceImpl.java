@@ -1,8 +1,8 @@
 package com.jonki.popcorn.core.security.service.impl;
 
+import com.jonki.popcorn.common.dto.SecurityRole;
 import com.jonki.popcorn.core.jpa.entity.UserEntity;
 import com.jonki.popcorn.core.jpa.repository.UserRepository;
-import com.jonki.popcorn.common.dto.SecurityRole;
 import com.jonki.popcorn.core.security.model.CustomUserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

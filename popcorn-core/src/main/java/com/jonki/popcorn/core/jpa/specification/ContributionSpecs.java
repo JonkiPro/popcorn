@@ -1,10 +1,10 @@
 package com.jonki.popcorn.core.jpa.specification;
 
+import com.jonki.popcorn.common.dto.DataStatus;
+import com.jonki.popcorn.common.dto.MovieField;
 import com.jonki.popcorn.core.jpa.entity.ContributionEntity;
 import com.jonki.popcorn.core.jpa.entity.ContributionEntity_;
 import com.jonki.popcorn.core.jpa.entity.MovieEntity;
-import com.jonki.popcorn.common.dto.DataStatus;
-import com.jonki.popcorn.common.dto.MovieField;
 
 import javax.annotation.Nullable;
 import javax.persistence.criteria.CriteriaBuilder;

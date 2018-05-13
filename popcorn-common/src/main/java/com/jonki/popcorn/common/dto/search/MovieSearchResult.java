@@ -1,8 +1,8 @@
 package com.jonki.popcorn.common.dto.search;
 
-import com.jonki.popcorn.common.dto.movie.type.MovieType;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jonki.popcorn.common.dto.movie.type.MovieType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.EqualsAndHashCode;

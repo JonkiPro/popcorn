@@ -1,7 +1,10 @@
 package com.jonki.popcorn.core.jpa.entity.movie;
 
 import com.jonki.popcorn.common.dto.MovieField;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;

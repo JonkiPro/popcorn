@@ -2,7 +2,18 @@ package com.jonki.popcorn.core.jpa.entity;
 
 import com.jonki.popcorn.common.dto.DataStatus;
 import com.jonki.popcorn.common.dto.movie.type.MovieType;
-import com.jonki.popcorn.core.jpa.entity.movie.*;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieBoxOfficeEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieCountryEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieGenreEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieLanguageEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieOtherTitleEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieOutlineEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieRateEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieReleaseDateEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieReviewEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieSiteEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieSummaryEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieSynopsisEntity;
 
 import javax.annotation.Generated;
 import javax.persistence.metamodel.ListAttribute;

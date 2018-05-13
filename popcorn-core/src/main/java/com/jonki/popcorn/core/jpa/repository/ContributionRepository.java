@@ -1,9 +1,9 @@
 package com.jonki.popcorn.core.jpa.repository;
 
-import com.jonki.popcorn.core.jpa.entity.UserEntity;
 import com.jonki.popcorn.common.dto.DataStatus;
-import com.jonki.popcorn.core.jpa.entity.ContributionEntity;
 import com.jonki.popcorn.common.dto.MovieField;
+import com.jonki.popcorn.core.jpa.entity.ContributionEntity;
+import com.jonki.popcorn.core.jpa.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

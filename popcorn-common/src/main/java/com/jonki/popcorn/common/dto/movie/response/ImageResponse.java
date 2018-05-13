@@ -1,9 +1,9 @@
 package com.jonki.popcorn.common.dto.movie.response;
 
-import com.jonki.popcorn.common.dto.movie.MovieInfoDTO;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.jonki.popcorn.common.dto.movie.MovieInfoDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;

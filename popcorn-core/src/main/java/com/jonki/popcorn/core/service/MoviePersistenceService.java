@@ -1,7 +1,17 @@
 package com.jonki.popcorn.core.service;
 
 import com.jonki.popcorn.common.dto.VerificationStatus;
-import com.jonki.popcorn.common.dto.movie.*;
+import com.jonki.popcorn.common.dto.movie.BoxOffice;
+import com.jonki.popcorn.common.dto.movie.Country;
+import com.jonki.popcorn.common.dto.movie.Genre;
+import com.jonki.popcorn.common.dto.movie.Language;
+import com.jonki.popcorn.common.dto.movie.OtherTitle;
+import com.jonki.popcorn.common.dto.movie.Outline;
+import com.jonki.popcorn.common.dto.movie.ReleaseDate;
+import com.jonki.popcorn.common.dto.movie.Review;
+import com.jonki.popcorn.common.dto.movie.Site;
+import com.jonki.popcorn.common.dto.movie.Summary;
+import com.jonki.popcorn.common.dto.movie.Synopsis;
 import com.jonki.popcorn.common.dto.movie.request.ImageRequest;
 import com.jonki.popcorn.common.dto.movie.request.Rate;
 import com.jonki.popcorn.common.dto.request.MovieDTO;

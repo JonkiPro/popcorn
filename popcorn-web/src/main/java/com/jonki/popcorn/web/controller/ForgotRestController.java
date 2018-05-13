@@ -1,23 +1,31 @@
 package com.jonki.popcorn.web.controller;
 
+import com.jonki.popcorn.common.dto.User;
 import com.jonki.popcorn.common.dto.error.ValidationErrorDTO;
 import com.jonki.popcorn.common.dto.request.ForgotPasswordDTO;
-import com.jonki.popcorn.common.dto.User;
-import com.jonki.popcorn.common.exception.FormBadRequestException;
 import com.jonki.popcorn.common.dto.request.ForgotUsernameDTO;
+import com.jonki.popcorn.common.exception.FormBadRequestException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
-import com.jonki.popcorn.core.service.UserPersistenceService;
-import com.jonki.popcorn.core.service.UserSearchService;
 import com.jonki.popcorn.core.properties.BundleProperties;
 import com.jonki.popcorn.core.service.MailService;
-import io.swagger.annotations.*;
+import com.jonki.popcorn.core.service.UserPersistenceService;
+import com.jonki.popcorn.core.service.UserSearchService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.ResourceBundle;

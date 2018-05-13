@@ -4,7 +4,10 @@ import com.jonki.popcorn.common.dto.DataStatus;
 import com.jonki.popcorn.common.dto.MovieField;
 
 import javax.annotation.Generated;
-import javax.persistence.metamodel.*;
+import javax.persistence.metamodel.MapAttribute;
+import javax.persistence.metamodel.SetAttribute;
+import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.StaticMetamodel;
 import java.util.Date;
 
 /**

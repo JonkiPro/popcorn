@@ -1,7 +1,7 @@
 package com.jonki.popcorn.common.dto.request;
 
-import com.jonki.popcorn.common.dto.request.validator.ValidEmail;
 import com.jonki.popcorn.common.dto.request.validator.PasswordsEqualConstraint;
+import com.jonki.popcorn.common.dto.request.validator.ValidEmail;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

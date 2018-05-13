@@ -1,17 +1,29 @@
 package com.jonki.popcorn.core.jpa.specification;
 
+import com.jonki.popcorn.common.dto.DataStatus;
 import com.jonki.popcorn.common.dto.movie.type.CountryType;
 import com.jonki.popcorn.common.dto.movie.type.GenreType;
 import com.jonki.popcorn.common.dto.movie.type.LanguageType;
 import com.jonki.popcorn.common.dto.movie.type.MovieType;
 import com.jonki.popcorn.core.jpa.entity.MovieEntity;
 import com.jonki.popcorn.core.jpa.entity.MovieEntity_;
-import com.jonki.popcorn.common.dto.DataStatus;
-import com.jonki.popcorn.core.jpa.entity.movie.*;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieCountryEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieCountryEntity_;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieGenreEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieGenreEntity_;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieLanguageEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieLanguageEntity_;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieOtherTitleEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieOtherTitleEntity_;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieReleaseDateEntity;
+import com.jonki.popcorn.core.jpa.entity.movie.MovieReleaseDateEntity_;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

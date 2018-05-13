@@ -1,8 +1,8 @@
 package com.jonki.popcorn.web.hateoas.assembler;
 
 import com.jonki.popcorn.common.dto.search.MovieSearchResult;
-import com.jonki.popcorn.web.hateoas.resource.MovieSearchResultResource;
 import com.jonki.popcorn.web.controller.MovieRestController;
+import com.jonki.popcorn.web.hateoas.resource.MovieSearchResultResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.stereotype.Component;

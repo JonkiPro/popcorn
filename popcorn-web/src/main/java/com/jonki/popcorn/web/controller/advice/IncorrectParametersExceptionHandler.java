@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A handler to capture erroneous fields in methods parameters.

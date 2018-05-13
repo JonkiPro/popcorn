@@ -1,8 +1,8 @@
 package com.jonki.popcorn.web.hateoas.assembler;
 
 import com.jonki.popcorn.common.dto.search.ContributionSearchResult;
-import com.jonki.popcorn.web.hateoas.resource.ContributionSearchResultResource;
 import com.jonki.popcorn.web.controller.MovieContributionRestController;
+import com.jonki.popcorn.web.hateoas.resource.ContributionSearchResultResource;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;

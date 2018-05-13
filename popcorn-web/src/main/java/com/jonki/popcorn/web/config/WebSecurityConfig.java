@@ -1,12 +1,15 @@
 package com.jonki.popcorn.web.config;
 
+import com.jonki.popcorn.web.config.properties.SecurityProperties;
 import com.jonki.popcorn.web.security.handler.RestAuthenticationFailureHandler;
 import com.jonki.popcorn.web.security.handler.RestAuthenticationSuccessHandler;
-import com.jonki.popcorn.web.config.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
