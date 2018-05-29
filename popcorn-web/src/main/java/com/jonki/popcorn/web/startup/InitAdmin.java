@@ -1,6 +1,6 @@
 package com.jonki.popcorn.web.startup;
 
-import com.jonki.popcorn.common.dto.request.RegisterDTO;
+import com.jonki.popcorn.common.dto.request.RegisterRequest;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
 import com.jonki.popcorn.core.service.UserPersistenceService;
 import com.jonki.popcorn.core.service.UserSearchService;
@@ -39,11 +39,11 @@ public class InitAdmin implements ApplicationListener<ApplicationReadyEvent> {
     private final String EMAIL = "TkM2Gs9Hrd@gmail.com";
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
+    public void onApplicationEvent(final ApplicationReadyEvent event) {
 
         try {
             userSearchService.getUserByUsername(USERNAME);
-        } catch (ResourceNotFoundException ex) {
+        } catch (final ResourceNotFoundException ex) {
             userPersistenceService.createAdmin(initAdmin());
         }
     }
@@ -53,13 +53,8 @@ public class InitAdmin implements ApplicationListener<ApplicationReadyEvent> {
      *
      * @return user (administrator)
      */
-    private RegisterDTO initAdmin() {
-        RegisterDTO registerDTO = new RegisterDTO();
-        registerDTO.setUsername(USERNAME);
-        registerDTO.setPassword(PASSWORD);
-        registerDTO.setPasswordAgain(PASSWORD);
-        registerDTO.setEmail(EMAIL);
-
-        return registerDTO;
+    private RegisterRequest initAdmin() {
+        return new RegisterRequest.Builder(
+                USERNAME, EMAIL, PASSWORD, PASSWORD, null).build();
     }
 }

@@ -10,6 +10,9 @@ import lombok.Getter;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+/**
+ * Synopsis DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = Synopsis.Builder.class)
 @ApiModel(description = "The synopsis of the movie")

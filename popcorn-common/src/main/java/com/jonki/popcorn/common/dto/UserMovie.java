@@ -10,10 +10,15 @@ import lombok.Getter;
 
 import javax.annotation.Nullable;
 
+/**
+ * Read only data transfer object representing a UserMovie.
+ */
 @Getter
 @JsonDeserialize(builder = UserMovie.Builder.class)
 @ApiModel(description = "Movie details with additional fields for the logged in user")
 public class UserMovie extends Movie {
+
+    private static final long serialVersionUID = -6500104361727649701L;
 
     @ApiModelProperty(notes = "Rating of the movie of the logged-in user")
     private final Float yourRating;

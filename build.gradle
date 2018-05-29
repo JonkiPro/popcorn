@@ -14,6 +14,7 @@ def javaProjects = subprojects.findAll {
 }
 
 allprojects {
+	apply plugin: 'jacoco'
 	apply plugin: 'idea'
 	apply plugin: 'eclipse'
 
@@ -121,10 +122,20 @@ configure(javaProjects) {
 		ignoreFailures = true
 	}
 
+	jacocoTestReport {
+		reports {
+			html.enabled = true
+			xml.enabled = true
+			csv.enabled = true
+		}
+	}
+
 	tasks.withType(FindBugs) {
 		reports {
 			xml.enabled = false
 			html.enabled = true
 		}
 	}
+
+	test.finalizedBy jacocoTestReport
 }

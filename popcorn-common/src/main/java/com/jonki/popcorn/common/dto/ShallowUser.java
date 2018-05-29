@@ -7,6 +7,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
+/**
+ * Read only data transfer object representing a ShallowUser.
+ */
 @Getter
 @JsonDeserialize(builder = ShallowUser.Builder.class)
 @ApiModel(description = "This type represents a user, but omits many of the fields found on the full User type")

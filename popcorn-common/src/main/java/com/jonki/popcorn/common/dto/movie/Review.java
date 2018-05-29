@@ -11,6 +11,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+/**
+ * Review DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = Review.Builder.class)
 @ApiModel(description = "The review of the movie")

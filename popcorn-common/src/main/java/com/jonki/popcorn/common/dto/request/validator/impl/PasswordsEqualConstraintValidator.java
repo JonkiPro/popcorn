@@ -1,6 +1,6 @@
 package com.jonki.popcorn.common.dto.request.validator.impl;
 
-import com.jonki.popcorn.common.dto.request.RegisterDTO;
+import com.jonki.popcorn.common.dto.request.RegisterRequest;
 import com.jonki.popcorn.common.dto.request.validator.PasswordsEqualConstraint;
 
 import javax.validation.ConstraintValidator;
@@ -16,8 +16,8 @@ public class PasswordsEqualConstraintValidator implements ConstraintValidator<Pa
 
     @Override
     public boolean isValid(Object candidate, ConstraintValidatorContext context) {
-        final RegisterDTO registerDTO = (RegisterDTO) candidate;
+        final RegisterRequest registerRequest = (RegisterRequest) candidate;
 
-        return registerDTO.getPassword().equals(registerDTO.getPasswordAgain());
+        return registerRequest.getPassword().equals(registerRequest.getPasswordAgain());
     }
 }

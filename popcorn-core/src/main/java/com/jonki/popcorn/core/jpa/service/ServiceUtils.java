@@ -81,7 +81,7 @@ public final class ServiceUtils {
      * @return The immutable DTO representation of the entity data
      */
     static Contribution toContributionDto(final ContributionEntity contributionEntity) {
-        final Contribution.Builder builder = new Contribution.Builder(
+        final Contribution.Builder builder = (Contribution.Builder) new Contribution.Builder(
                 contributionEntity.getMovie().getId(),
                 contributionEntity.getMovie().getTitle(),
                 toShallowUserDto(contributionEntity.getUser()),

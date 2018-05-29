@@ -6,6 +6,10 @@ import lombok.Getter;
 
 import java.util.Date;
 
+/**
+ * Read only data transfer object representing a Message.
+ * Common class for MessageReceived and MessageSent.
+ */
 @Getter
 @ApiModel(description = "Message data")
 public abstract class Message extends BaseDTO {

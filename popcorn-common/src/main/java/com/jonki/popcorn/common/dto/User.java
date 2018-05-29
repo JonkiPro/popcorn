@@ -9,6 +9,9 @@ import lombok.Getter;
 
 import javax.annotation.Nullable;
 
+/**
+ * Read only data transfer object representing a User.
+ */
 @Getter
 @JsonDeserialize(builder = User.Builder.class)
 @ApiModel(description = "User data")

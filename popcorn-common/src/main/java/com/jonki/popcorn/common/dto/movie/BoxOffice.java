@@ -11,6 +11,9 @@ import lombok.Getter;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
+/**
+ * BoxOffice DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = BoxOffice.Builder.class)
 @ApiModel(description = "The box office of the movie")

@@ -14,8 +14,12 @@ import lombok.Getter;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Read only data transfer object representing a Movie.
+ */
 @Getter
 @JsonDeserialize(builder = Movie.Builder.class)
 @ApiModel(description = "Movie details")
@@ -92,9 +96,9 @@ public class Movie extends BaseDTO {
         private Float bRating;
         private Integer bNumberOfRatings;
         private ReleaseDate bReleaseDate;
-        private List<CountryType> bCountries;
-        private List<LanguageType> bLanguages;
-        private List<GenreType> bGenres;
+        private List<CountryType> bCountries = new ArrayList<>();
+        private List<LanguageType> bLanguages = new ArrayList<>();
+        private List<GenreType> bGenres = new ArrayList<>();
         private BigDecimal bBoxofficeCumulative;
         private String bOutline;
         private String bSummary;
@@ -167,7 +171,10 @@ public class Movie extends BaseDTO {
          * @return The builder
          */
         public Builder withCountries(@Nullable final List<CountryType> countries) {
-            this.bCountries = countries;
+            this.bCountries.clear();
+            if(countries != null) {
+                this.bCountries.addAll(countries);
+            }
             return this;
         }
 
@@ -178,7 +185,10 @@ public class Movie extends BaseDTO {
          * @return The builder
          */
         public Builder withLanguages(@Nullable final List<LanguageType> languages) {
-            this.bLanguages = languages;
+            this.bLanguages.clear();
+            if(languages != null) {
+                this.bLanguages.addAll(languages);
+            }
             return this;
         }
 
@@ -189,7 +199,10 @@ public class Movie extends BaseDTO {
          * @return The builder
          */
         public Builder withGenres(@Nullable final List<GenreType> genres) {
-            this.bGenres = genres;
+            this.bGenres.clear();
+            if(genres != null) {
+                this.bGenres.addAll(genres);
+            }
             return this;
         }
 

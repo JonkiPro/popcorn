@@ -9,6 +9,9 @@ import lombok.Getter;
 
 import java.util.Date;
 
+/**
+ * Read only data transfer object representing a MessageSent.
+ */
 @Getter
 @JsonDeserialize(builder = MessageSent.Builder.class)
 @ApiModel(description = "Message data sent")

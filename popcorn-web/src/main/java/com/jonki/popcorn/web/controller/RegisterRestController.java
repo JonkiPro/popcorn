@@ -1,7 +1,7 @@
 package com.jonki.popcorn.web.controller;
 
 import com.jonki.popcorn.common.dto.error.ValidationErrorDTO;
-import com.jonki.popcorn.common.dto.request.RegisterDTO;
+import com.jonki.popcorn.common.dto.request.RegisterRequest;
 import com.jonki.popcorn.common.exception.FormBadRequestException;
 import com.jonki.popcorn.core.properties.BundleProperties;
 import com.jonki.popcorn.core.service.UserPersistenceService;
@@ -76,15 +76,15 @@ public class RegisterRestController {
     public
     ResponseEntity<Void> register(
             @ApiParam(value = "Registration form", required = true)
-            @RequestBody @Valid final RegisterDTO registerDTO,
+            @RequestBody @Valid final RegisterRequest registerRequest,
             final UriComponentsBuilder uriComponentsBuilder
     ) {
-        log.info("Called with {}", registerDTO);
+        log.info("Called with {}", registerRequest);
 
-        this.validReCaptcha(registerDTO.getReCaptcha());
-        this.validRegisterDTO(registerDTO);
+        this.validReCaptcha(registerRequest.getReCaptcha());
+        this.validRegisterDTO(registerRequest);
 
-        this.userPersistenceService.createUser(registerDTO);
+        this.userPersistenceService.createUser(registerRequest);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(uriComponentsBuilder.path("/register/successfully").build().toUri());
@@ -110,16 +110,16 @@ public class RegisterRestController {
     /**
      * Check if there is a user with the given name and email.
      *
-     * @param registerDTO RegisterDTO object
+     * @param registerRequest RegisterRequest object
      * @throws FormBadRequestException if any data exists
      */
-    private void validRegisterDTO(final RegisterDTO registerDTO) {
+    private void validRegisterDTO(final RegisterRequest registerRequest) {
         final ValidationErrorDTO validationErrorDTO = new ValidationErrorDTO();
 
-        if(this.userSearchService.existsUserByUsername(registerDTO.getUsername())) {
+        if(this.userSearchService.existsUserByUsername(registerRequest.getUsername())) {
             validationErrorDTO.addFieldError("username", this.bundle.getString("validation.existsUsername"));
         }
-        if(this.userSearchService.existsUserByEmail(registerDTO.getEmail())) {
+        if(this.userSearchService.existsUserByEmail(registerRequest.getEmail())) {
             validationErrorDTO.addFieldError("email", this.bundle.getString("validation.existsEmail"));
         }
 

@@ -3,16 +3,22 @@ package com.jonki.popcorn.common.dto.movie.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.jonki.popcorn.common.dto.CommonResource;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
 import java.util.Date;
 
+/**
+ * Read only data transfer object representing a RateResponse.
+ */
 @Getter
 @JsonDeserialize(builder = RateResponse.Builder.class)
 @ApiModel(description = "Movie rating")
-public class RateResponse {
+public class RateResponse extends CommonResource {
+
+    private static final long serialVersionUID = 7480636341237372778L;
 
     @ApiModelProperty(notes = "Movie rating", required = true)
     private final Integer rate;

@@ -11,6 +11,9 @@ import lombok.Getter;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
+/**
+ * This class represents the subset of data returned from a Contribution when a search for Contributions is conducted.
+ */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(description = "This class represents the subset of data returned from a Contribution when a search for Contributions is conducted")

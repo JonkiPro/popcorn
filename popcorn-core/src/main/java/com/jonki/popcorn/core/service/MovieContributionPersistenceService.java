@@ -12,9 +12,9 @@ import com.jonki.popcorn.common.dto.movie.Review;
 import com.jonki.popcorn.common.dto.movie.Site;
 import com.jonki.popcorn.common.dto.movie.Summary;
 import com.jonki.popcorn.common.dto.movie.Synopsis;
-import com.jonki.popcorn.common.dto.movie.request.ContributionNew;
-import com.jonki.popcorn.common.dto.movie.request.ContributionUpdate;
 import com.jonki.popcorn.common.dto.movie.request.ImageRequest;
+import com.jonki.popcorn.common.dto.request.ContributionNewRequest;
+import com.jonki.popcorn.common.dto.request.ContributionUpdateRequest;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceForbiddenException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
@@ -60,7 +60,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createOtherTitleContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<OtherTitle> contribution
+            @NotNull @Valid final ContributionNewRequest<OtherTitle> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -73,7 +73,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateOtherTitleContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<OtherTitle> contribution
+            @NotNull @Valid final ContributionUpdateRequest<OtherTitle> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -87,7 +87,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createReleaseDateContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<ReleaseDate> contribution
+            @NotNull @Valid final ContributionNewRequest<ReleaseDate> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -100,7 +100,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateReleaseDateContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<ReleaseDate> contribution
+            @NotNull @Valid final ContributionUpdateRequest<ReleaseDate> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -114,7 +114,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createOutlineContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<Outline> contribution
+            @NotNull @Valid final ContributionNewRequest<Outline> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -127,7 +127,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateOutlineContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<Outline> contribution
+            @NotNull @Valid final ContributionUpdateRequest<Outline> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -141,7 +141,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createSummaryContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<Summary> contribution
+            @NotNull @Valid final ContributionNewRequest<Summary> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -154,7 +154,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateSummaryContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<Summary> contribution
+            @NotNull @Valid final ContributionUpdateRequest<Summary> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -168,7 +168,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createSynopsisContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<Synopsis> contribution
+            @NotNull @Valid final ContributionNewRequest<Synopsis> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -181,7 +181,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateSynopsisContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<Synopsis> contribution
+            @NotNull @Valid final ContributionUpdateRequest<Synopsis> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -195,7 +195,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createBoxOfficeContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<BoxOffice> contribution
+            @NotNull @Valid final ContributionNewRequest<BoxOffice> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -208,7 +208,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateBoxOfficeContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<BoxOffice> contribution
+            @NotNull @Valid final ContributionUpdateRequest<BoxOffice> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -222,7 +222,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createSiteContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<Site> contribution
+            @NotNull @Valid final ContributionNewRequest<Site> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -235,7 +235,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateSiteContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<Site> contribution
+            @NotNull @Valid final ContributionUpdateRequest<Site> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -249,7 +249,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createCountryContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<Country> contribution
+            @NotNull @Valid final ContributionNewRequest<Country> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -262,7 +262,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateCountryContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<Country> contribution
+            @NotNull @Valid final ContributionUpdateRequest<Country> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -276,7 +276,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createLanguageContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<Language> contribution
+            @NotNull @Valid final ContributionNewRequest<Language> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -289,7 +289,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateLanguageContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<Language> contribution
+            @NotNull @Valid final ContributionUpdateRequest<Language> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -303,7 +303,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createGenreContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<Genre> contribution
+            @NotNull @Valid final ContributionNewRequest<Genre> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -316,7 +316,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateGenreContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<Genre> contribution
+            @NotNull @Valid final ContributionUpdateRequest<Genre> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -330,7 +330,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createReviewContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<Review> contribution
+            @NotNull @Valid final ContributionNewRequest<Review> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -343,7 +343,7 @@ public interface MovieContributionPersistenceService {
      */
     void updateReviewContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<Review> contribution
+            @NotNull @Valid final ContributionUpdateRequest<Review> contribution
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
@@ -359,7 +359,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createPhotoContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<ImageRequest> contribution
+            @NotNull @Valid final ContributionNewRequest<ImageRequest> contribution
     ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException;
 
     /**
@@ -374,7 +374,7 @@ public interface MovieContributionPersistenceService {
      */
     void updatePhotoContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution
+            @NotNull @Valid final ContributionUpdateRequest<ImageRequest> contribution
     ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException;
 
     /**
@@ -390,7 +390,7 @@ public interface MovieContributionPersistenceService {
      */
     Long createPosterContribution(
             @Min(1) final Long movieId,
-            @NotNull @Valid final ContributionNew<ImageRequest> contribution
+            @NotNull @Valid final ContributionNewRequest<ImageRequest> contribution
     ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException;
 
     /**
@@ -405,6 +405,6 @@ public interface MovieContributionPersistenceService {
      */
     void updatePosterContribution(
             @Min(1) final Long contributionId,
-            @NotNull @Valid final ContributionUpdate<ImageRequest> contribution
+            @NotNull @Valid final ContributionUpdateRequest<ImageRequest> contribution
     ) throws ResourceNotFoundException, ResourceConflictException, ResourcePreconditionException, ResourceServerException;
 }

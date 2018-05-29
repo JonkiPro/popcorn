@@ -4,10 +4,10 @@ import com.jonki.popcorn.common.dto.SecurityRole;
 import com.jonki.popcorn.common.dto.StorageDirectory;
 import com.jonki.popcorn.common.dto.StorageProvider;
 import com.jonki.popcorn.common.dto.UserMoviePermission;
-import com.jonki.popcorn.common.dto.request.ChangeEmailDTO;
-import com.jonki.popcorn.common.dto.request.ChangePasswordDTO;
-import com.jonki.popcorn.common.dto.request.ForgotPasswordDTO;
-import com.jonki.popcorn.common.dto.request.RegisterDTO;
+import com.jonki.popcorn.common.dto.request.ChangeEmailRequest;
+import com.jonki.popcorn.common.dto.request.ChangePasswordRequest;
+import com.jonki.popcorn.common.dto.request.ForgotPasswordRequest;
+import com.jonki.popcorn.common.dto.request.RegisterRequest;
 import com.jonki.popcorn.common.exception.ResourceBadRequestException;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
@@ -85,17 +85,17 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public String createUser(
-            @NotNull @Valid final RegisterDTO registerDTO
+            @NotNull @Valid final RegisterRequest registerRequest
     ) throws ResourceConflictException {
-        log.info("Called with registerDTO {}", registerDTO);
+        log.info("Called with registerRequest {}", registerRequest);
 
-        if(userRepository.existsByUsernameIgnoreCase(registerDTO.getUsername())) {
-            throw new ResourceConflictException("The username " + registerDTO.getUsername() + " exists");
-        } else if(userRepository.existsByEmailIgnoreCase(registerDTO.getEmail())) {
-            throw new ResourceConflictException("The e-mail " + registerDTO.getEmail() + " exists");
+        if(userRepository.existsByUsernameIgnoreCase(registerRequest.getUsername())) {
+            throw new ResourceConflictException("The username " + registerRequest.getUsername() + " exists");
+        } else if(userRepository.existsByEmailIgnoreCase(registerRequest.getEmail())) {
+            throw new ResourceConflictException("The e-mail " + registerRequest.getEmail() + " exists");
         }
 
-        final UserEntity user = this.registerDtoToUserEntity(registerDTO);
+        final UserEntity user = this.registerRequestToUserEntity(registerRequest);
         user.setActivationToken(RandomUtils.randomToken());
         user.setAuthorities(EnumSet.of(SecurityRole.ROLE_USER));
 
@@ -126,18 +126,18 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void resetPassword(
-            @NotNull @Valid final ForgotPasswordDTO forgotPasswordDTO
+            @NotNull @Valid final ForgotPasswordRequest forgotPasswordRequest
     ) throws ResourceNotFoundException {
-        log.info("Called with forgotPasswordDTO {}", forgotPasswordDTO);
+        log.info("Called with forgotPasswordRequest {}", forgotPasswordRequest);
 
         final UserEntity user
                 = this.userRepository
-                     .findByUsernameIgnoreCaseAndEmailIgnoreCaseAndEnabledTrue(forgotPasswordDTO.getUsername(), forgotPasswordDTO.getEmail())
+                     .findByUsernameIgnoreCaseAndEmailIgnoreCaseAndEnabledTrue(forgotPasswordRequest.getUsername(), forgotPasswordRequest.getEmail())
                          .orElseThrow(
                                  () -> new ResourceNotFoundException("No user found with username "
-                                                                     + forgotPasswordDTO.getUsername()
+                                                                     + forgotPasswordRequest.getUsername()
                                                                      + ", e-mail "
-                                                                     + forgotPasswordDTO.getEmail())
+                                                                     + forgotPasswordRequest.getEmail())
                          );
 
         final String newPassword = RandomUtils.randomPassword();
@@ -152,18 +152,18 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void updateNewEmail(
-            @NotNull @Valid final ChangeEmailDTO changeEmailDTO
+            @NotNull @Valid final ChangeEmailRequest changeEmailRequest
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with changeEmailDTO {}", changeEmailDTO);
+        log.info("Called with changeEmailRequest {}", changeEmailRequest);
 
         final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
-        if(this.userRepository.existsByEmailIgnoreCase(changeEmailDTO.getEmail())) {
-            throw new ResourceConflictException("The e-mail " + changeEmailDTO.getEmail() + " exists");
+        if(this.userRepository.existsByEmailIgnoreCase(changeEmailRequest.getEmail())) {
+            throw new ResourceConflictException("The e-mail " + changeEmailRequest.getEmail() + " exists");
         }
 
         user.setEmailChangeToken(RandomUtils.randomToken());
-        user.setNewEmail(changeEmailDTO.getEmail());
+        user.setNewEmail(changeEmailRequest.getEmail());
 
         this.mailService.sendMailWithEmailChangeToken(user.getEmail(), user.getEmailChangeToken());
     }
@@ -173,17 +173,17 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public void updatePassword(
-            @NotNull @Valid final ChangePasswordDTO changePasswordDTO
+            @NotNull @Valid final ChangePasswordRequest changePasswordRequest
     ) throws ResourceNotFoundException, ResourceBadRequestException {
-        log.info("Called with changePasswordDTO {}", changePasswordDTO);
+        log.info("Called with changePasswordRequest {}", changePasswordRequest);
 
         final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
-        if(!EncryptUtils.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
+        if(!EncryptUtils.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
             throw new ResourceBadRequestException("The entered password doesn't match the old password");
         }
 
-        user.setPassword(EncryptUtils.encrypt(changePasswordDTO.getNewPassword()));
+        user.setPassword(EncryptUtils.encrypt(changePasswordRequest.getNewPassword()));
     }
 
     /**
@@ -296,17 +296,17 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      */
     @Override
     public String createAdmin(
-            RegisterDTO registerDTO
+            final RegisterRequest registerRequest
     ) throws ResourceConflictException {
-        log.info("Called with ", registerDTO);
+        log.info("Called with registerRequest {}", registerRequest);
 
-        if(userRepository.existsByUsernameIgnoreCase(registerDTO.getUsername())) {
-            throw new ResourceConflictException("The username " + registerDTO.getUsername() + " exists");
-        } else if(userRepository.existsByEmailIgnoreCase(registerDTO.getEmail())) {
-            throw new ResourceConflictException("The e-mail " + registerDTO.getEmail() + " exists");
+        if(userRepository.existsByUsernameIgnoreCase(registerRequest.getUsername())) {
+            throw new ResourceConflictException("The username " + registerRequest.getUsername() + " exists");
+        } else if(userRepository.existsByEmailIgnoreCase(registerRequest.getEmail())) {
+            throw new ResourceConflictException("The e-mail " + registerRequest.getEmail() + " exists");
         }
 
-        final UserEntity user = this.registerDtoToUserEntity(registerDTO);
+        final UserEntity user = this.registerRequestToUserEntity(registerRequest);
         user.setAuthorities(EnumSet.of(SecurityRole.ROLE_USER, SecurityRole.ROLE_ADMIN));
         user.setPermissions(EnumSet.of(UserMoviePermission.ALL));
         user.setEnabled(true);
@@ -328,16 +328,16 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
     }
 
     /**
-     * Converter RegisterDTO to UserEntity.
+     * Converter RegisterRequest to UserEntity.
      *
-     * @param registerDTO RegisterDTO object
+     * @param registerRequest RegisterRequest object
      * @return The user entity
      */
-    private UserEntity registerDtoToUserEntity(final RegisterDTO registerDTO) {
+    private UserEntity registerRequestToUserEntity(final RegisterRequest registerRequest) {
         final UserEntity user = new UserEntity();
-        user.setUsername(registerDTO.getUsername());
-        user.setEmail(registerDTO.getEmail());
-        user.setPassword(EncryptUtils.encrypt(registerDTO.getPassword()));
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(EncryptUtils.encrypt(registerRequest.getPassword()));
 
         return user;
     }

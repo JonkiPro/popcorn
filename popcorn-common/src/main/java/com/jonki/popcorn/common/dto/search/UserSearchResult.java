@@ -9,6 +9,9 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * This class represents the subset of data returned from a User when a search for Users is conducted.
+ */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(description = "This class represents the subset of data returned from a User when a search for Users is conducted")

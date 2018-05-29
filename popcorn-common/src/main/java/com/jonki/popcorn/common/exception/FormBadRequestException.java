@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FormBadRequestException extends RuntimeException {
 
+    private static final long serialVersionUID = -7344751131503160217L;
+
     /**
      * An object with a list of erroneous fields.
      */
@@ -22,6 +24,6 @@ public class FormBadRequestException extends RuntimeException {
      * @return Object with error list
      */
     public ValidationErrorDTO getErrors() {
-        return fieldErrors;
+        return this.fieldErrors;
     }
 }

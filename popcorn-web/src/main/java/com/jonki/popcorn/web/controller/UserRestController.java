@@ -104,7 +104,8 @@ public class UserRestController {
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
     @GetMapping(value = "/{username}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public UserResource getProfile(
+    public
+    UserResource getProfile(
             @ApiParam(value = "The user's name", required = true)
             @PathVariable("username") final String username
     ) {

@@ -5,15 +5,15 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.io.Serializable;
+import javax.annotation.Nullable;
 
 /**
  * Base fields for multiple DTOs.
  */
 @Getter
-@EqualsAndHashCode(of = "id", doNotUseGetters = true)
+@EqualsAndHashCode(of = "id", callSuper = false, doNotUseGetters = true)
 @ApiModel(description = "The base object")
-public abstract class BaseDTO implements Serializable {
+public abstract class BaseDTO extends CommonResource{
 
     private static final long serialVersionUID = 5144674981062625160L;
 
@@ -46,7 +46,7 @@ public abstract class BaseDTO implements Serializable {
          * @param id The id
          * @return The builder
          */
-        public T withId(final String id) {
+        public T withId(@Nullable final String id) {
             this.bId = id;
             return (T) this;
         }

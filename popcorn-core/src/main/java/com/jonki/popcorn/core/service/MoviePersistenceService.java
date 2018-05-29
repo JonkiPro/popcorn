@@ -13,8 +13,8 @@ import com.jonki.popcorn.common.dto.movie.Site;
 import com.jonki.popcorn.common.dto.movie.Summary;
 import com.jonki.popcorn.common.dto.movie.Synopsis;
 import com.jonki.popcorn.common.dto.movie.request.ImageRequest;
-import com.jonki.popcorn.common.dto.movie.request.Rate;
-import com.jonki.popcorn.common.dto.request.MovieDTO;
+import com.jonki.popcorn.common.dto.movie.request.RateRequest;
+import com.jonki.popcorn.common.dto.request.MovieRequest;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceForbiddenException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
@@ -36,11 +36,11 @@ public interface MoviePersistenceService {
     /**
      * Create movie with DTO data.
      *
-     * @param movieDTO DTO with movie data
+     * @param movieRequest DTO with movie data
      * @throws ResourceNotFoundException if no user found
      */
     void createMovie(
-            @NotNull @Valid final MovieDTO movieDTO
+            @NotNull @Valid final MovieRequest movieRequest
     ) throws ResourceNotFoundException;
 
     /**
@@ -407,13 +407,13 @@ public interface MoviePersistenceService {
      * Save the rating for the movie.
      *
      * @param id The movie ID
-     * @param rate Rating for the movie
+     * @param rateRequest Rating for the movie
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if today's date is earlier than the release date of the movie
      */
     void saveRating(
             @Min(1) final Long id,
-            @NotNull @Valid Rate rate
+            @NotNull @Valid RateRequest rateRequest
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**

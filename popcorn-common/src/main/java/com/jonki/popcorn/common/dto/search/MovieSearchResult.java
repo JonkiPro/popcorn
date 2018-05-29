@@ -11,6 +11,9 @@ import lombok.Getter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * This class represents the subset of data returned from a Movie when a search for Movies is conducted.
+ */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(description = "This class represents the subset of data returned from a Movie when a search for Movies is conducted")

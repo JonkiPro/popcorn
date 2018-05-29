@@ -10,6 +10,9 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Genre DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = Genre.Builder.class)
 @ApiModel(description = "The genre of the movie")

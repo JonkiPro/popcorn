@@ -2,8 +2,8 @@ package com.jonki.popcorn.web.controller;
 
 import com.jonki.popcorn.common.dto.User;
 import com.jonki.popcorn.common.dto.error.ValidationErrorDTO;
-import com.jonki.popcorn.common.dto.request.ForgotPasswordDTO;
-import com.jonki.popcorn.common.dto.request.ForgotUsernameDTO;
+import com.jonki.popcorn.common.dto.request.ForgotPasswordRequest;
+import com.jonki.popcorn.common.dto.request.ForgotUsernameRequest;
 import com.jonki.popcorn.common.exception.FormBadRequestException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
 import com.jonki.popcorn.core.properties.BundleProperties;
@@ -70,13 +70,13 @@ public class ForgotRestController {
     public
     void forgotUsername(
             @ApiParam(value = "Username recovery form", required = true)
-            @RequestBody @Valid final ForgotUsernameDTO forgotUsernameDTO
+            @RequestBody @Valid final ForgotUsernameRequest forgotUsernameRequest
     ) {
-        log.info("Called with {}", forgotUsernameDTO);
+        log.info("Called with forgotUsernameRequest {}", forgotUsernameRequest);
 
-        this.validEmail(forgotUsernameDTO.getEmail());
+        this.validEmail(forgotUsernameRequest.getEmail());
 
-        final User user = this.userSearchService.getUserByEmail(forgotUsernameDTO.getEmail());
+        final User user = this.userSearchService.getUserByEmail(forgotUsernameRequest.getEmail());
 
         this.mailService.sendMailWithUsername(user.getEmail(), user.getUsername());
     }
@@ -91,13 +91,13 @@ public class ForgotRestController {
     public
     void forgotPassword(
             @ApiParam(value = "Password recovery form", required = true)
-            @RequestBody @Valid final ForgotPasswordDTO forgotPasswordDTO
+            @RequestBody @Valid final ForgotPasswordRequest forgotPasswordRequest
     ) {
-        log.info("Called with {}", forgotPasswordDTO);
+        log.info("Called with forgotPasswordRequest {}", forgotPasswordRequest);
 
-        this.validForgotPasswordDTO(forgotPasswordDTO);
+        this.validForgotPasswordRequest(forgotPasswordRequest);
 
-        this.userPersistenceService.resetPassword(forgotPasswordDTO);
+        this.userPersistenceService.resetPassword(forgotPasswordRequest);
     }
 
 
@@ -119,12 +119,12 @@ public class ForgotRestController {
     /**
      * Check if the username and e-mail address exists in the database.
      *
-     * @param forgotPasswordDTO ForgotPasswordDTO object
+     * @param forgotPasswordRequest ForgotPasswordRequest object
      * @throws ResourceNotFoundException if no user found
      */
-    private void validForgotPasswordDTO(final ForgotPasswordDTO forgotPasswordDTO) {
-        if(!this.userSearchService.existsUserByUsername(forgotPasswordDTO.getUsername())
-                && !this.userSearchService.existsUserByEmail(forgotPasswordDTO.getEmail())) {
+    private void validForgotPasswordRequest(final ForgotPasswordRequest forgotPasswordRequest) {
+        if(!this.userSearchService.existsUserByUsername(forgotPasswordRequest.getUsername())
+                && !this.userSearchService.existsUserByEmail(forgotPasswordRequest.getEmail())) {
             throw new ResourceNotFoundException("No user with this name and email was found");
         }
     }

@@ -27,4 +27,6 @@ dependencies {
 	/*******************************
 	 * Test Dependencies
 	 *******************************/
+
+	testImplementation(project(":popcorn-test"))
 }

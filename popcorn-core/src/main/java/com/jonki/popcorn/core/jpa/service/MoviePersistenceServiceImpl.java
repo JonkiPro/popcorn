@@ -18,8 +18,8 @@ import com.jonki.popcorn.common.dto.movie.Site;
 import com.jonki.popcorn.common.dto.movie.Summary;
 import com.jonki.popcorn.common.dto.movie.Synopsis;
 import com.jonki.popcorn.common.dto.movie.request.ImageRequest;
-import com.jonki.popcorn.common.dto.movie.request.Rate;
-import com.jonki.popcorn.common.dto.request.MovieDTO;
+import com.jonki.popcorn.common.dto.movie.request.RateRequest;
+import com.jonki.popcorn.common.dto.request.MovieRequest;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceForbiddenException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
@@ -106,20 +106,20 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      */
     @Override
     public void createMovie(
-            @NotNull @Valid final MovieDTO movieDTO
+            @NotNull @Valid final MovieRequest movieRequest
     ) throws ResourceNotFoundException {
-        log.info("Called with movieDTO {}", movieDTO);
+        log.info("Called with movieRequest {}", movieRequest);
 
         final UserEntity user = this.findUser(this.authorizationService.getUserId());
 
         final MovieEntity movie = new MovieEntity();
 
-        movie.setTitle(movieDTO.getTitle());
-        movie.setType(movieDTO.getType());
+        movie.setTitle(movieRequest.getTitle());
+        movie.setType(movieRequest.getType());
 
         this.movieRepository.save(movie);
 
-        final MovieOtherTitleEntity movieOtherTitleEntity = new MovieOtherTitleEntity(movieDTO.getTitle(), null, TitleAttribute.ORIGINAL_TITLE);
+        final MovieOtherTitleEntity movieOtherTitleEntity = new MovieOtherTitleEntity(movieRequest.getTitle(), null, TitleAttribute.ORIGINAL_TITLE);
         movieOtherTitleEntity.setMovie(movie);
         movie.getOtherTitles().add(movieOtherTitleEntity);
     }
@@ -727,9 +727,9 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
     @Override
     public void saveRating(
             @Min(1) final Long id,
-            @NotNull @Valid final Rate rate
+            @NotNull @Valid final RateRequest rateRequest
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with id {}, rate {}", id, rate);
+        log.info("Called with id {}, rateRequest {}", id, rateRequest);
 
         final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(id, DataStatus.ACCEPTED);
@@ -748,7 +748,7 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
         final List<MovieRateEntity> ratings = movie.getRatings();
         for(final MovieRateEntity mRate : ratings) {
             if(mRate.getUser().getUniqueId().equals(user.getUniqueId())) {
-                mRate.setRate(rate.getRate());
+                mRate.setRate(rateRequest.getRate());
 
                 movie.setRating(this.calculationRating(ratings));
 
@@ -760,7 +760,7 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
 
         if(!rated) {
             final MovieRateEntity movieRate = new MovieRateEntity();
-            movieRate.setRate(rate.getRate());
+            movieRate.setRate(rateRequest.getRate());
             movieRate.setMovie(movie);
             movieRate.setUser(user);
 

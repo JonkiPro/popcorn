@@ -12,6 +12,9 @@ import org.hibernate.validator.constraints.URL;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Site DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = Site.Builder.class)
 @ApiModel(description = "The website of the movie")

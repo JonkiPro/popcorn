@@ -10,6 +10,9 @@ import lombok.Getter;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+/**
+ * Outline DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = Outline.Builder.class)
 @ApiModel(description = "The outline of the movie")

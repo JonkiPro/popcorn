@@ -15,10 +15,10 @@ import com.jonki.popcorn.common.dto.movie.Review;
 import com.jonki.popcorn.common.dto.movie.Site;
 import com.jonki.popcorn.common.dto.movie.Summary;
 import com.jonki.popcorn.common.dto.movie.Synopsis;
-import com.jonki.popcorn.common.dto.movie.request.ContributionNew;
-import com.jonki.popcorn.common.dto.movie.request.ContributionUpdate;
 import com.jonki.popcorn.common.dto.movie.request.ImageRequest;
 import com.jonki.popcorn.common.dto.movie.response.ImageResponse;
+import com.jonki.popcorn.common.dto.request.ContributionNewRequest;
+import com.jonki.popcorn.common.dto.request.ContributionUpdateRequest;
 import com.jonki.popcorn.common.dto.search.ContributionSearchResult;
 import com.jonki.popcorn.core.service.MovieContributionPersistenceService;
 import com.jonki.popcorn.core.service.MovieContributionSearchService;
@@ -198,7 +198,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<OtherTitle> contribution
+            @RequestBody @Valid final ContributionNewRequest<OtherTitle> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -229,7 +229,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<OtherTitle> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<OtherTitle> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -269,7 +269,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<ReleaseDate> contribution
+            @RequestBody @Valid final ContributionNewRequest<ReleaseDate> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -300,7 +300,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<ReleaseDate> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<ReleaseDate> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -341,7 +341,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<Outline> contribution
+            @RequestBody @Valid final ContributionNewRequest<Outline> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -372,7 +372,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<Outline> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<Outline> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -413,7 +413,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<Summary> contribution
+            @RequestBody @Valid final ContributionNewRequest<Summary> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -444,7 +444,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<Summary> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<Summary> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -485,7 +485,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<Synopsis> contribution
+            @RequestBody @Valid final ContributionNewRequest<Synopsis> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -516,7 +516,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<Synopsis> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<Synopsis> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -557,7 +557,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<BoxOffice> contribution
+            @RequestBody @Valid final ContributionNewRequest<BoxOffice> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -588,7 +588,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<BoxOffice> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<BoxOffice> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -629,7 +629,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<Site> contribution
+            @RequestBody @Valid final ContributionNewRequest<Site> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -660,7 +660,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<Site> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<Site> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -701,7 +701,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<Country> contribution
+            @RequestBody @Valid final ContributionNewRequest<Country> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -732,7 +732,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<Country> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<Country> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -773,7 +773,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<Language> contribution
+            @RequestBody @Valid final ContributionNewRequest<Language> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -804,7 +804,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<Language> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<Language> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -845,7 +845,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<Genre> contribution
+            @RequestBody @Valid final ContributionNewRequest<Genre> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -876,7 +876,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<Genre> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<Genre> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -917,7 +917,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionNew<Review> contribution
+            @RequestBody @Valid final ContributionNewRequest<Review> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -948,7 +948,7 @@ public class MovieContributionRestController {
             @ApiParam(value = "The contribution ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "The contribution", required = true)
-            @RequestBody @Valid final ContributionUpdate<Review> contribution
+            @RequestBody @Valid final ContributionUpdateRequest<Review> contribution
     ) {
         log.info("Called with id {}, contribution {}", id, contribution);
 
@@ -986,6 +986,7 @@ public class MovieContributionRestController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
+    @SuppressWarnings("unchecked")
     public
     ResponseEntity<Void> createPhotoContribution(
             @ApiParam(value = "The movie ID", required = true)
@@ -1007,22 +1008,24 @@ public class MovieContributionRestController {
                         " sources {}, comment {}",
                 id, elementsToAdd, idsToUpdate, elementsToUpdate, idsToDelete, sources, comment);
 
-        final ContributionNew<ImageRequest> contribution = new ContributionNew<>();
+        final ContributionNewRequest.Builder<ImageRequest> builder = new ContributionNewRequest.Builder<>(
+                sources
+        );
 
         final List<ImageRequest> listPhotosToAdd = new ArrayList<>();
         for(final MultipartFile multipartFile : elementsToAdd) {
-            final ImageRequest.Builder builder = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
-            listPhotosToAdd.add(builder.build());
+            final ImageRequest.Builder bir = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
+            listPhotosToAdd.add(bir.build());
         }
-        contribution.setElementsToAdd(listPhotosToAdd);
+        builder.withElementsToAdd(listPhotosToAdd);
 
         final HashMap<Long, ImageRequest> mapPhotosToUpdate = MapUtils.merge(idsToUpdate, elementsToUpdate);
-        contribution.setElementsToUpdate(mapPhotosToUpdate);
+        builder.withElementsToUpdate(mapPhotosToUpdate);
 
-        contribution.setIdsToDelete(idsToDelete);
-        contribution.setSources(sources);
+        builder.withIdsToDelete(idsToDelete);
+        builder.withComment(comment);
 
-        final Long cId = this.movieContributionPersistenceService.createPhotoContribution(id, contribution);
+        final Long cId = this.movieContributionPersistenceService.createPhotoContribution(id, builder.build());
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -1046,6 +1049,7 @@ public class MovieContributionRestController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/contributions/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @SuppressWarnings("unchecked")
     public
     void updatePhotoContribution(
             @ApiParam(value = "The movie ID", required = true)
@@ -1071,25 +1075,27 @@ public class MovieContributionRestController {
                 "elementsToUpdate {}, idsToDelete {}, sources {}, comment {}", id, idsToAdd,
                 elementsToAdd, newElementsToAdd, idsToUpdate, elementsToUpdate, idsToDelete, sources, comment);
 
-        final ContributionUpdate<ImageRequest> contribution = new ContributionUpdate<>();
+        final ContributionUpdateRequest.Builder<ImageRequest> builder = new ContributionUpdateRequest.Builder<>(
+                sources
+        );
 
         final HashMap<Long, ImageRequest> mapPhotosToAdd = MapUtils.merge(idsToAdd, elementsToAdd);
-        contribution.setElementsToAdd(mapPhotosToAdd);
+        builder.withElementsToAdd(mapPhotosToAdd);
 
         final List<ImageRequest> listNewPhotosToAdd = new ArrayList<>();
         for(final MultipartFile multipartFile : newElementsToAdd) {
-            final ImageRequest.Builder builder = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
-            listNewPhotosToAdd.add(builder.build());
+            final ImageRequest.Builder bir = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
+            listNewPhotosToAdd.add(bir.build());
         }
-        contribution.setNewElementsToAdd(listNewPhotosToAdd);
+        builder.withNewElementsToAdd(listNewPhotosToAdd);
 
         final HashMap<Long, ImageRequest> mapPhotosToUpdate = MapUtils.merge(idsToUpdate, elementsToUpdate);
-        contribution.setElementsToUpdate(mapPhotosToUpdate);
+        builder.withElementsToUpdate(mapPhotosToUpdate);
 
-        contribution.setIdsToDelete(idsToDelete);
-        contribution.setSources(sources);
+        builder.withIdsToDelete(idsToDelete);
+        builder.withComment(comment);
 
-        this.movieContributionPersistenceService.updatePhotoContribution(id, contribution);
+        this.movieContributionPersistenceService.updatePhotoContribution(id, builder.build());
     }
 
     @ApiOperation(value = "Get the contribution of posters")
@@ -1123,6 +1129,7 @@ public class MovieContributionRestController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}/contributions/posters", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
+    @SuppressWarnings("unchecked")
     public
     ResponseEntity<Void> createPosterContribution(
             @ApiParam(value = "The movie ID", required = true)
@@ -1144,22 +1151,24 @@ public class MovieContributionRestController {
                         " sources {}, comment {}",
                 id, elementsToAdd, idsToUpdate, elementsToUpdate, idsToDelete, sources, comment);
 
-        final ContributionNew<ImageRequest> contribution = new ContributionNew<>();
+        final ContributionNewRequest.Builder<ImageRequest> builder = new ContributionNewRequest.Builder<>(
+                sources
+        );
 
         final List<ImageRequest> listPhotosToAdd = new ArrayList<>();
         for(final MultipartFile multipartFile : elementsToAdd) {
-            final ImageRequest.Builder builder = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
-            listPhotosToAdd.add(builder.build());
+            final ImageRequest.Builder bir = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
+            listPhotosToAdd.add(bir.build());
         }
-        contribution.setElementsToAdd(listPhotosToAdd);
+        builder.withElementsToAdd(listPhotosToAdd);
 
         final HashMap<Long, ImageRequest> mapPhotosToUpdate = MapUtils.merge(idsToUpdate, elementsToUpdate);
-        contribution.setElementsToUpdate(mapPhotosToUpdate);
+        builder.withElementsToUpdate(mapPhotosToUpdate);
 
-        contribution.setIdsToDelete(idsToDelete);
-        contribution.setSources(sources);
+        builder.withIdsToDelete(idsToDelete);
+        builder.withComment(comment);
 
-        final Long cId = this.movieContributionPersistenceService.createPosterContribution(id, contribution);
+        final Long cId = this.movieContributionPersistenceService.createPosterContribution(id, builder.build());
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -1183,6 +1192,7 @@ public class MovieContributionRestController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/contributions/{id}/posters", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @SuppressWarnings("unchecked")
     public
     void updatePosterContribution(
             @ApiParam(value = "The movie ID", required = true)
@@ -1208,24 +1218,26 @@ public class MovieContributionRestController {
                         "elementsToUpdate {}, idsToDelete {}, sources {}, comment {}", id, idsToAdd,
                 elementsToAdd, newElementsToAdd, idsToUpdate, elementsToUpdate, idsToDelete, sources, comment);
 
-        final ContributionUpdate<ImageRequest> contribution = new ContributionUpdate<>();
+        final ContributionUpdateRequest.Builder<ImageRequest> builder = new ContributionUpdateRequest.Builder<>(
+                sources
+        );
 
         final HashMap<Long, ImageRequest> mapPhotosToAdd = MapUtils.merge(idsToAdd, elementsToAdd);
-        contribution.setElementsToAdd(mapPhotosToAdd);
+        builder.withElementsToAdd(mapPhotosToAdd);
 
         final List<ImageRequest> listNewPhotosToAdd = new ArrayList<>();
         for(final MultipartFile multipartFile : newElementsToAdd) {
-            final ImageRequest.Builder builder = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
-            listNewPhotosToAdd.add(builder.build());
+            final ImageRequest.Builder bir = new ImageRequest.Builder().withFile(MultipartFileUtils.convert(multipartFile));
+            listNewPhotosToAdd.add(bir.build());
         }
-        contribution.setNewElementsToAdd(listNewPhotosToAdd);
+        builder.withNewElementsToAdd(listNewPhotosToAdd);
 
         final HashMap<Long, ImageRequest> mapPhotosToUpdate = MapUtils.merge(idsToUpdate, elementsToUpdate);
-        contribution.setElementsToUpdate(mapPhotosToUpdate);
+        builder.withElementsToUpdate(mapPhotosToUpdate);
 
-        contribution.setIdsToDelete(idsToDelete);
-        contribution.setSources(sources);
+        builder.withIdsToDelete(idsToDelete);
+        builder.withComment(comment);
 
-        this.movieContributionPersistenceService.updatePosterContribution(id, contribution);
+        this.movieContributionPersistenceService.updatePosterContribution(id, builder.build());
     }
 }

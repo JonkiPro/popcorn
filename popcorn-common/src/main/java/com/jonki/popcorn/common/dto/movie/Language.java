@@ -10,6 +10,9 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Language DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = Language.Builder.class)
 @ApiModel(description = "The language of the movie")

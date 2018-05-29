@@ -12,6 +12,9 @@ import lombok.Getter;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
+/**
+ * ReleaseDate DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = ReleaseDate.Builder.class)
 @ApiModel(description = "The release date of the movie")

@@ -1,6 +1,6 @@
 package com.jonki.popcorn.core.service;
 
-import com.jonki.popcorn.common.dto.request.SendMessageDTO;
+import com.jonki.popcorn.common.dto.request.MessageRequest;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,13 +20,13 @@ public interface MessagePersistenceService {
     /**
      * Create message with DTO data.
      *
-     * @param sendMessageDTO DTO with message data
+     * @param messageRequest DTO with message data
      * @return The id of the message created
      * @throws ResourceNotFoundException if no user found
      * @throws ResourceConflictException if any data conflict
      */
     String createMessage(
-            @NotNull @Valid final SendMessageDTO sendMessageDTO
+            @NotNull @Valid final MessageRequest messageRequest
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**

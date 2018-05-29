@@ -1,7 +1,7 @@
 package com.jonki.popcorn.core.jpa.service;
 
 import com.google.common.collect.Iterables;
-import com.jonki.popcorn.common.dto.request.SendMessageDTO;
+import com.jonki.popcorn.common.dto.request.MessageRequest;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
 import com.jonki.popcorn.core.jpa.entity.MessageEntity;
@@ -63,12 +63,12 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
      */
     @Override
     public String createMessage(
-            @NotNull @Valid final SendMessageDTO sendMessageDTO
+            @NotNull @Valid final MessageRequest messageRequest
     ) throws ResourceNotFoundException, ResourceConflictException {
-        log.info("Called with sendMessageDTO {}", sendMessageDTO);
+        log.info("Called with messageRequest {}", messageRequest);
 
         final UserEntity user = this.findUser(this.authorizationService.getUserId());
-        final MessageEntity message = this.sendMessageDtoToMessageEntity(sendMessageDTO);
+        final MessageEntity message = this.messageRequestToMessageEntity(messageRequest);
 
         message.setSender(user);
 
@@ -134,19 +134,19 @@ public class MessagePersistenceServiceImpl implements MessagePersistenceService 
     }
 
     /**
-     * Converter SendMessageDTO to MessageEntity.
+     * Converter MessageRequest to MessageEntity.
      *
-     * @param sendMessageDTO SendMessageDTO object
+     * @param messageRequest MessageRequest object
      * @return The message entity
      */
-    private MessageEntity sendMessageDtoToMessageEntity(final SendMessageDTO sendMessageDTO) {
-        final UserEntity user = this.userRepository.findOneByUsernameIgnoreCaseAndEnabledTrue(sendMessageDTO.getTo());
-        if(user == null) throw new ResourceNotFoundException("No user found with username " + sendMessageDTO.getTo());
+    private MessageEntity messageRequestToMessageEntity(final MessageRequest messageRequest) {
+        final UserEntity user = this.userRepository.findOneByUsernameIgnoreCaseAndEnabledTrue(messageRequest.getTo());
+        if(user == null) throw new ResourceNotFoundException("No user found with username " + messageRequest.getTo());
 
         final MessageEntity message = new MessageEntity();
         message.setRecipient(user);
-        message.setSubject(sendMessageDTO.getSubject());
-        message.setText(sendMessageDTO.getText());
+        message.setSubject(messageRequest.getSubject());
+        message.setText(messageRequest.getText());
         message.setVisibleForSender(true);
         message.setVisibleForRecipient(true);
 

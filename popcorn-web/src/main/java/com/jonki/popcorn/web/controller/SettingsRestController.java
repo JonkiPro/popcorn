@@ -1,8 +1,8 @@
 package com.jonki.popcorn.web.controller;
 
 import com.jonki.popcorn.common.dto.error.ValidationErrorDTO;
-import com.jonki.popcorn.common.dto.request.ChangeEmailDTO;
-import com.jonki.popcorn.common.dto.request.ChangePasswordDTO;
+import com.jonki.popcorn.common.dto.request.ChangeEmailRequest;
+import com.jonki.popcorn.common.dto.request.ChangePasswordRequest;
 import com.jonki.popcorn.common.exception.FormBadRequestException;
 import com.jonki.popcorn.core.properties.BundleProperties;
 import com.jonki.popcorn.core.service.AuthorizationService;
@@ -74,13 +74,13 @@ public class SettingsRestController {
     public
     void updateEmail(
             @ApiParam(value = "Form of e-mail change", required = true)
-            @RequestBody @Valid final ChangeEmailDTO changeEmailDTO
+            @RequestBody @Valid final ChangeEmailRequest changeEmailRequest
     ) {
-        log.info("Called with {}", changeEmailDTO);
+        log.info("Called with changeEmailRequest {}", changeEmailRequest);
 
-        this.validChangeEmailDTO(changeEmailDTO);
+        this.validChangeEmailRequest(changeEmailRequest);
 
-        this.userPersistenceService.updateNewEmail(changeEmailDTO);
+        this.userPersistenceService.updateNewEmail(changeEmailRequest);
     }
 
     @ApiOperation(value = "It changes the user's password")
@@ -93,13 +93,13 @@ public class SettingsRestController {
     public
     void updatePassword(
             @ApiParam(value = "Form of password change", required = true)
-            @RequestBody @Valid final ChangePasswordDTO changePasswordDTO
+            @RequestBody @Valid final ChangePasswordRequest changePasswordRequest
     ) {
-        log.info("Called with {}", changePasswordDTO);
+        log.info("Called with changePasswordRequest {}", changePasswordRequest);
 
-        this.validChangePasswordDTO(changePasswordDTO);
+        this.validChangePasswordRequest(changePasswordRequest);
 
-        this.userPersistenceService.updatePassword(changePasswordDTO);
+        this.userPersistenceService.updatePassword(changePasswordRequest);
     }
 
     @ApiOperation(value = "It changes the user's avatar")
@@ -139,17 +139,17 @@ public class SettingsRestController {
     /**
      * Check that the password is correct and that there is a user with the given email address.
      *
-     * @param changeEmailDTO ChangeEmailDTO object
+     * @param changeEmailRequest ChangeEmailRequest object
      * @throws FormBadRequestException if any data problem
      */
-    private void validChangeEmailDTO(final ChangeEmailDTO changeEmailDTO) {
+    private void validChangeEmailRequest(final ChangeEmailRequest changeEmailRequest) {
         final ValidationErrorDTO validationErrorDTO = new ValidationErrorDTO();
 
-        if(this.userSearchService.existsUserByEmail(changeEmailDTO.getEmail())) {
+        if(this.userSearchService.existsUserByEmail(changeEmailRequest.getEmail())) {
             validationErrorDTO.addFieldError("email", bundle.getString("validation.existsEmail"));
         }
         final String userPassword = this.userSearchService.getUserPassword(this.authorizationService.getUsername());
-        if(!EncryptUtils.matches(changeEmailDTO.getPassword(), userPassword)) {
+        if(!EncryptUtils.matches(changeEmailRequest.getPassword(), userPassword)) {
             validationErrorDTO.addFieldError("password", bundle.getString("validation.passwordsAreDifferent"));
         }
 
@@ -161,18 +161,18 @@ public class SettingsRestController {
     /**
      * Check that the passwords are correct.
      *
-     * @param changePasswordDTO ChangePasswordDTO object
+     * @param changePasswordRequest ChangePasswordRequest object
      * @throws FormBadRequestException if any data problem
      */
-    private void validChangePasswordDTO(final ChangePasswordDTO changePasswordDTO) {
+    private void validChangePasswordRequest(final ChangePasswordRequest changePasswordRequest) {
         final ValidationErrorDTO validationErrorDTO = new ValidationErrorDTO();
 
         final String userPassword = this.userSearchService.getUserPassword(this.authorizationService.getUsername());
 
-        if(!EncryptUtils.matches(changePasswordDTO.getOldPassword(), userPassword)) {
+        if(!EncryptUtils.matches(changePasswordRequest.getOldPassword(), userPassword)) {
             validationErrorDTO.addFieldError("oldPassword", bundle.getString("validation.passwordsAreDifferent"));
         }
-        if(EncryptUtils.matches(changePasswordDTO.getNewPassword(), userPassword)) {
+        if(EncryptUtils.matches(changePasswordRequest.getNewPassword(), userPassword)) {
             validationErrorDTO.addFieldError("newPassword", bundle.getString("validation.passwordsAreTheSame"));
         }
 

@@ -13,6 +13,9 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+/**
+ * OtherTitle DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = OtherTitle.Builder.class)
 @ApiModel(description = "The title of the movie")

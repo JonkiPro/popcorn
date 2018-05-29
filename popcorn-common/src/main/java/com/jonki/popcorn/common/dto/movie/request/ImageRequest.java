@@ -10,6 +10,9 @@ import lombok.Getter;
 
 import java.io.File;
 
+/**
+ * Fields representing all the values users can set when creating a new File resource.
+ */
 @Getter
 @JsonDeserialize(builder = ImageRequest.Builder.class)
 @ApiModel(description = "The image(photo, poster) of the movie")

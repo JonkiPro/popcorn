@@ -8,6 +8,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 
+/**
+ * Read only data transfer object representing a ImageResponse.
+ */
 @Getter
 @JsonDeserialize(builder = ImageResponse.Builder.class)
 @ApiModel(description = "The image(photo, poster) of the movie")

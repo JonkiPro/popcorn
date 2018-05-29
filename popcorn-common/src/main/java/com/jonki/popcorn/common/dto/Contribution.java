@@ -15,6 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Read only data transfer object representing a Contribution.
+ * @param <T> A class type representing the DTO with information about the movie.
+ */
 @Getter
 @JsonDeserialize(builder = Contribution.Builder.class)
 @ApiModel(description = "An object representing the contribution")
@@ -97,12 +101,12 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
     /**
      * A builder to create contributions.
      */
-    public static class Builder extends BaseDTO.Builder<Builder> {
+    public static class Builder<T> extends BaseDTO.Builder<Builder> {
 
-        private final Map<Long, ? extends MovieInfoDTO> bElementsToAdd = new HashMap<>();
-        private final Map<Long, ? extends MovieInfoDTO> bElementsToUpdate = new HashMap<>();
-        private final Map<Long, ? extends MovieInfoDTO> bElementsToDelete = new HashMap<>();
-        private final Map<Long, ? extends MovieInfoDTO> bElementsUpdated = new HashMap<>();
+        private final Map<Long, T> bElementsToAdd = new HashMap<>();
+        private final Map<Long, T> bElementsToUpdate = new HashMap<>();
+        private final Map<Long, T> bElementsToDelete = new HashMap<>();
+        private final Map<Long, T> bElementsUpdated = new HashMap<>();
         private final Long bMovieId;
         private final String bMovieTitle;
         private final ShallowUser bOwner;
@@ -150,6 +154,62 @@ public class Contribution<T extends MovieInfoDTO> extends BaseDTO {
             this.bField = field;
             this.bSources = sources;
             this.bCreationDate = creationDate;
+        }
+
+        /**
+         * Set elements to add on this contribution.
+         *
+         * @param elementsToAdd Elements to add
+         * @return The builder
+         */
+        public Builder withElementsToAdd(@Nullable final Map<Long, T> elementsToAdd) {
+            this.bElementsToAdd.clear();
+            if(elementsToAdd != null) {
+                this.bElementsToAdd.putAll(elementsToAdd);
+            }
+            return this;
+        }
+
+        /**
+         * Set elements to update on this contribution.
+         *
+         * @param elementsToUpdate Elements to update
+         * @return The builder
+         */
+        public Builder withElementsToUpdate(@Nullable final Map<Long, T> elementsToUpdate) {
+            this.bElementsToUpdate.clear();
+            if(elementsToUpdate != null) {
+                this.bElementsToUpdate.putAll(elementsToUpdate);
+            }
+            return this;
+        }
+
+        /**
+         * Set elements to delete on this contribution.
+         *
+         * @param elementsToDelete Elements to delete
+         * @return The builder
+         */
+        public Builder withElementsToDelete(@Nullable final Map<Long, T> elementsToDelete) {
+            this.bElementsToDelete.clear();
+            if(elementsToDelete != null) {
+                this.bElementsToDelete.putAll(elementsToDelete);
+            }
+            return this;
+        }
+
+        /**
+         * Set elements updated on this contribution.
+         *
+         * @param elementsUpdated Elements updated
+         * @return The builder
+         */
+        public Builder withElementsUpdated(@Nullable final Map<Long, T> elementsUpdated) {
+            this.bElementsUpdated.clear();
+            if(elementsUpdated != null) {
+                this.bElementsUpdated.putAll(elementsUpdated);
+            }
+            return this;
         }
 
         /**

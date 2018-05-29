@@ -12,14 +12,14 @@ import com.jonki.popcorn.common.dto.movie.Review;
 import com.jonki.popcorn.common.dto.movie.Site;
 import com.jonki.popcorn.common.dto.movie.Summary;
 import com.jonki.popcorn.common.dto.movie.Synopsis;
-import com.jonki.popcorn.common.dto.movie.request.Rate;
+import com.jonki.popcorn.common.dto.movie.request.RateRequest;
 import com.jonki.popcorn.common.dto.movie.response.ImageResponse;
 import com.jonki.popcorn.common.dto.movie.response.RateResponse;
 import com.jonki.popcorn.common.dto.movie.type.CountryType;
 import com.jonki.popcorn.common.dto.movie.type.GenreType;
 import com.jonki.popcorn.common.dto.movie.type.LanguageType;
 import com.jonki.popcorn.common.dto.movie.type.MovieType;
-import com.jonki.popcorn.common.dto.request.MovieDTO;
+import com.jonki.popcorn.common.dto.request.MovieRequest;
 import com.jonki.popcorn.common.dto.search.MovieSearchResult;
 import com.jonki.popcorn.core.service.AuthorizationService;
 import com.jonki.popcorn.core.service.MoviePersistenceService;
@@ -110,11 +110,11 @@ public class MovieRestController {
     public
     ResponseEntity<Void> createMovie(
             @ApiParam(value = "New movie", required = true)
-            @RequestBody @Valid MovieDTO movieDTO
+            @RequestBody @Valid MovieRequest movieRequest
     ) {
-        log.info("Called with movieDTO {}", movieDTO);
+        log.info("Called with movieRequest {}", movieRequest);
 
-        this.moviePersistenceService.createMovie(movieDTO);
+        this.moviePersistenceService.createMovie(movieRequest);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
 
@@ -397,7 +397,7 @@ public class MovieRestController {
         return this.movieSearchService.getPosters(id);
     }
 
-    @ApiOperation(value = "Rate the movie")
+    @ApiOperation(value = "RateRequest the movie")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No movie found"),
             @ApiResponse(code = 409, message = "Today's date is earlier than the release date of the movie")
@@ -410,11 +410,11 @@ public class MovieRestController {
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id,
             @ApiParam(value = "Rating for the movie", required = true)
-            @RequestBody @Valid final Rate rate
+            @RequestBody @Valid final RateRequest rateRequest
     ) {
-        log.info("Called with id {}, rate {}", id, rate);
+        log.info("Called with id {}, rateRequest {}", id, rateRequest);
 
-        this.moviePersistenceService.saveRating(id, rate);
+        this.moviePersistenceService.saveRating(id, rateRequest);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
 

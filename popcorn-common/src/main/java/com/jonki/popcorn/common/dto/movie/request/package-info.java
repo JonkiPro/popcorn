@@ -1,6 +1,6 @@
 /**
- * Data transfer objects for APIs and internal services sent as an request.
- * Objects intended ONLY for transferring data for movies.
+ * Data transfer objects for the APIs as well as the internal services.
+ * All DTOs are used to resource creation requests.
  */
 
 @ParametersAreNonnullByDefault

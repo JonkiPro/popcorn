@@ -1,9 +1,9 @@
 package com.jonki.popcorn.core.service;
 
-import com.jonki.popcorn.common.dto.request.ChangeEmailDTO;
-import com.jonki.popcorn.common.dto.request.ChangePasswordDTO;
-import com.jonki.popcorn.common.dto.request.ForgotPasswordDTO;
-import com.jonki.popcorn.common.dto.request.RegisterDTO;
+import com.jonki.popcorn.common.dto.request.ChangeEmailRequest;
+import com.jonki.popcorn.common.dto.request.ChangePasswordRequest;
+import com.jonki.popcorn.common.dto.request.ForgotPasswordRequest;
+import com.jonki.popcorn.common.dto.request.RegisterRequest;
 import com.jonki.popcorn.common.exception.ResourceBadRequestException;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
@@ -26,12 +26,12 @@ public interface UserPersistenceService {
     /**
      * Create user with DTO data.
      *
-     * @param registerDTO DTO with user registration data
+     * @param registerRequest DTO with user registration data
      * @return The id of the user created
      * @throws ResourceConflictException if username or e-mail exists
      */
     String createUser(
-            @NotNull @Valid final RegisterDTO registerDTO
+            @NotNull @Valid final RegisterRequest registerRequest
     ) throws ResourceConflictException;
 
     /**
@@ -47,35 +47,35 @@ public interface UserPersistenceService {
     /**
      * Reset the user password.
      *
-     * @param forgotPasswordDTO DTO of the user whose password should be reset
+     * @param forgotPasswordRequest DTO of the user whose password should be reset
      * @throws ResourceNotFoundException if no user found
      */
     void resetPassword(
-            @NotNull @Valid final ForgotPasswordDTO forgotPasswordDTO
+            @NotNull @Valid final ForgotPasswordRequest forgotPasswordRequest
     ) throws ResourceNotFoundException;
 
     /**
      * Update the new e-mail.
      *
-     * @param changeEmailDTO DTO user whose new e-mail should be set
+     * @param changeEmailRequest DTO user whose new e-mail should be set
      * @throws ResourceNotFoundException if no user found
      * @throws ResourceConflictException if e-mail exists
      */
     @PreAuthorize("hasRole('ROLE_USER')")
     void updateNewEmail(
-            @NotNull @Valid final ChangeEmailDTO changeEmailDTO
+            @NotNull @Valid final ChangeEmailRequest changeEmailRequest
     ) throws ResourceNotFoundException, ResourceConflictException;
 
     /**
      * Update the password.
      *
-     * @param changePasswordDTO DTO user whose password should be changed
+     * @param changePasswordRequest DTO user whose password should be changed
      * @throws ResourceBadRequestException if the password is incorrect
      * @throws ResourceNotFoundException if no user found
      */
     @PreAuthorize("hasRole('ROLE_USER')")
     void updatePassword(
-            @NotNull @Valid final ChangePasswordDTO changePasswordDTO
+            @NotNull @Valid final ChangePasswordRequest changePasswordRequest
     ) throws ResourceBadRequestException, ResourceNotFoundException;
 
     /**
@@ -163,11 +163,11 @@ public interface UserPersistenceService {
     /**
      * Create user admin with DTO data.
      *
-     * @param registerDTO DTO with user registration data
+     * @param registerRequest DTO with user registration data
      * @return The id of the user created
      * @throws ResourceConflictException if username or e-mail exists
      */
     String createAdmin(
-            final RegisterDTO registerDTO
+            final RegisterRequest registerRequest
     ) throws ResourceConflictException;
 }

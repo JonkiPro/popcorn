@@ -1,7 +1,7 @@
 package com.jonki.popcorn.web.controller;
 
 import com.jonki.popcorn.common.dto.error.ValidationErrorDTO;
-import com.jonki.popcorn.common.dto.request.SendMessageDTO;
+import com.jonki.popcorn.common.dto.request.MessageRequest;
 import com.jonki.popcorn.common.exception.FormBadRequestException;
 import com.jonki.popcorn.common.exception.ResourceForbiddenException;
 import com.jonki.popcorn.core.properties.BundleProperties;
@@ -97,17 +97,17 @@ public class MessageRestController {
     public
     ResponseEntity<Void> createMessage(
             @ApiParam(value = "New message", required = true)
-            @RequestBody @Valid final SendMessageDTO sendMessageDTO,
+            @RequestBody @Valid final MessageRequest messageRequest,
             final UriComponentsBuilder uriComponentsBuilder
     ) {
-        log.info("Called with {}", sendMessageDTO);
+        log.info("Called with messageRequest {}", messageRequest);
 
-        this.validUsername(sendMessageDTO.getTo());
+        this.validUsername(messageRequest.getTo());
 
-        this.messagePersistenceService.createMessage(sendMessageDTO);
+        this.messagePersistenceService.createMessage(messageRequest);
 
         final UriComponents uriComponents
-                = uriComponentsBuilder.path("/profile/{username}").buildAndExpand(sendMessageDTO.getTo());
+                = uriComponentsBuilder.path("/profile/{username}").buildAndExpand(messageRequest.getTo());
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(uriComponents.toUri());

@@ -10,6 +10,9 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Country DTO. The class serves both as a resource and a resource creation request.
+ */
 @Getter
 @JsonDeserialize(builder = Country.Builder.class)
 @ApiModel(description = "The country of the movie")
