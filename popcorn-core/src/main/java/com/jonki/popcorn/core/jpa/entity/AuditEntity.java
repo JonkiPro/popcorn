@@ -19,7 +19,7 @@ import java.util.Date;
  * Abstract class to support basic columns for entities. e.g. Users and Messages.
  */
 @Getter
-@ToString(callSuper = true, exclude = "entityVersion")
+@ToString(callSuper = true, of = {"created"})
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 public class AuditEntity extends IdEntity {
@@ -30,10 +30,26 @@ public class AuditEntity extends IdEntity {
     @Column(name = "created", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private Date created;
+    private Date created = new Date();
 
     @Version
     @Column(name = "entity_version", nullable = false)
     @Getter(AccessLevel.NONE)
     private Integer entityVersion;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

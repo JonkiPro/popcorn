@@ -54,7 +54,6 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -201,7 +200,7 @@ public class MovieSearchServiceImpl implements MovieSearchService {
      * {@inheritDoc}
      */
     @Override
-    public Set<RateResponse> getRatings(
+    public List<RateResponse> getRatings(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -209,14 +208,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
         return this.findMovie(id).getRatings()
                 .stream()
                 .map(ServiceUtils::toRateResponseDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<OtherTitle> getTitles(
+    public List<OtherTitle> getTitles(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -225,14 +224,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(title -> title.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toOtherTitleDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<ReleaseDate> getReleaseDates(
+    public List<ReleaseDate> getReleaseDates(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -241,14 +240,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(releaseDate -> releaseDate.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toReleaseDateDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Outline> getOutlines(
+    public List<Outline> getOutlines(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -257,14 +256,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(outline -> outline.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toOutlineDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Summary> getSummaries(
+    public List<Summary> getSummaries(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -273,14 +272,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(summary -> summary.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toSummaryDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Synopsis> getSynopses(
+    public List<Synopsis> getSynopses(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -289,14 +288,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(synopsis -> synopsis.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toSynopsisDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<BoxOffice> getBoxOffices(
+    public List<BoxOffice> getBoxOffices(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -305,14 +304,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(boxOffice -> boxOffice.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toBoxOfficeDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Site> getSites(
+    public List<Site> getSites(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -321,14 +320,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(site -> site.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toSiteDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Country> getCountries(
+    public List<Country> getCountries(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -337,14 +336,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(review -> review.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toCountryDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Language> getLanguages(
+    public List<Language> getLanguages(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -353,14 +352,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(review -> review.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toLanguageDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Genre> getGenres(
+    public List<Genre> getGenres(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -369,14 +368,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(review -> review.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toGenreDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<Review> getReviews(
+    public List<Review> getReviews(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -385,14 +384,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(review -> review.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toReviewDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<ImageResponse> getPhotos(
+    public List<ImageResponse> getPhotos(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -401,14 +400,14 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(photo -> photo.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toImageResponseDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<ImageResponse> getPosters(
+    public List<ImageResponse> getPosters(
             @Min(1) final Long id
     ) throws ResourceNotFoundException {
         log.info("Called with id {}", id);
@@ -417,7 +416,7 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 .stream()
                 .filter(poster -> poster.getStatus() == DataStatus.ACCEPTED)
                 .map(ServiceUtils::toImageResponseDto)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     /**

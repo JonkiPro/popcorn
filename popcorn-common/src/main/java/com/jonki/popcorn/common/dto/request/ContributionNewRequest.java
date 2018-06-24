@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -40,7 +41,7 @@ public class ContributionNewRequest<T extends MovieInfoDTO> extends CommonReques
 
     @ApiModelProperty(notes = "Sources of information(elements)", required = true)
     @NotEmpty
-    private Set<String> sources = new HashSet<>();
+    private Set<@URL String> sources = new HashSet<>();
 
     @ApiModelProperty(notes = "Comment from the user")
     private String comment;

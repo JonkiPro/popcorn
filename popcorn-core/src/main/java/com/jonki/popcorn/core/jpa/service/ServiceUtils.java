@@ -42,6 +42,7 @@ import com.jonki.popcorn.core.jpa.entity.movie.MovieSummaryEntity;
 import com.jonki.popcorn.core.jpa.entity.movie.MovieSynopsisEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -219,7 +220,7 @@ public final class ServiceUtils {
                 messageEntity.getText(),
                 messageEntity.getCreated(),
                 toShallowUserDto(messageEntity.getSender()),
-                messageEntity.getDateOfRead()
+                messageEntity.getDateOfRead().orElse(new Date())
         )
                 .withId(messageEntity.getUniqueId());
 

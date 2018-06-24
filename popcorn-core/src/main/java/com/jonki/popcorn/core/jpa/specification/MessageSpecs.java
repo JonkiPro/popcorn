@@ -16,6 +16,8 @@ import java.util.Optional;
 
 /**
  * Specifications for JPA queries.
+ *
+ * @see <a href="https://docs.spring.io/spring-data/data-jpa/docs/1.0.x/reference/html/#specifications">Docs</a>
  */
 public final class MessageSpecs {
 

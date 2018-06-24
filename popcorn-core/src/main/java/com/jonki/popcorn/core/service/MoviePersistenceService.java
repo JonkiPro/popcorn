@@ -423,7 +423,7 @@ public interface MoviePersistenceService {
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if the movie is added to favorites
      */
-    void setFavoriteQuestion(
+    void setFavoriteMovie(
             @Min(1) final Long id
     ) throws ResourceNotFoundException, ResourceConflictException;
 
@@ -434,7 +434,7 @@ public interface MoviePersistenceService {
      * @throws ResourceNotFoundException if no movie found or no user found
      * @throws ResourceConflictException if the movie is not added to favorites
      */
-    void undoFavoriteQuestion(
+    void undoFavoriteMovie(
             @Min(1) final Long id
     ) throws ResourceNotFoundException, ResourceConflictException;
 }

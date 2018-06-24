@@ -37,6 +37,8 @@ dependencies {
 	/*******************************
 	 * Test Dependencies
 	 *******************************/
+
+	testCompile(project(":popcorn-test"))
 }
 
 //Ignore the metamodel classes from all our style/coverage/bug finding tools

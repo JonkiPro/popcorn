@@ -1,7 +1,9 @@
 package com.jonki.popcorn.core.jpa.entity.movie;
 
 import com.jonki.popcorn.common.dto.StorageProvider;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -15,6 +17,8 @@ import javax.persistence.PrePersist;
 /**
  * The base class for entities representing files.
  */
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString(callSuper = true)
@@ -38,7 +42,7 @@ public class MovieFileEntity extends MovieInfoEntity {
     @PrePersist
     protected void onCreateMovieFileEntity() {
         if(this.provider == null) {
-            provider = StorageProvider.GOOGLE;
+            this.provider = StorageProvider.GOOGLE;
         }
     }
 }

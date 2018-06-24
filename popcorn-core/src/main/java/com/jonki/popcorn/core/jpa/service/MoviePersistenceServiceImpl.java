@@ -774,7 +774,7 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public void setFavoriteQuestion(
+    public void setFavoriteMovie(
             @Min(1) final Long id
     ) throws ResourceNotFoundException, ResourceConflictException {
         this.findUser(this.authorizationService.getUserId()).addFavoriteMovie(this.findMovie(id, DataStatus.ACCEPTED));
@@ -784,7 +784,7 @@ public class MoviePersistenceServiceImpl implements MoviePersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public void undoFavoriteQuestion(
+    public void undoFavoriteMovie(
             @Min(1) final Long id
     ) throws ResourceNotFoundException, ResourceConflictException {
         this.findUser(this.authorizationService.getUserId()).removeFavoriteMovie(this.findMovie(id, DataStatus.ACCEPTED));

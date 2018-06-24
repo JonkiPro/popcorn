@@ -93,6 +93,9 @@ configure(javaProjects) {
 		 *******************************/
 
 		testCompile("org.springframework.boot:spring-boot-starter-test")
+
+		testRuntime("javax.el:javax.el-api")
+		testRuntime("org.glassfish:javax.el")
 	}
 
 	task removeIdeaOutDirectory(type: Delete) {

@@ -2,20 +2,24 @@ package com.jonki.popcorn.core.jpa.entity;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.UUID;
 
 /**
  * The base for entities. e.g. Users and Messages.
  */
 @Getter
-@EqualsAndHashCode(of = "uniqueId", callSuper = false)
-@ToString(callSuper = true)
+@Setter
+@EqualsAndHashCode(callSuper = false, of = {"uniqueId"})
+@ToString(callSuper = true, of = {"uniqueId"})
 @MappedSuperclass
 public class BaseEntity extends AuditEntity {
 
@@ -23,7 +27,9 @@ public class BaseEntity extends AuditEntity {
 
     @Basic(optional = false)
     @Column(name = "unique_id", nullable = false, unique = true, updatable = false)
-    private String uniqueId;
+    @NotBlank
+    @Size(max = 255)
+    private String uniqueId = UUID.randomUUID().toString();
 
     /**
      * Default constructor.

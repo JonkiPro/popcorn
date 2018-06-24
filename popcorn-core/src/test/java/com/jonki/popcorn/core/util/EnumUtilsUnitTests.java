@@ -1,0 +1,41 @@
+package com.jonki.popcorn.core.util;
+
+import com.jonki.popcorn.common.dto.MovieField;
+import com.jonki.popcorn.common.exception.ResourcePreconditionException;
+import com.jonki.popcorn.test.category.UnitTest;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+/**
+ * Unit tests for EnumUtils.
+ */
+@Category(UnitTest.class)
+public class EnumUtilsUnitTests {
+
+    /**
+     * Test correct obtaining of the enumeration value for String.
+     */
+    @Test
+    public void testGetEnumFromString() {
+        final MovieField movieField = EnumUtils.getEnumFromString(MovieField.class, "SYNOPSIS");
+        Assert.assertThat(MovieField.SYNOPSIS, Matchers.is(movieField));
+    }
+
+    /**
+     * Test for illegal String.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetEnumFromStringIllegal() {
+        EnumUtils.getEnumFromString(MovieField.class, "SYNOPSIS.");
+    }
+
+    /**
+     * Test for NULL enum type.
+     */
+    @Test(expected = ResourcePreconditionException.class)
+    public void testGetEnumFromStringEnumTypeNull() {
+        EnumUtils.getEnumFromString(null, "SYNOPSIS");
+    }
+}

@@ -96,13 +96,13 @@ import java.util.stream.Collectors;
 @Validated
 public class MovieContributionPersistenceServiceImpl implements MovieContributionPersistenceService {
 
+    private final ContributionRepository contributionRepository;
     private final MovieRepository movieRepository;
     private final MovieInfoRepository movieInfoRepository;
-    private final ContributionRepository contributionRepository;
     private final UserRepository userRepository;
     private final MoviePersistenceService moviePersistenceService;
     private final StorageService storageService;
-    private final AuthorizationService authorizationServicea;
+    private final AuthorizationService authorizationService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -110,9 +110,9 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
     /**
      * Constructor.
      *
+     * @param contributionRepository The contribution repository to use
      * @param movieRepository The movie repository to use
      * @param movieInfoRepository The movie info repository to use
-     * @param contributionRepository The contribution repository to use
      * @param userRepository The user repository to use
      * @param moviePersistenceService The movie persistence service to use
      * @param storageService The storage service to use
@@ -120,21 +120,21 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
      */
     @Autowired
     public MovieContributionPersistenceServiceImpl(
+            @NotNull final ContributionRepository contributionRepository,
             @NotNull final MovieRepository movieRepository,
             @NotNull final MovieInfoRepository movieInfoRepository,
-            @NotNull final ContributionRepository contributionRepository,
             @NotNull final UserRepository userRepository,
             @NotNull final MoviePersistenceService moviePersistenceService,
             @Qualifier("googleStorageService") @NotNull final StorageService storageService,
             @NotNull final AuthorizationService authorizationService
     ) {
+        this.contributionRepository = contributionRepository;
         this.movieRepository = movieRepository;
         this.movieInfoRepository = movieInfoRepository;
-        this.contributionRepository = contributionRepository;
         this.userRepository = userRepository;
         this.moviePersistenceService = moviePersistenceService;
         this.storageService = storageService;
-        this.authorizationServicea = authorizationService;
+        this.authorizationService = authorizationService;
     }
 
     /**
@@ -148,7 +148,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
     ) throws ResourceForbiddenException, ResourceNotFoundException {
         log.info("Called with id {}, status {}, comment {}", id, status, comment);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contribution = this.findContribution(id, DataStatus.WAITING);
 
         if(!CollectionUtils.containsAny(user.getPermissions(), contribution.getField().getNecessaryPermissions())) {
@@ -178,7 +178,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieOtherTitleEntity> otherTitlesEntities = movie.getOtherTitles().stream()
                 .filter(otherTitle -> otherTitle.getStatus() == DataStatus.ACCEPTED
@@ -224,7 +224,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.OTHER_TITLE);
 
         this.validIds(contributionEntity, contribution);
@@ -257,7 +257,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieReleaseDateEntity> releaseDatesEntities = movie.getReleaseDates().stream()
                 .filter(releaseDate -> releaseDate.getStatus() == DataStatus.ACCEPTED
@@ -303,7 +303,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.RELEASE_DATE);
 
         this.validIds(contributionEntity, contribution);
@@ -336,7 +336,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieOutlineEntity> outlineEntities = movie.getOutlines().stream()
                 .filter(outline -> outline.getStatus() == DataStatus.ACCEPTED
@@ -382,7 +382,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.OUTLINE);
 
         this.validIds(contributionEntity, contribution);
@@ -415,7 +415,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieSummaryEntity> summaryEntities = movie.getSummaries().stream()
                 .filter(summary -> summary.getStatus() == DataStatus.ACCEPTED
@@ -461,7 +461,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.SUMMARY);
 
         this.validIds(contributionEntity, contribution);
@@ -494,7 +494,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieSynopsisEntity> synopsisEntities = movie.getSynopses().stream()
                 .filter(synopsis -> synopsis.getStatus() == DataStatus.ACCEPTED
@@ -540,7 +540,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.SYNOPSIS);
 
         this.validIds(contributionEntity, contribution);
@@ -573,7 +573,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieBoxOfficeEntity> boxOfficesEntities = movie.getBoxOffices().stream()
                 .filter(boxOffice -> boxOffice.getStatus() == DataStatus.ACCEPTED
@@ -619,7 +619,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.BOX_OFFICE);
 
         this.validIds(contributionEntity, contribution);
@@ -652,7 +652,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieSiteEntity> sitesEntities = movie.getSites().stream()
                 .filter(site -> site.getStatus() == DataStatus.ACCEPTED
@@ -698,7 +698,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.SITE);
 
         this.validIds(contributionEntity, contribution);
@@ -731,7 +731,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieCountryEntity> countriesEntities = movie.getCountries().stream()
                 .filter(country -> country.getStatus() == DataStatus.ACCEPTED
@@ -777,7 +777,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.COUNTRY);
 
         this.validIds(contributionEntity, contribution);
@@ -810,7 +810,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieLanguageEntity> languagesEntities = movie.getLanguages().stream()
                 .filter(language -> language.getStatus() == DataStatus.ACCEPTED
@@ -856,7 +856,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.LANGUAGE);
 
         this.validIds(contributionEntity, contribution);
@@ -889,7 +889,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieGenreEntity> genresEntities = movie.getGenres().stream()
                 .filter(genre -> genre.getStatus() == DataStatus.ACCEPTED
@@ -935,7 +935,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.GENRE);
 
         this.validIds(contributionEntity, contribution);
@@ -968,7 +968,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MovieReviewEntity> reviewsEntities = movie.getReviews().stream()
                 .filter(review -> review.getStatus() == DataStatus.ACCEPTED
@@ -1014,7 +1014,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.REVIEW);
 
         this.validIds(contributionEntity, contribution);
@@ -1047,7 +1047,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MoviePhotoEntity> photosEntities = movie.getPhotos().stream()
                 .filter(photo -> photo.getStatus() == DataStatus.ACCEPTED
@@ -1097,7 +1097,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.PHOTO);
 
         final Set<Long> idsToAddBeforeCleanUp = new HashSet<>(contributionEntity.getIdsToAdd());
@@ -1150,7 +1150,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with movieId {}, contribution {}",
                 movieId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final MovieEntity movie = this.findMovie(movieId, DataStatus.ACCEPTED);
         final List<MoviePosterEntity> postersEntities = movie.getPosters().stream()
                 .filter(poster -> poster.getStatus() == DataStatus.ACCEPTED
@@ -1200,7 +1200,7 @@ public class MovieContributionPersistenceServiceImpl implements MovieContributio
         log.info("Called with contributionId {}, contribution {}",
                 contributionId, contribution);
 
-        final UserEntity user = this.findUser(this.authorizationServicea.getUserId());
+        final UserEntity user = this.findUser(this.authorizationService.getUserId());
         final ContributionEntity contributionEntity = this.findContribution(contributionId, DataStatus.WAITING, user, MovieField.POSTER);
 
         final Set<Long> idsToAddBeforeCleanUp = new HashSet<>(contributionEntity.getIdsToAdd());

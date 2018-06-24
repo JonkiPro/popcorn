@@ -30,7 +30,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Interface for searching movies.
@@ -95,7 +94,7 @@ public interface MovieSearchService {
      * @return User ratings
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<RateResponse> getRatings(
+    List<RateResponse> getRatings(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -106,7 +105,7 @@ public interface MovieSearchService {
      * @return Movie titles
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<OtherTitle> getTitles(
+    List<OtherTitle> getTitles(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -117,7 +116,7 @@ public interface MovieSearchService {
      * @return Movie release dates
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<ReleaseDate> getReleaseDates(
+    List<ReleaseDate> getReleaseDates(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -128,7 +127,7 @@ public interface MovieSearchService {
      * @return Movie outlines
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<Outline> getOutlines(
+    List<Outline> getOutlines(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -139,7 +138,7 @@ public interface MovieSearchService {
      * @return Movie summaries
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<Summary> getSummaries(
+    List<Summary> getSummaries(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -150,7 +149,7 @@ public interface MovieSearchService {
      * @return Movie synopses
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<Synopsis> getSynopses(
+    List<Synopsis> getSynopses(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -161,7 +160,7 @@ public interface MovieSearchService {
      * @return Movie titles
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<BoxOffice> getBoxOffices(
+    List<BoxOffice> getBoxOffices(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -172,7 +171,7 @@ public interface MovieSearchService {
      * @return Movie sites
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<Site> getSites(
+    List<Site> getSites(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -183,7 +182,7 @@ public interface MovieSearchService {
      * @return Movie countries
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<Country> getCountries(
+    List<Country> getCountries(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -194,7 +193,7 @@ public interface MovieSearchService {
      * @return Movie languages
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<Language> getLanguages(
+    List<Language> getLanguages(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -205,7 +204,7 @@ public interface MovieSearchService {
      * @return Movie genres
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<Genre> getGenres(
+    List<Genre> getGenres(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -216,7 +215,7 @@ public interface MovieSearchService {
      * @return Movie reviews
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<Review> getReviews(
+    List<Review> getReviews(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -227,7 +226,7 @@ public interface MovieSearchService {
      * @return Movie photos
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<ImageResponse> getPhotos(
+    List<ImageResponse> getPhotos(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 
@@ -238,7 +237,7 @@ public interface MovieSearchService {
      * @return Movie posters
      * @throws ResourceNotFoundException if no movie found
      */
-    Set<ImageResponse> getPosters(
+    List<ImageResponse> getPosters(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;
 }

@@ -6,11 +6,13 @@ import com.jonki.popcorn.common.dto.UserMoviePermission;
 import com.jonki.popcorn.common.exception.ResourceConflictException;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
 import com.jonki.popcorn.core.jpa.entity.movie.MovieRateEntity;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import javax.annotation.Nullable;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -24,8 +26,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +45,22 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@ToString(callSuper = true)
+@ToString(
+        callSuper = true,
+        of = {
+                "username",
+                "email",
+                "password",
+                "activationToken",
+                "emailChangeToken",
+                "newEmail",
+                "avatarId",
+                "avatarProvider",
+                "enabled",
+                "modifiedDate"
+        },
+        doNotUseGetters = true
+)
 @Entity
 @Table(name = "users")
 public class UserEntity extends BaseEntity {
@@ -46,14 +69,19 @@ public class UserEntity extends BaseEntity {
 
     @Basic(optional = false)
     @Column(name = "username", length = 36, unique = true, nullable = false)
+    @NotBlank
+    @Size(min = 6, max = 36)
     private String username;
 
     @Basic(optional = false)
     @Column(name = "email", unique = true, nullable = false)
+    @NotBlank
+    @Email
     private String email;
 
     @Basic(optional = false)
     @Column(name = "password", nullable = false)
+    @NotBlank
     private String password;
 
     @Basic
@@ -81,7 +109,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "users_authorities",
             joinColumns = {
@@ -90,13 +118,14 @@ public class UserEntity extends BaseEntity {
     )
     @Column(name = "authority", nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
-    private Set<SecurityRole> authorities;
+    @NotEmpty
+    private Set<SecurityRole> authorities = new HashSet<>();
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<MessageEntity> sentMessages;
+    private List<MessageEntity> sentMessages = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<MessageEntity> receivedMessages;
+    private List<MessageEntity> receivedMessages = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -108,7 +137,7 @@ public class UserEntity extends BaseEntity {
                     @JoinColumn(name = "user_friend_id", referencedColumnName = "id", nullable = false, updatable = false)
             }
     )
-    private List<UserEntity> friends;
+    private Set<UserEntity> friends = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -120,7 +149,8 @@ public class UserEntity extends BaseEntity {
                     @JoinColumn(name = "user_invited_id", referencedColumnName = "id", nullable = false, updatable = false)
             }
     )
-    private List<UserEntity> sentInvitations;
+    @OrderColumn(name = "invitation_order", nullable = false, updatable = false)
+    private List<UserEntity> sentInvitations = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -132,9 +162,10 @@ public class UserEntity extends BaseEntity {
                     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
             }
     )
-    private List<UserEntity> receivedInvitations;
+    @OrderColumn(name = "invitation_order", nullable = false, updatable = false)
+    private List<UserEntity> receivedInvitations = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "users_movie_permissions",
             joinColumns = {
@@ -143,13 +174,13 @@ public class UserEntity extends BaseEntity {
     )
     @Column(name = "permission", nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
-    private Set<UserMoviePermission> permissions;
+    private Set<UserMoviePermission> permissions = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<MovieRateEntity> ratings;
+    private Set<MovieRateEntity> ratings = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private Set<ContributionEntity> contributions;
+    private Set<ContributionEntity> contributions = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -166,6 +197,7 @@ public class UserEntity extends BaseEntity {
     @Basic
     @Column(name = "modified_date", nullable = false)
     @LastModifiedDate
+    @Setter(AccessLevel.NONE)
     private Date modifiedDate;
 
     /**
@@ -185,6 +217,16 @@ public class UserEntity extends BaseEntity {
     }
 
     /**
+     * Set all the authorities.
+     *
+     * @param authorities The dependency authorities to set
+     */
+    public void setAuthorities(@NotNull final Set<SecurityRole> authorities) {
+        this.authorities.clear();
+        this.authorities.addAll(authorities);
+    }
+
+    /**
      * Add a new user to these friends. Manages both sides of relationship.
      *
      * @param user The user to add. Not null.
@@ -192,9 +234,9 @@ public class UserEntity extends BaseEntity {
      */
     public void addFriend(@NotNull final UserEntity user) throws ResourceConflictException {
         if (this.friends.contains(user)) {
-            throw new ResourceConflictException("A user with id " + user.getId() + " is already added");
-        } else if (this.getId().equals(user.getId())) {
-            throw new ResourceConflictException("Conflict of IDs " + this.getId() + " : " + user.getId());
+            throw new ResourceConflictException("A user with id " + user.getUniqueId() + " is already added");
+        } else if (this.getUniqueId().equals(user.getUniqueId())) {
+            throw new ResourceConflictException("Conflict of IDs " + this.getUniqueId() + " : " + user.getUniqueId());
         }
         this.friends.add(user);
         user.getFriends().add(this);
@@ -208,7 +250,7 @@ public class UserEntity extends BaseEntity {
      */
     public void removeFriend(@NotNull final UserEntity user) throws ResourceNotFoundException {
         if (!this.friends.contains(user)) {
-            throw new ResourceNotFoundException("A user with id " + user.getId() + " is not added");
+            throw new ResourceNotFoundException("A user with id " + user.getUniqueId() + " is not added");
         }
         this.friends.remove(user);
         user.getFriends().remove(this);
@@ -223,11 +265,11 @@ public class UserEntity extends BaseEntity {
      */
     public void addSentInvitation(@NotNull final UserEntity user) throws ResourceConflictException {
         if (this.sentInvitations.contains(user)) {
-            throw new ResourceConflictException("A user with id " + user.getId() + " is already added");
+            throw new ResourceConflictException("A user with id " + user.getUniqueId() + " is already added");
         } else if (this.friends.contains(user)) {
-            throw new ResourceConflictException("A user with id " + user.getId() + " is already added to friends");
-        } else if (this.getId().equals(user.getId())) {
-            throw new ResourceConflictException("Conflict of IDs " + this.getId() + " : " + user.getId());
+            throw new ResourceConflictException("A user with id " + user.getUniqueId() + " is already added to friends");
+        } else if (this.getUniqueId().equals(user.getUniqueId())) {
+            throw new ResourceConflictException("Conflict of IDs " + this.getUniqueId() + " : " + user.getUniqueId());
         }
         this.sentInvitations.add(user);
         user.getReceivedInvitations().add(this);
@@ -241,10 +283,22 @@ public class UserEntity extends BaseEntity {
      */
     public void removeSentInvitation(@NotNull final UserEntity user) throws ResourceNotFoundException {
         if (!this.sentInvitations.contains(user)) {
-            throw new ResourceNotFoundException("A user with id " + user.getId() + " is not added");
+            throw new ResourceNotFoundException("A user with id " + user.getUniqueId() + " is not added");
         }
         this.sentInvitations.remove(user);
         user.getReceivedInvitations().remove(this);
+    }
+
+    /**
+     * Set all the permissions.
+     *
+     * @param permissions The dependency permissions to set
+     */
+    public void setPermissions(@Nullable final Set<UserMoviePermission> permissions) {
+        this.permissions.clear();
+        if (permissions != null) {
+            this.permissions.addAll(permissions);
+        }
     }
 
     /**
@@ -273,5 +327,21 @@ public class UserEntity extends BaseEntity {
         }
         this.favoritesMovies.remove(movie);
         movie.setFavoriteCount(movie.getFavoriteCount()-1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

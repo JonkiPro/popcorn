@@ -16,9 +16,11 @@ import com.jonki.popcorn.core.jpa.entity.movie.MovieReviewEntity;
 import com.jonki.popcorn.core.jpa.entity.movie.MovieSiteEntity;
 import com.jonki.popcorn.core.jpa.entity.movie.MovieSummaryEntity;
 import com.jonki.popcorn.core.jpa.entity.movie.MovieSynopsisEntity;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Basic;
@@ -35,6 +37,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +50,19 @@ import java.util.Optional;
  */
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = {"id"})
+@ToString(
+        of = {
+                "id",
+                "title",
+                "type",
+                "budget",
+                "status",
+                "rating",
+                "favoriteCount"
+        },
+        doNotUseGetters = true
+)
 @Entity
 @Table(name = "movies")
 public class MovieEntity implements Serializable {
@@ -64,19 +81,22 @@ public class MovieEntity implements Serializable {
             }
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "movieSequenceGenerator")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Basic(optional = false)
     @Column(name = "title", nullable = false)
+    @NotBlank
     private String title;
 
     @Basic
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @NotNull
     private MovieType type;
 
     @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @OrderBy("id ASC")
+    @OrderBy("country ASC")
     private List<MovieOtherTitleEntity> otherTitles = new ArrayList<>();
 
     @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -99,12 +119,15 @@ public class MovieEntity implements Serializable {
     private List<MovieSiteEntity> sites = new ArrayList<>();
 
     @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("country ASC")
     private List<MovieCountryEntity> countries = new ArrayList<>();
 
     @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("language ASC")
     private List<MovieLanguageEntity> languages = new ArrayList<>();
 
     @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("genre ASC")
     private List<MovieGenreEntity> genres = new ArrayList<>();
 
     @OneToMany(mappedBy = "movie", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -117,6 +140,7 @@ public class MovieEntity implements Serializable {
     private List<MoviePosterEntity> posters = new ArrayList<>();
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("date ASC")
     private List<MovieRateEntity> ratings = new ArrayList<>();
 
     @Basic
@@ -126,6 +150,7 @@ public class MovieEntity implements Serializable {
     @Basic(optional = false)
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
+    @NotNull
     private DataStatus status;
 
     @Basic
@@ -134,6 +159,8 @@ public class MovieEntity implements Serializable {
 
     @Basic
     @Column(name = "favorite_count", nullable = false)
+    @NotNull
+    @Min(0)
     private Integer favoriteCount;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
@@ -147,7 +174,7 @@ public class MovieEntity implements Serializable {
     @PrePersist
     protected void onCreateMovieEntity() {
         if(this.status == null) {
-            status = DataStatus.WAITING;
+            this.status = DataStatus.WAITING;
         }
         if (this.favoriteCount == null) {
             this.favoriteCount = 0;

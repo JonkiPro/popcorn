@@ -6,7 +6,9 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -28,6 +30,9 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,7 +46,19 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = {"id"})
+@ToString(
+        of = {
+                "id",
+                "status",
+                "field",
+                "userComment",
+                "created",
+                "verificationDate",
+                "verificationComment"
+        },
+        doNotUseGetters = true
+)
 @Entity
 @Table(name = "contributions")
 @EntityListeners(AuditingEntityListener.class)
@@ -61,14 +78,17 @@ public class ContributionEntity implements Serializable {
             }
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contributionSequenceGenerator")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id", nullable = false)
+    @NotNull
     private MovieEntity movie;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
     private UserEntity user;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -79,7 +99,7 @@ public class ContributionEntity implements Serializable {
             }
     )
     @Column(name = "element_id_to_add", nullable = false, updatable = false)
-    private Set<Long> idsToAdd = new HashSet<>();
+    private Set<@Min(1) Long> idsToAdd = new HashSet<>();
 
     @ElementCollection(fetch=FetchType.LAZY)
     @CollectionTable(
@@ -90,7 +110,7 @@ public class ContributionEntity implements Serializable {
     )
     @MapKeyColumn(name = "new_element_id", nullable = false)
     @Column(name = "old_element_id", nullable = false, updatable = false)
-    private Map<Long, Long> idsToUpdate = new HashMap<>();
+    private Map<@NotNull @Min(1) Long, @NotNull @Min(1) Long> idsToUpdate = new HashMap<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
@@ -100,16 +120,18 @@ public class ContributionEntity implements Serializable {
             }
     )
     @Column(name = "element_id_to_delete", nullable = false, updatable = false)
-    private Set<Long> idsToDelete = new HashSet<>();
+    private Set<@Min(1) Long> idsToDelete = new HashSet<>();
 
     @Basic(optional = false)
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
+    @NotNull
     private DataStatus status;
 
     @Basic(optional = false)
     @Column(name = "field", nullable = false)
     @Enumerated(EnumType.STRING)
+    @NotNull
     private MovieField field;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -120,7 +142,8 @@ public class ContributionEntity implements Serializable {
             }
     )
     @Column(nullable = false, updatable = false)
-    private Set<String> sources = new HashSet<>();
+    @NotEmpty
+    private Set<@URL String> sources = new HashSet<>();
 
     @Basic
     @Column(name = "user_comment")
@@ -129,13 +152,14 @@ public class ContributionEntity implements Serializable {
     @Basic(optional = false)
     @Column(name = "created", updatable = false, nullable = false)
     @CreatedDate
+    @Setter(AccessLevel.NONE)
     private Date created;
 
     @Basic
     @Column(name = "verification_date")
     private Date verificationDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "verification_user")
     private UserEntity verificationUser;
 
@@ -146,6 +170,7 @@ public class ContributionEntity implements Serializable {
     @Version
     @Column(name = "entity_version", nullable = false)
     @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private Integer entityVersion;
 
     /**
@@ -161,7 +186,7 @@ public class ContributionEntity implements Serializable {
     @PrePersist
     protected void onCreateContributionEntity() {
         if(this.status == null) {
-            status = DataStatus.WAITING;
+            this.status = DataStatus.WAITING;
         }
     }
 

@@ -116,7 +116,7 @@ public class MessageSearchServiceImpl implements MessageSearchService {
                 = this.messageRepository.findByUniqueIdAndRecipientAndIsVisibleForRecipientTrue(id, user)
                 .orElseThrow(() -> new ResourceNotFoundException("No message found with id " + id));
 
-        if(message.getDateOfRead() == null) {
+        if(!message.getDateOfRead().isPresent()) {
             message.setDateOfRead(new Date());
         }
 

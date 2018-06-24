@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Basic;
@@ -17,6 +18,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,6 +30,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -35,7 +38,8 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = {"id"})
+@ToString(of = {"id", "status", "reportedForUpdate", "reportedForDelete"})
 @Entity
 @Table(name = "movies_info")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -56,15 +60,18 @@ public class MovieInfoEntity implements Serializable {
             }
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "movieInfoSequenceGenerator")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id", nullable = false)
+    @NotNull
     private MovieEntity movie;
 
     @Basic(optional = false)
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
+    @NotNull
     private DataStatus status;
 
     @Basic(optional = false)
@@ -78,6 +85,7 @@ public class MovieInfoEntity implements Serializable {
     @Version
     @Column(name = "entity_version", nullable = false)
     @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private Integer entityVersion;
 
     /**
@@ -86,7 +94,7 @@ public class MovieInfoEntity implements Serializable {
     @PrePersist
     protected void onCreateMovieInfoEntity() {
         if(this.status == null) {
-            status = DataStatus.WAITING;
+            this.status = DataStatus.WAITING;
         }
     }
 

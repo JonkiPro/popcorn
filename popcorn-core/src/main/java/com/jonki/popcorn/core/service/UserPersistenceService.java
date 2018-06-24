@@ -27,10 +27,9 @@ public interface UserPersistenceService {
      * Create user with DTO data.
      *
      * @param registerRequest DTO with user registration data
-     * @return The id of the user created
-     * @throws ResourceConflictException if username or e-mail exists
+     * @throws ResourceConflictException if username or e-mail or uniqueId exists
      */
-    String createUser(
+    void createUser(
             @NotNull @Valid final RegisterRequest registerRequest
     ) throws ResourceConflictException;
 
@@ -98,7 +97,6 @@ public interface UserPersistenceService {
      * @param token New email activation token
      * @throws ResourceNotFoundException if no user found
      */
-    @PreAuthorize("hasRole('ROLE_USER')")
     void updateEmail(
             @NotBlank final String token
     ) throws ResourceNotFoundException;
@@ -164,10 +162,9 @@ public interface UserPersistenceService {
      * Create user admin with DTO data.
      *
      * @param registerRequest DTO with user registration data
-     * @return The id of the user created
-     * @throws ResourceConflictException if username or e-mail exists
+     * @throws ResourceConflictException if username or e-mail or uniqueId exists
      */
-    String createAdmin(
+    void createAdmin(
             final RegisterRequest registerRequest
     ) throws ResourceConflictException;
 }

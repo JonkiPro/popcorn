@@ -64,7 +64,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/api/v1.0/movies")
@@ -220,7 +219,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/titles")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<OtherTitle> getTitles(
+    List<OtherTitle> getTitles(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -234,7 +233,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/releaseDates")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<ReleaseDate> getReleaseDates(
+    List<ReleaseDate> getReleaseDates(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -248,7 +247,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/outlines")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<Outline> getOutlines(
+    List<Outline> getOutlines(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -262,7 +261,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/summaries")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<Summary> getSummaries(
+    List<Summary> getSummaries(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -276,7 +275,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/synopses")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<Synopsis> getSynopses(
+    List<Synopsis> getSynopses(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -290,7 +289,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/boxOffices")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<BoxOffice> getBoxOffices(
+    List<BoxOffice> getBoxOffices(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -304,7 +303,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/sites")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<Site> getSites(
+    List<Site> getSites(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -318,7 +317,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/countries")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<Country> getCountries(
+    List<Country> getCountries(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -332,7 +331,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/languages")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<Language> getLanguages(
+    List<Language> getLanguages(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -346,7 +345,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/genres")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<Genre> getGenres(
+    List<Genre> getGenres(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -360,7 +359,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/reviews")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<Review> getReviews(
+    List<Review> getReviews(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -374,7 +373,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/photos")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<ImageResponse> getPhotos(
+    List<ImageResponse> getPhotos(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -388,7 +387,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/posters")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<ImageResponse> getPosters(
+    List<ImageResponse> getPosters(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -426,7 +425,7 @@ public class MovieRestController {
     @GetMapping(value = "/{id}/ratings")
     @ResponseStatus(HttpStatus.OK)
     public
-    Set<RateResponse> getRatings(
+    List<RateResponse> getRatings(
             @ApiParam(value = "The movie ID", required = true)
             @PathVariable("id") final Long id
     ) {
@@ -450,7 +449,7 @@ public class MovieRestController {
     ) {
         log.info("Called with id {}", id);
 
-        this.moviePersistenceService.setFavoriteQuestion(id);
+        this.moviePersistenceService.setFavoriteMovie(id);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
 
@@ -472,6 +471,6 @@ public class MovieRestController {
     ) {
         log.info("Called with id {}", id);
 
-        this.moviePersistenceService.undoFavoriteQuestion(id);
+        this.moviePersistenceService.undoFavoriteMovie(id);
     }
 }

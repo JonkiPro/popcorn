@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -84,7 +85,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public String createUser(
+    public void createUser(
             @NotNull @Valid final RegisterRequest registerRequest
     ) throws ResourceConflictException {
         log.info("Called with registerRequest {}", registerRequest);
@@ -101,7 +102,11 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
 
         this.mailService.sendMailWithActivationToken(user.getEmail(), user.getActivationToken());
 
-        return this.userRepository.save(user).getUniqueId();
+        try {
+            this.userRepository.save(user);
+        } catch (final DataIntegrityViolationException e) {
+            throw new ResourceConflictException("A user with id " + user.getUniqueId() + " already exists", e);
+        }
     }
 
     /**
@@ -295,7 +300,7 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public String createAdmin(
+    public void createAdmin(
             final RegisterRequest registerRequest
     ) throws ResourceConflictException {
         log.info("Called with registerRequest {}", registerRequest);
@@ -311,7 +316,11 @@ public class UserPersistenceServiceImpl implements UserPersistenceService {
         user.setPermissions(EnumSet.of(UserMoviePermission.ALL));
         user.setEnabled(true);
 
-        return this.userRepository.save(user).getUniqueId();
+        try {
+            this.userRepository.save(user);
+        } catch (final DataIntegrityViolationException e) {
+            throw new ResourceConflictException("A user with id " + user.getUniqueId() + " already exists", e);
+        }
     }
 
     /**

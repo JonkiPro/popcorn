@@ -71,8 +71,8 @@ import java.util.List;
 @Validated
 public class MovieContributionSearchServiceImpl implements MovieContributionSearchService {
 
-    private final MovieRepository movieRepository;
     private final ContributionRepository contributionRepository;
+    private final MovieRepository movieRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -80,16 +80,16 @@ public class MovieContributionSearchServiceImpl implements MovieContributionSear
     /**
      * Constructor.
      *
-     * @param movieRepository The movie repository to use
      * @param contributionRepository The contribution repository to use
+     * @param movieRepository The movie repository to use
      */
     @Autowired
     public MovieContributionSearchServiceImpl(
-            @NotNull final MovieRepository movieRepository,
-            @NotNull final ContributionRepository contributionRepository
+            @NotNull final ContributionRepository contributionRepository,
+            @NotNull final MovieRepository movieRepository
     ) {
-        this.movieRepository = movieRepository;
         this.contributionRepository = contributionRepository;
+        this.movieRepository = movieRepository;
     }
 
     /**
