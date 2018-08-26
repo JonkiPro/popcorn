@@ -190,7 +190,7 @@ public class MovieSpecsUnitTests {
                 MAX_RATING
         );
 
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.otherTitles);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.otherTitles);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -203,7 +203,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(2)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -216,7 +216,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -226,7 +226,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -237,7 +237,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito
@@ -287,7 +287,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(2)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -300,7 +300,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -310,7 +310,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -321,7 +321,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito
@@ -359,7 +359,7 @@ public class MovieSpecsUnitTests {
                 MAX_RATING
         );
 
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.otherTitles);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.otherTitles);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -372,7 +372,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.never())
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(2)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -385,7 +385,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -395,7 +395,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -406,7 +406,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito
@@ -444,7 +444,7 @@ public class MovieSpecsUnitTests {
                 MAX_RATING
         );
 
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.otherTitles);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.otherTitles);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -457,7 +457,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.never())
                 .and(
@@ -470,7 +470,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -480,7 +480,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -491,7 +491,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito
@@ -529,7 +529,7 @@ public class MovieSpecsUnitTests {
                 MAX_RATING
         );
 
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.otherTitles);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.otherTitles);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -542,7 +542,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -555,7 +555,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -565,7 +565,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -576,7 +576,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito
@@ -614,7 +614,7 @@ public class MovieSpecsUnitTests {
                 MAX_RATING
         );
 
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.otherTitles);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.otherTitles);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -627,7 +627,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(2)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -640,7 +640,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.never()).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -650,7 +650,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -661,7 +661,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito
@@ -699,7 +699,7 @@ public class MovieSpecsUnitTests {
                 MAX_RATING
         );
 
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.otherTitles);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.otherTitles);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -712,7 +712,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(2)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -725,7 +725,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -735,7 +735,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.never()).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -746,7 +746,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito
@@ -784,7 +784,7 @@ public class MovieSpecsUnitTests {
                 MAX_RATING
         );
 
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.otherTitles);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.otherTitles);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -797,7 +797,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(2)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -810,7 +810,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -820,7 +820,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -831,7 +831,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(5)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.never()).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito
@@ -869,7 +869,7 @@ public class MovieSpecsUnitTests {
                 MAX_RATING
         );
 
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.otherTitles);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.otherTitles);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -882,7 +882,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(2)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -895,7 +895,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -905,7 +905,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -916,7 +916,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito
@@ -954,7 +954,7 @@ public class MovieSpecsUnitTests {
                 null
         );
 
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.otherTitles);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.otherTitles);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -967,7 +967,7 @@ public class MovieSpecsUnitTests {
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.movieRoot.get(MovieEntity_.type), TYPE);
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.releaseDates);
+        Mockito.verify(this.movieRoot, Mockito.times(2)).join(MovieEntity_.releaseDates);
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .and(
@@ -980,7 +980,7 @@ public class MovieSpecsUnitTests {
                         this.cb.lessThanOrEqualTo(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.date), TO_DATE),
                         this.cb.equal(this.releaseDateEntityJoin.get(MovieReleaseDateEntity_.status), DataStatus.ACCEPTED)
                 );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.countries);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.countries);
         COUNTRIES.forEach(
                 country ->
                         Mockito
@@ -990,7 +990,7 @@ public class MovieSpecsUnitTests {
                                         this.cb.equal(this.countryEntityJoin.get(MovieCountryEntity_.status), DataStatus.ACCEPTED)
                                 )
         );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.languages);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.languages);
         LANGUAGES.forEach(
                 language ->
                         Mockito
@@ -1001,7 +1001,7 @@ public class MovieSpecsUnitTests {
                                 )
 
         );
-        Mockito.verify(this.movieRoot, Mockito.times(6)).join(MovieEntity_.genres);
+        Mockito.verify(this.movieRoot, Mockito.times(1)).join(MovieEntity_.genres);
         GENRES.forEach(
                 genre ->
                         Mockito

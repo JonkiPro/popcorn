@@ -23,6 +23,7 @@ import com.jonki.popcorn.common.dto.search.MovieSearchResult;
 import com.jonki.popcorn.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
@@ -83,6 +84,7 @@ public interface MovieSearchService {
      * @return The movie
      * @throws ResourceNotFoundException if no movie found or no user found
      */
+    @PreAuthorize("hasRole('ROLE_USER')")
     UserMovie getUserMovie(
             @Min(1) final Long id
     ) throws ResourceNotFoundException;

@@ -50,7 +50,7 @@ public class MovieInfoEntity implements Serializable {
 
     @Id
     @Basic(optional = false)
-    @Column(unique = true, nullable = false, updatable = false)
+    @Column(name = "id", unique = true, nullable = false, updatable = false)
     @GenericGenerator(
             name = "movieInfoSequenceGenerator", strategy = "enhanced-sequence",
             parameters = {

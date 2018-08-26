@@ -55,7 +55,7 @@ public class MovieRateEntity extends IdEntity {
     private Integer rate;
 
     @Basic(optional = false)
-    @Column(nullable = false)
+    @Column(name = "date", nullable = false)
     @CreatedDate
     @LastModifiedDate
     @Setter(AccessLevel.NONE)

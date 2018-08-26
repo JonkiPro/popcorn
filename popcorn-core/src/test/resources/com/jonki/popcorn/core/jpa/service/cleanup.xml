@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <users/>
+    <movies/>
+    <contributions/>
+    <contributions_ids_to_add/>
+    <contributions_ids_to_delete/>
+    <contributions_ids_to_update/>
+    <contributions_sources/>
+    <movies_ratings/>
+    <users_authorities/>
+    <users_movie_permissions/>
+    <users_favorites_movies/>
+    <users_friends/>
+    <users_received_invitations/>
+    <users_sent_invitations/>
+    <movies_info/>
+    <messages/>
+</dataset>

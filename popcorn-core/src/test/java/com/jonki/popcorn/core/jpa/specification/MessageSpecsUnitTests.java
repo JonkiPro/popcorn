@@ -78,10 +78,10 @@ public class MessageSpecsUnitTests {
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(MessageEntity_.sender), USER);
         Mockito
-                .verify(this.cb, Mockito.times(2))
+                .verify(this.cb, Mockito.times(1))
                 .like(this.cb.upper(this.root.get(MessageEntity_.subject)), "%" + SUBJECT.toUpperCase() + "%");
         Mockito
-                .verify(this.cb, Mockito.times(2))
+                .verify(this.cb, Mockito.times(1))
                 .like(this.cb.upper(this.root.get(MessageEntity_.text)), "%" + TEXT.toUpperCase() + "%");
         Mockito
                 .verify(this.cb, Mockito.times(1))
@@ -101,7 +101,7 @@ public class MessageSpecsUnitTests {
                 .equal(this.root.get(MessageEntity_.sender), USER);
         Mockito
                 .verify(this.cb, Mockito.never())
-                .like(this.root.get(MessageEntity_.subject), "%" + SUBJECT.toUpperCase() + "%");
+                .like(this.cb.upper(this.root.get(MessageEntity_.subject)), "%" + SUBJECT.toUpperCase() + "%");
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .like(this.cb.upper(this.root.get(MessageEntity_.text)), "%" + TEXT.toUpperCase() + "%");
@@ -115,7 +115,7 @@ public class MessageSpecsUnitTests {
      */
     @Test
     public void testFindAllSentMessagesForUserWithOutText() {
-        final Specification<MessageEntity> spec = MessageSpecs.findSentMessagesForUser(USER, null, TEXT);
+        final Specification<MessageEntity> spec = MessageSpecs.findSentMessagesForUser(USER, SUBJECT, null);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito
@@ -126,7 +126,7 @@ public class MessageSpecsUnitTests {
                 .like(this.cb.upper(this.root.get(MessageEntity_.subject)), "%" + SUBJECT.toUpperCase() + "%");
         Mockito
                 .verify(this.cb, Mockito.never())
-                .like(this.root.get(MessageEntity_.text), "%" + TEXT.toUpperCase() + "%");
+                .like(this.cb.upper(this.root.get(MessageEntity_.text)), "%" + TEXT.toUpperCase() + "%");
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .isTrue(this.root.get(MessageEntity_.isVisibleForSender));
@@ -144,10 +144,10 @@ public class MessageSpecsUnitTests {
                 .verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(MessageEntity_.recipient), USER);
         Mockito
-                .verify(this.cb, Mockito.times(2))
+                .verify(this.cb, Mockito.times(1))
                 .like(this.cb.upper(this.root.get(MessageEntity_.subject)), "%" + SUBJECT.toUpperCase() + "%");
         Mockito
-                .verify(this.cb, Mockito.times(2))
+                .verify(this.cb, Mockito.times(1))
                 .like(this.cb.upper(this.root.get(MessageEntity_.text)), "%" + TEXT.toUpperCase() + "%");
         Mockito
                 .verify(this.cb, Mockito.times(1))
@@ -167,7 +167,7 @@ public class MessageSpecsUnitTests {
                 .equal(this.root.get(MessageEntity_.recipient), USER);
         Mockito
                 .verify(this.cb, Mockito.never())
-                .like(this.root.get(MessageEntity_.subject), "%" + SUBJECT.toUpperCase() + "%");
+                .like(this.cb.upper(this.root.get(MessageEntity_.subject)), "%" + SUBJECT.toUpperCase() + "%");
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .like(this.cb.upper(this.root.get(MessageEntity_.text)), "%" + TEXT.toUpperCase() + "%");
@@ -181,7 +181,7 @@ public class MessageSpecsUnitTests {
      */
     @Test
     public void testFindAllReceivedMessagesForUserWithOutText() {
-        final Specification<MessageEntity> spec = MessageSpecs.findReceivedMessagesForUser(USER, null, TEXT);
+        final Specification<MessageEntity> spec = MessageSpecs.findReceivedMessagesForUser(USER, SUBJECT, null);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito
@@ -192,7 +192,7 @@ public class MessageSpecsUnitTests {
                 .like(this.cb.upper(this.root.get(MessageEntity_.subject)), "%" + SUBJECT.toUpperCase() + "%");
         Mockito
                 .verify(this.cb, Mockito.never())
-                .like(this.root.get(MessageEntity_.text), "%" + TEXT.toUpperCase() + "%");
+                .like(this.cb.upper(this.root.get(MessageEntity_.text)), "%" + TEXT.toUpperCase() + "%");
         Mockito
                 .verify(this.cb, Mockito.times(1))
                 .isTrue(this.root.get(MessageEntity_.isVisibleForRecipient));

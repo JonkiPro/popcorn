@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <users
+        id="1"
+        username="jonki1"
+        email="jonki1@gmail.com"
+        password="$2a$12$O02MQJS6AnCJiRw1nF6XsO7udBCza591oUKUbRC4/XrUmPXZaSjVK"
+        enabled="true"
+        created="2018-07-07 13:00:00"
+        modified_date="2018-07-07 13:00:00"
+        unique_id="user1"
+        entity_version="0"
+    />
+    <users_authorities
+        user_id="1"
+        authority="ROLE_USER"
+    />
+    <users_friends
+        user_id="1"
+        user_friend_id="2"
+    />
+    <users_friends
+        user_id="1"
+        user_friend_id="3"
+    />
+    <users_sent_invitations
+        user_id="1"
+        user_invited_id="4"
+        invitation_order="0"
+    />
+    <users_received_invitations
+        user_invited_id="1"
+        user_id="5"
+        invitation_order="0"
+    />
+
+    <users
+        id="2"
+        username="jonki2"
+        email="jonki2@gmail.com"
+        password="$2a$12$O02MQJS6AnCJiRw1nF6XsO7udBCza591oUKUbRC4/XrUmPXZaSjVK"
+        enabled="true"
+        created="2018-07-07 13:00:00"
+        modified_date="2018-07-07 13:00:00"
+        unique_id="user2"
+        entity_version="0"
+    />
+    <users_authorities
+        user_id="2"
+        authority="ROLE_USER"
+    />
+    <users_friends
+        user_id="2"
+        user_friend_id="1"
+    />
+
+    <users
+        id="3"
+        username="jonki3"
+        email="jonki3@gmail.com"
+        password="$2a$12$O02MQJS6AnCJiRw1nF6XsO7udBCza591oUKUbRC4/XrUmPXZaSjVK"
+        enabled="true"
+        created="2018-07-07 13:00:00"
+        modified_date="2018-07-07 13:00:00"
+        unique_id="user3"
+        entity_version="0"
+    />
+    <users_authorities
+        user_id="3"
+        authority="ROLE_USER"
+    />
+    <users_friends
+        user_id="3"
+        user_friend_id="1"
+    />
+
+    <users
+        id="4"
+        username="jonki4"
+        email="jonki4@gmail.com"
+        password="$2a$12$O02MQJS6AnCJiRw1nF6XsO7udBCza591oUKUbRC4/XrUmPXZaSjVK"
+        enabled="true"
+        created="2018-07-07 13:00:00"
+        modified_date="2018-07-07 13:00:00"
+        unique_id="user4"
+        entity_version="0"
+    />
+    <users_authorities
+        user_id="4"
+        authority="ROLE_USER"
+    />
+    <users_received_invitations
+        user_invited_id="4"
+        user_id="1"
+        invitation_order="0"
+    />
+
+    <users
+        id="5"
+        username="jonki5"
+        email="jonki5@gmail.com"
+        password="$2a$12$O02MQJS6AnCJiRw1nF6XsO7udBCza591oUKUbRC4/XrUmPXZaSjVK"
+        enabled="true"
+        created="2018-07-07 13:00:00"
+        modified_date="2018-07-07 13:00:00"
+        unique_id="user5"
+        entity_version="0"
+    />
+    <users_authorities
+        user_id="5"
+        authority="ROLE_USER"
+    />
+    <users_sent_invitations
+        user_id="5"
+        user_invited_id="1"
+        invitation_order="0"
+    />
+
+    <users
+        id="6"
+        username="jonki6"
+        email="jonki6@gmail.com"
+        password="$2a$12$O02MQJS6AnCJiRw1nF6XsO7udBCza591oUKUbRC4/XrUmPXZaSjVK"
+        enabled="false"
+        created="2018-07-07 13:00:00"
+        modified_date="2018-07-07 13:00:00"
+        unique_id="user6"
+        entity_version="0"
+    />
+    <users_authorities
+        user_id="6"
+        authority="ROLE_USER"
+    />
+</dataset>

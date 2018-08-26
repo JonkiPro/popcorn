@@ -18,6 +18,7 @@ dependencies {
 	compile("org.springframework.boot:spring-boot-configuration-processor")
 	compile("org.eclipse.persistence:org.eclipse.persistence.jpa")
 	compile("org.eclipse.persistence:org.eclipse.persistence.jpa.modelgen.processor")
+	compile("javax.servlet:javax.servlet-api")
 	compile("com.google.api-client:google-api-client")
 	compile("com.google.oauth-client:google-oauth-client-jetty")
 	compile("com.google.apis:google-api-services-drive")
@@ -39,6 +40,8 @@ dependencies {
 	 *******************************/
 
 	testCompile(project(":popcorn-test"))
+	testCompile("com.github.springtestdbunit:spring-test-dbunit")
+	testCompile("org.dbunit:dbunit")
 }
 
 //Ignore the metamodel classes from all our style/coverage/bug finding tools
