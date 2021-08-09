@@ -31,11 +31,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.util.ResourceBundle;
 
+/**
+ * REST end-point for supporting User registration.
+ */
 @RestController
 @PreAuthorize("hasRole('ROLE_ANONYMOUS')")
 @RequestMapping(value = "/api/v1.0/register")
@@ -66,6 +70,13 @@ public class RegisterRestController {
         this.reCaptchaProperties = reCaptchaProperties;
     }
 
+    /**
+     * Create an User.
+     *
+     * @param registerRequest The user to create
+     * @param uriComponentsBuilder Builder for {@link UriComponents}
+     * @return The created user
+     */
     @ApiOperation(value = "Register the user")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the form or the username or e-mail exists"),
@@ -92,6 +103,11 @@ public class RegisterRestController {
         return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
+    /**
+     * Activate the user with the given token.
+     *
+     * @param token Activation token user account
+     */
     @ApiOperation(value = "Activate the user with token")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "Token not found") })
     @PutMapping(value = "/token/{token}")

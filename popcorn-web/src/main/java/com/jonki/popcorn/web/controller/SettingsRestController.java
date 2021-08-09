@@ -33,6 +33,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.util.ResourceBundle;
 
+/**
+ * REST end-point for supporting User settings.
+ */
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping(value = "/api/v1.0/users/account/update")
@@ -63,6 +66,11 @@ public class SettingsRestController {
         this.authorizationService = authorizationService;
     }
 
+    /**
+     * Update the user's e-mail.
+     *
+     * @param changeEmailRequest DTO with data to update the user's e-mail
+     */
     @ApiOperation(value = "It changes the user's email and sends a token to the mail")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the form"),
@@ -83,6 +91,11 @@ public class SettingsRestController {
         this.userPersistenceService.updateNewEmail(changeEmailRequest);
     }
 
+    /**
+     * Update the user's password.
+     *
+     * @param changePasswordRequest DTO with data to update the user's password
+     */
     @ApiOperation(value = "It changes the user's password")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the form or password is incorrect"),
@@ -102,6 +115,11 @@ public class SettingsRestController {
         this.userPersistenceService.updatePassword(changePasswordRequest);
     }
 
+    /**
+     * Update the user's avatar.
+     *
+     * @param avatar The new user avatar
+     */
     @ApiOperation(value = "It changes the user's avatar")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No user found"),
@@ -120,6 +138,11 @@ public class SettingsRestController {
         this.userPersistenceService.updateAvatar(MultipartFileUtils.convert(avatar));
     }
 
+    /**
+     * Update the user's new email as up-to-date using the token.
+     *
+     * @param token Token updating the user's new e-mail as up-to-date
+     */
     @ApiOperation(value = "Activates e-mail change with token")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "Token not found") })
     @PreAuthorize("permitAll()")

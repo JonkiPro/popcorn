@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST end-point for supporting User relationships.
+ */
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping(value = "/api/v1.0/relations")
@@ -44,6 +47,11 @@ public class UserRelationRestController {
         this.userPersistenceService = userPersistenceService;
     }
 
+    /**
+     * Add a user to friends.
+     *
+     * @param username The user's name you want to add to friends. Not null/empty/blank
+     */
     @ApiOperation(value = "Add friend")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No user found or no invitation found"),
@@ -63,6 +71,11 @@ public class UserRelationRestController {
         this.userPersistenceService.addFriend(user.getId());
     }
 
+    /**
+     * Delete a friend (User) from friends.
+     *
+     * @param username The user's name you want to delete from friends list. Not null/empty/blank
+     */
     @ApiOperation(value = "Remove friend")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found or no friendship found") })
     @DeleteMapping(value = "/friends/{username}")
@@ -79,6 +92,11 @@ public class UserRelationRestController {
         this.userPersistenceService.removeFriend(user.getId());
     }
 
+    /**
+     * Add a user to the list of invited users to friends.
+     *
+     * @param username The user's name you want to add to invited users. Not null/empty/blank
+     */
     @ApiOperation(value = "Create an invitation")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No user found"),
@@ -98,6 +116,12 @@ public class UserRelationRestController {
         this.userPersistenceService.addInvitation(user.getId());
     }
 
+    /**
+     * Delete a sent invitation (User) from sent invitations.
+     *
+     * @param username The user's name you want to delete from the list of sent invitations to friends.
+     *                Not null/empty/blank
+     */
     @ApiOperation(value = "Delete invitation")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found or no invitation found") })
     @DeleteMapping(value = "/invitations/{username}")
@@ -114,6 +138,12 @@ public class UserRelationRestController {
         this.userPersistenceService.removeInvitation(user.getId());
     }
 
+    /**
+     * Delete a received invitation (User) from received invitations.
+     *
+     * @param username The user's name you want to delete from the list of received invitations to friends.
+     *                Not null/empty/blank
+     */
     @ApiOperation(value = "Reject invitation")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found or no invitation found") })
     @DeleteMapping(value = "/invitations/{username}/reject")

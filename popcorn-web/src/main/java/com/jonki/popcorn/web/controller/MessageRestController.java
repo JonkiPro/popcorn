@@ -44,6 +44,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+/**
+ * REST end-point for supporting Messages.
+ */
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping(value = "/api/v1.0/messages")
@@ -86,6 +89,13 @@ public class MessageRestController {
         this.messageReceivedResourceAssembler = messageReceivedResourceAssembler;
     }
 
+    /**
+     * Create an Message.
+     *
+     * @param messageRequest The message to create
+     * @param uriComponentsBuilder Builder for {@link UriComponents}
+     * @return The created message
+     */
     @ApiOperation(value = "Create a message")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the form"),
@@ -115,6 +125,12 @@ public class MessageRestController {
         return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
+    /**
+     * Get MessageSent for given id.
+     *
+     * @param id The unique id for message
+     * @return The sent message
+     */
     @ApiOperation(value = "Get sent message by ID")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No message found or no user found") })
     @GetMapping(value = "/sent/{id}", produces = MediaTypes.HAL_JSON_VALUE)
@@ -129,6 +145,12 @@ public class MessageRestController {
         return this.messageSentResourceAssembler.toResource(this.messageSearchService.getMessageSent(id));
     }
 
+    /**
+     * Get MessageReceived for given id.
+     *
+     * @param id The unique id for message
+     * @return The received message
+     */
     @ApiOperation(value = "Get received message by ID")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No message found or no user found") })
     @GetMapping(value = "/received/{id}", produces = MediaTypes.HAL_JSON_VALUE)
@@ -143,6 +165,11 @@ public class MessageRestController {
         return this.messageReceivedResourceAssembler.toResource(this.messageSearchService.getMessageReceived(id));
     }
 
+    /**
+     * Delete an sent message from database.
+     *
+     * @param id The unique id of message to delete
+     */
     @ApiOperation(value = "Delete sent message by ID")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No message found") })
     @DeleteMapping(value = "/sent/{id}")
@@ -157,6 +184,11 @@ public class MessageRestController {
         this.messagePersistenceService.deleteMessageSent(id);
     }
 
+    /**
+     * Delete an received message from database.
+     *
+     * @param id The unique id of message to delete
+     */
     @ApiOperation(value = "Delete received message by ID")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No message found") })
     @DeleteMapping(value = "/received/{id}")
@@ -171,6 +203,12 @@ public class MessageRestController {
         this.messagePersistenceService.deleteMessageReceived(id);
     }
 
+    /**
+     * Get sent messages based on user parameters.
+     *
+     * @param q Phrase to search in the title and content of the message (optional)
+     * @return All sent messages matching the criteria
+     */
     @ApiOperation(value = "Get sent messages")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
     @GetMapping(value = "/sent", produces = MediaTypes.HAL_JSON_VALUE)
@@ -188,6 +226,12 @@ public class MessageRestController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get received messages based on user parameters.
+     *
+     * @param q Phrase to search in the title and content of the message (optional)
+     * @return All received messages matching the criteria
+     */
     @ApiOperation(value = "Get received messages")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
     @GetMapping(value = "/received", produces = MediaTypes.HAL_JSON_VALUE)

@@ -39,6 +39,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * REST end-point for supporting Users.
+ */
 @RestController
 @RequestMapping(value = "/api/v1.0/users")
 @Slf4j
@@ -71,6 +74,14 @@ public class UserRestController {
         this.userSearchResultResourceAssembler = userSearchResultResourceAssembler;
     }
 
+    /**
+     * Get users for given filter criteria.
+     *
+     * @param q Phrase to search in the user's name (optional)
+     * @param page The page to get
+     * @param assembler The paged resources assembler to use
+     * @return All users matching the criteria
+     */
     @ApiOperation(value = "Find users")
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -100,6 +111,12 @@ public class UserRestController {
         ), this.userSearchResultResourceAssembler, self);
     }
 
+    /**
+     * Get User for given id.
+     *
+     * @param username The user's name
+     * @return The user
+     */
     @ApiOperation(value = "Get user profile by username")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
     @GetMapping(value = "/{username}", produces = MediaTypes.HAL_JSON_VALUE)
@@ -114,6 +131,12 @@ public class UserRestController {
         return this.userResourceAssembler.toResource(this.userSearchService.getUserByUsername(username));
     }
 
+    /**
+     * Get all the friends (Users) for a given user.
+     *
+     * @param username The user's name. Not null/empty/blank
+     * @return The list of friends
+     */
     @ApiOperation(value = "Get user friends")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
     @GetMapping(value = "/{username}/friends", produces = MediaTypes.HAL_JSON_VALUE)
@@ -133,6 +156,13 @@ public class UserRestController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get all the invitations (Users) for a given user.
+     *
+     * @param username The user's name. Not null/empty/blank
+     * @param outgoing True, if invitations sent. False, if invitations received (optional, default false)
+     * @return The list of invitations
+     */
     @ApiOperation(value = "Get user invitations")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -157,6 +187,12 @@ public class UserRestController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get the status of a relationship with a user with the given name.
+     *
+     * @param username The user's name. Not null/empty/blank
+     * @return The status of a relationship
+     */
     @ApiOperation(value = "Get the relationship status between users")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
     @PreAuthorize("hasRole('ROLE_USER')")

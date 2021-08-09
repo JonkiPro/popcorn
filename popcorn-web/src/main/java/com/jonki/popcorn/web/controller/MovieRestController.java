@@ -65,6 +65,9 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * REST end-point for supporting Movies.
+ */
 @RestController
 @RequestMapping(value = "/api/v1.0/movies")
 @Slf4j
@@ -101,6 +104,12 @@ public class MovieRestController {
         this.movieSearchResultResourceAssembler = movieSearchResultResourceAssembler;
     }
 
+    /**
+     * Create an Movie.
+     *
+     * @param movieRequest The movie to create
+     * @return The created movie
+     */
     @ApiOperation(value = "Create a new movie")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No user found") })
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -120,6 +129,12 @@ public class MovieRestController {
         return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
+    /**
+     * Update the movie's status.
+     *
+     * @param id The movie ID
+     * @param status Verification status for the movie
+     */
     @ApiOperation(value = "Update the movie status")
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "No permissions"),
@@ -140,6 +155,22 @@ public class MovieRestController {
         this.moviePersistenceService.updateMovieStatus(id, status);
     }
 
+    /**
+     * Get movies for given filter criteria.
+     *
+     * @param title The title of the movie (optional)
+     * @param type The type of the movie (optional)
+     * @param fromDate Release date range "from" (optional)
+     * @param toDate Release date range "to" (optional)
+     * @param countries List of countries (optional)
+     * @param languages List of languages (optional)
+     * @param genres List of genres (optional)
+     * @param minRating Min. movie rating (optional)
+     * @param maxRating Max. movie rating (optional)
+     * @param page The page to get
+     * @param assembler The paged resources assembler to use
+     * @return All movies matching the criteria
+     */
     @ApiOperation(value = "Find movies")
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -197,6 +228,12 @@ public class MovieRestController {
         ), this.movieSearchResultResourceAssembler, self);
     }
 
+    /**
+     * Get Movie for given id.
+     *
+     * @param id The movie ID
+     * @return The movie
+     */
     @ApiOperation(value = "Get movie")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found or no user found") })
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
@@ -214,6 +251,12 @@ public class MovieRestController {
         }
     }
 
+    /**
+     * Get all the titles for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of titles
+     */
     @ApiOperation(value = "Get movie titles")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/titles")
@@ -228,6 +271,12 @@ public class MovieRestController {
         return this.movieSearchService.getTitles(id);
     }
 
+    /**
+     * Get all the release dates for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of release dates
+     */
     @ApiOperation(value = "Get movie release dates")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/releaseDates")
@@ -242,6 +291,12 @@ public class MovieRestController {
         return this.movieSearchService.getReleaseDates(id);
     }
 
+    /**
+     * Get all the outlines for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of outlines
+     */
     @ApiOperation(value = "Get movie outlines")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/outlines")
@@ -256,6 +311,12 @@ public class MovieRestController {
         return this.movieSearchService.getOutlines(id);
     }
 
+    /**
+     * Get all the summaries for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of summaries
+     */
     @ApiOperation(value = "Get movie summaries")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/summaries")
@@ -270,6 +331,12 @@ public class MovieRestController {
         return this.movieSearchService.getSummaries(id);
     }
 
+    /**
+     * Get all the synopses for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of synopses
+     */
     @ApiOperation(value = "Get movie synopses")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/synopses")
@@ -284,6 +351,12 @@ public class MovieRestController {
         return this.movieSearchService.getSynopses(id);
     }
 
+    /**
+     * Get all the box offices for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of box offices
+     */
     @ApiOperation(value = "Get movie box offices")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/boxOffices")
@@ -298,6 +371,12 @@ public class MovieRestController {
         return this.movieSearchService.getBoxOffices(id);
     }
 
+    /**
+     * Get all the sites for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of sites
+     */
     @ApiOperation(value = "Get movie sites")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/sites")
@@ -312,6 +391,12 @@ public class MovieRestController {
         return this.movieSearchService.getSites(id);
     }
 
+    /**
+     * Get all the countries for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of countries
+     */
     @ApiOperation(value = "Get movie countries")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/countries")
@@ -326,6 +411,12 @@ public class MovieRestController {
         return this.movieSearchService.getCountries(id);
     }
 
+    /**
+     * Get all the languages for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of languages
+     */
     @ApiOperation(value = "Get movie languages")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/languages")
@@ -340,6 +431,12 @@ public class MovieRestController {
         return this.movieSearchService.getLanguages(id);
     }
 
+    /**
+     * Get all the genres for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of genres
+     */
     @ApiOperation(value = "Get movie genres")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/genres")
@@ -354,6 +451,12 @@ public class MovieRestController {
         return this.movieSearchService.getGenres(id);
     }
 
+    /**
+     * Get all the reviews for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of reviews
+     */
     @ApiOperation(value = "Get movie reviews")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/reviews")
@@ -368,6 +471,12 @@ public class MovieRestController {
         return this.movieSearchService.getReviews(id);
     }
 
+    /**
+     * Get all the photos for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of photos
+     */
     @ApiOperation(value = "Get movie photos")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/photos")
@@ -382,6 +491,12 @@ public class MovieRestController {
         return this.movieSearchService.getPhotos(id);
     }
 
+    /**
+     * Get all the posters for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of posters
+     */
     @ApiOperation(value = "Get movie posters")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/posters")
@@ -396,6 +511,13 @@ public class MovieRestController {
         return this.movieSearchService.getPosters(id);
     }
 
+    /**
+     * Create a rating for the movie.
+     *
+     * @param id The movie ID
+     * @param rateRequest Rating for the movie
+     * @return The created rating
+     */
     @ApiOperation(value = "RateRequest the movie")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No movie found"),
@@ -420,6 +542,12 @@ public class MovieRestController {
         return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
+    /**
+     * Get all the ratings for a given movie.
+     *
+     * @param id The movie ID
+     * @return The list of ratings
+     */
     @ApiOperation(value = "Get ratings")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/ratings")
@@ -434,6 +562,11 @@ public class MovieRestController {
         return this.movieSearchService.getRatings(id);
     }
 
+    /**
+     * Add a movie to favorites.
+     *
+     * @param id The movie ID you want to add to favorites. Not null/empty/blank
+     */
     @ApiOperation(value = "Add a movie to your favourites list")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No movie found"),
@@ -456,6 +589,11 @@ public class MovieRestController {
         return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
     }
 
+    /**
+     * Delete a movie from favorites.
+     *
+     * @param id The movie ID you want to delete from favorites list. Not null/empty/blank
+     */
     @ApiOperation(value = "Remove a movie from your favourites list")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No movie found"),

@@ -30,6 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.ResourceBundle;
 
+/**
+ * REST end-point for supporting User data recovery.
+ */
 @RestController
 @PreAuthorize("hasRole('ROLE_ANONYMOUS')")
 @RequestMapping(value = "/api/v1.0/users/attributes")
@@ -60,6 +63,11 @@ public class ForgotRestController {
         this.mailService = mailService;
     }
 
+    /**
+     * Recover username and send it to the e-mail address.
+     *
+     * @param forgotUsernameRequest DTO with data to recover the username
+     */
     @ApiOperation(value = "Recover username and send it to the e-mail address")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the form or the user with such an e-mail doesn't exist"),
@@ -81,6 +89,11 @@ public class ForgotRestController {
         this.mailService.sendMailWithUsername(user.getEmail(), user.getUsername());
     }
 
+    /**
+     * Generate a new password for the user and send it to the e-mail address.
+     *
+     * @param forgotPasswordRequest DTO with data to generate a new password
+     */
     @ApiOperation(value = "Generate a new password for the user and send it to the e-mail address")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the form"),

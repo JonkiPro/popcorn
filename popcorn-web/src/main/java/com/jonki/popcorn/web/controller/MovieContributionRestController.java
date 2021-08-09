@@ -71,6 +71,9 @@ import java.util.Set;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+/**
+ * REST end-point for supporting Movie Contributions.
+ */
 @RestController
 @RequestMapping(value = "/api/v1.0/movies")
 @Slf4j
@@ -99,6 +102,13 @@ public class MovieContributionRestController {
         this.contributionSearchResultResourceAssembler = contributionSearchResultResourceAssembler;
     }
 
+    /**
+     * Update the contribution's status.
+     *
+     * @param id The contribution ID
+     * @param status Verification status for the contribution
+     * @param comment Comment on the contribution (optional)
+     */
     @ApiOperation(value = "Update the contribution status")
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "No permissions"),
@@ -121,6 +131,18 @@ public class MovieContributionRestController {
         this.movieContributionPersistenceService.updateContributionStatus(id, status, comment);
     }
 
+    /**
+     * Get contributions for given filter criteria.
+     *
+     * @param id The movie ID
+     * @param field The movie field (optional)
+     * @param status The contribution status (optional)
+     * @param fromDate Creation date range "from" (optional)
+     * @param toDate Creation date range "to" (optional)
+     * @param page The page to get
+     * @param assembler The paged resources assembler to use
+     * @return All contributions matching the criteria
+     */
     @ApiOperation(value = "Find contributions")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No movie found") })
     @GetMapping(value = "/{id}/contributions", produces = MediaTypes.HAL_JSON_VALUE)
@@ -131,7 +153,7 @@ public class MovieContributionRestController {
             @PathVariable("id") final Long id,
             @ApiParam(value = "The movie field")
             @RequestParam(value = "field", required = false) final MovieField field,
-            @ApiParam(value = "The data status")
+            @ApiParam(value = "The contribution status")
             @RequestParam(value = "status", required = false) final DataStatus status,
             @ApiParam(value = "Creation date range \"from\"")
             @RequestParam(value = "fromDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") final Date fromDate,
@@ -164,6 +186,12 @@ public class MovieContributionRestController {
         ), this.contributionSearchResultResourceAssembler, self);
     }
 
+    /**
+     * Get Movie Contribution for given id.
+     *
+     * @param id The contribution ID
+     * @return The contribution
+     */
     @ApiOperation(value = "Get the contribution of titles")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "No contribution found") })
     @GetMapping(value = "/contributions/{id}/othertitles", produces = MediaTypes.HAL_JSON_VALUE)
@@ -184,6 +212,13 @@ public class MovieContributionRestController {
         return new ContributionResource<>(otherTitleContribution, self);
     }
 
+    /**
+     * Create an Contribution with titles.
+     *
+     * @param id The movie ID for which you want to add a contribution
+     * @param contribution Contribution with titles for the movie
+     * @return The created contribution
+     */
     @ApiOperation(value = "Create the contribution of titles")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Incorrect data in the DTO"),
